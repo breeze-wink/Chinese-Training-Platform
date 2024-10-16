@@ -9,6 +9,7 @@ import java.util.List;
 public interface KnowledgePointMapper {
 
     @Insert("INSERT INTO knowledge_point(name, description, course_standard_id) VALUES(#{name}, #{description}, #{courseStandardId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(KnowledgePoint point);
 
     @Delete("DELETE FROM knowledge_point WHERE id = #{id}")
@@ -22,4 +23,5 @@ public interface KnowledgePointMapper {
 
     @Select("SELECT * FROM knowledge_point")
     List<KnowledgePoint> selectAll();
+
 }
