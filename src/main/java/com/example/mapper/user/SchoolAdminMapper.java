@@ -8,6 +8,7 @@ import java.util.List;
 public interface SchoolAdminMapper {
 
     @Insert("INSERT INTO school_admin(username, password, email, school_id) VALUES(#{username}, #{password}, #{email}, #{schoolId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(SchoolAdmin admin);
 
     @Delete("DELETE FROM school_admin WHERE id = #{id}")

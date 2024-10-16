@@ -9,6 +9,7 @@ import java.util.List;
 public interface SystemAdminMapper {
 
     @Insert("INSERT INTO system_admin(username, password, email) VALUES(#{username}, #{password}, #{email})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(SystemAdmin admin);
 
     @Delete("DELETE FROM system_admin WHERE id = #{id}")

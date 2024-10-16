@@ -9,6 +9,7 @@ import java.util.List;
 public interface PracticeAnswerMapper {
 
     @Insert("INSERT INTO practice_answer(practice_record_id, question_id, answer_content, score, feedback) VALUES(#{practiceRecordId}, #{questionId}, #{answerContent}, #{score}, #{feedback})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(PracticeAnswer answer);
 
     @Delete("DELETE FROM practice_answer WHERE id = #{id}")

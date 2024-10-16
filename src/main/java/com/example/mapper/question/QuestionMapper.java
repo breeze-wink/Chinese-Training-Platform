@@ -9,6 +9,7 @@ import java.util.List;
 public interface QuestionMapper {
 
     @Insert("INSERT INTO question(content, type, options, answer, knowledge_point_id, creator_id) VALUES(#{content}, #{type}, #{options}, #{answer}, #{knowledgePointId}, #{creatorId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Question question);
 
     @Delete("DELETE FROM question WHERE id = #{id}")
