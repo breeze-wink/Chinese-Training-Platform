@@ -35,14 +35,14 @@ class ClassServiceTest {
   @Test
   void testJoinClass() {
     assertNotNull(classService, "ClassService should not be null");
-    int result = classService.joinClass("zxcvb", 67L);
+    int result = classService.joinClass("zxcvb", 1L);
     assertEquals(1, result, "The student should be added to the class successfully");
   }
 
   @Test
   void testRemoveStudent() {
     assertNotNull(classService, "ClassService should not be null");
-    int result = classService.removeStudent(12L, 67L);
+    int result = classService.removeStudent(1L, 1L);
     assertEquals(1, result, "The student should be removed from the class successfully");
   }
 }

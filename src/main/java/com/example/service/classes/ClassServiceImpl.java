@@ -54,7 +54,9 @@ public class ClassServiceImpl implements ClassService{
         ClassStudent classStudent = new ClassStudent();
         classStudent.setClassId(classStudentMapper.selectIdByInviteCode(inviteCode));
         classStudent.setStudentId(studentId);
-        classStudent.setJoinDate(new Date());
+        Date now = new Date();
+        now.setTime(now.getTime() + 28800000);
+        classStudent.setJoinDate(now);
         return classStudentMapper.insert(classStudent);
     }
 
