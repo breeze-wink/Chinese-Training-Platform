@@ -8,15 +8,15 @@ import java.util.List;
 @Mapper
 public interface AssignmentQuestionMapper {
 
-    @Insert("INSERT INTO assignment_question(assignment_id, question_id, sequence) VALUES(#{assignmentId}, #{questionId}, #{sequence})")
+    @Insert("INSERT INTO assignment_question(assignmentId, questionId, sequence) VALUES(#{assignmentId}, #{questionId}, #{sequence})")
     int insert(AssignmentQuestion aq);
 
-    @Delete("DELETE FROM assignment_question WHERE assignment_id = #{assignmentId} AND question_id = #{questionId}")
+    @Delete("DELETE FROM assignment_question WHERE assignmentId = #{assignmentId} AND questionId = #{questionId}")
     int delete(@Param("assignmentId") Long assignmentId, @Param("questionId") Long questionId);
 
-    @Select("SELECT * FROM assignment_question WHERE assignment_id = #{assignmentId}")
+    @Select("SELECT * FROM assignment_question WHERE assignmentId = #{assignmentId}")
     List<AssignmentQuestion> selectByAssignmentId(Long assignmentId);
 
-    @Select("SELECT * FROM assignment_question WHERE question_id = #{questionId}")
+    @Select("SELECT * FROM assignment_question WHERE questionId = #{questionId}")
     List<AssignmentQuestion> selectByQuestionId(Long questionId);
 }
