@@ -8,13 +8,13 @@ import java.util.List;
 @Mapper
 public interface AuthorizationCodeMapper {
 
-    @Insert("INSERT INTO authorization_code(code, school_id, expiration_date, usage_limit) VALUES(#{code}, #{schoolId}, #{expirationDate}, #{usageLimit})")
+    @Insert("INSERT INTO authorization_code(code, schoolId, expirationDate, usageLimit) VALUES(#{code}, #{schoolId}, #{expirationDate}, #{usageLimit})")
     int insert(AuthorizationCode code);
 
     @Delete("DELETE FROM authorization_code WHERE code = #{code}")
     int delete(String code);
 
-    @Update("UPDATE authorization_code SET school_id = #{schoolId}, expiration_date = #{expirationDate}, usage_limit = #{usageLimit} WHERE code = #{code}")
+    @Update("UPDATE authorization_code SET schoolId = #{schoolId}, expirationDate = #{expirationDate}, usageLimit = #{usageLimit} WHERE code = #{code}")
     int update(AuthorizationCode code);
 
     @Select("SELECT * FROM authorization_code WHERE code = #{code}")
