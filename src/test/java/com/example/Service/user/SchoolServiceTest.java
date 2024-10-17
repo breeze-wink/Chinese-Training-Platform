@@ -82,7 +82,7 @@ public class SchoolServiceTest {
         school.setName("school4");
         schoolService.addSchool(school);
 
-        // 更新学生信息
+        // 更新学校信息
         school.setName("school4-1");
         int result = schoolService.updateSchool(school);
         assertEquals(1, result, "The school should be updated successfully");
@@ -94,7 +94,7 @@ public class SchoolServiceTest {
 
     @Test
     void testGetAllStudents() {
-        // 测试获取所有学生
+        // 测试获取所有学校
         School school1 = new School();
         school1.setId(5L);
         school1.setName("school5");
