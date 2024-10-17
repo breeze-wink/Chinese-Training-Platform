@@ -8,6 +8,6 @@ public interface AuthorizationCodeService {
     int addAuthorizationCode(AuthorizationCode authorizationCode);
     int removeAuthorizationCode(String code);
     int updateAuthorizationCode(AuthorizationCode authorizationCode);
-    AuthorizationCode getAuthorizationCodeById(String code);
+    AuthorizationCode getAuthorizationCodeByCode(String code);
     List<AuthorizationCode> getAllAuthorizationCodes();
 }

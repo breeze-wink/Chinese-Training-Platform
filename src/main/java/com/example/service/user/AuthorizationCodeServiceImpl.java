@@ -34,7 +34,7 @@ public class AuthorizationCodeServiceImpl implements AuthorizationCodeService{
     }
 
     @Override
-    public AuthorizationCode getAuthorizationCodeById(String code) {
+    public AuthorizationCode getAuthorizationCodeByCode(String code) {
         return authorizationCodeMapper.selectByCode(code);
     }
 
