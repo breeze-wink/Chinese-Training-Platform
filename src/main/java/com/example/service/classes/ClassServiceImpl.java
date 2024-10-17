@@ -33,13 +33,12 @@ public class ClassServiceImpl implements ClassService{
         while(classMapper.inviteCodeCheck(inviteCode) != null){
             inviteCode = charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)];
         }
-        //Teacher teacher = teacherMapper.selectById(creatorId);
         Class clazz = new Class();
         clazz.setName(className);
         clazz.setDescription(classDescription);
         clazz.setInviteCode(inviteCode);
         clazz.setCreatorId(creatorId);
-        clazz.setSchoolId(1L);
+        clazz.setSchoolId(teacherMapper.selectById(creatorId).getSchoolId());
         return classMapper.insert(clazz);
     }
 
