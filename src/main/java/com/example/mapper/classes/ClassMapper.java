@@ -23,4 +23,7 @@ public interface ClassMapper {
 
     @Select("SELECT * FROM class")
     List<Class> selectAll();
+
+    @Select("SELECT * FROM class WHERE EXISTS(SELECT * FROM class WHERE invite_code = #{inviteCode})")
+    Class inviteCodeCheck(String inviteCode);
 }
