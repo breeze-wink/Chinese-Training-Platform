@@ -9,6 +9,7 @@ import java.util.List;
 public interface ClassMapper {
 
     @Insert("INSERT INTO class(name, description, invite_code, creator_id, school_id) VALUES(#{name}, #{description}, #{inviteCode}, #{creatorId}, #{schoolId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Class clazz);
 
     @Delete("DELETE FROM class WHERE id = #{id}")

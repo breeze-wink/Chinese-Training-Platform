@@ -9,6 +9,7 @@ import java.util.List;
 public interface AssignmentMapper {
 
     @Insert("INSERT INTO assignment(title, description, start_time, end_time, creator_id, class_id) VALUES(#{title}, #{description}, #{startTime}, #{endTime}, #{creatorId}, #{classId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Assignment assignment);
 
     @Delete("DELETE FROM assignment WHERE id = #{id}")

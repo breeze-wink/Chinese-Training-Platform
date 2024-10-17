@@ -9,6 +9,7 @@ import java.util.List;
 public interface CourseStandardMapper {
 
     @Insert("INSERT INTO course_standard(title, description) VALUES(#{title}, #{description})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(CourseStandard standard);
 
     @Delete("DELETE FROM course_standard WHERE id = #{id}")

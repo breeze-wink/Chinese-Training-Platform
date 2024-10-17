@@ -9,6 +9,7 @@ import java.util.List;
 public interface AssignmentSubmissionMapper {
 
     @Insert("INSERT INTO assignment_submission(assignment_id, student_id, submit_time, total_score, graded) VALUES(#{assignmentId}, #{studentId}, #{submitTime}, #{totalScore}, #{graded})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(AssignmentSubmission submission);
 
     @Delete("DELETE FROM assignment_submission WHERE id = #{id}")

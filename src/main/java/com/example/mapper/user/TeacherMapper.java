@@ -10,6 +10,7 @@ import java.util.List;
 public interface TeacherMapper {
 
     @Insert("INSERT INTO teacher(name, email, password, phone_number, school_id) VALUES(#{name}, #{email}, #{password}, #{phoneNumber}, #{schoolId})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Teacher teacher);
 
     @Delete("DELETE FROM teacher WHERE id = #{id}")

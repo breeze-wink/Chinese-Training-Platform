@@ -9,6 +9,7 @@ import java.util.List;
 public interface SubmissionAnswerMapper {
 
     @Insert("INSERT INTO submission_answer(submission_id, question_id, answer_content, score, feedback) VALUES(#{submissionId}, #{questionId}, #{answerContent}, #{score}, #{feedback})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(SubmissionAnswer answer);
 
     @Delete("DELETE FROM submission_answer WHERE id = #{id}")

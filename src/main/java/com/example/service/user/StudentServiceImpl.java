@@ -9,9 +9,11 @@ import java.util.List;
 
 @Service
 public class StudentServiceImpl implements StudentService {
-
+    private final StudentMapper studentMapper;
     @Autowired
-    private StudentMapper studentMapper;
+    public StudentServiceImpl (StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
 
     @Override
     @Transactional
