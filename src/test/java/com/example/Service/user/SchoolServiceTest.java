@@ -47,7 +47,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    void testGetStudentById() {
+    void testGetSchoolById() {
         // 添加后获取 ID
         School school = new School();
         school.setId(2L);
@@ -60,7 +60,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    void testRemoveStudent() {
+    void testRemoveSchool() {
         // 添加后获取 ID 后删除
         School school = new School();
         school.setId(3L);
@@ -75,7 +75,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    void testUpdateStudent() {
+    void testUpdateSchool() {
         // 添加后获取 ID 后更新
         School school = new School();
         school.setId(4L);
@@ -93,7 +93,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    void testGetAllStudents() {
+    void testGetAllSchools() {
         // 测试获取所有学校
         School school1 = new School();
         school1.setId(5L);
