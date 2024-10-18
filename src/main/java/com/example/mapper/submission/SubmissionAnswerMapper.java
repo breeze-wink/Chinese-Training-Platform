@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface SubmissionAnswerMapper {
 
-    @Insert("INSERT INTO submission_answer(submission_id, question_id, answer_content, score, feedback) VALUES(#{submissionId}, #{questionId}, #{answerContent}, #{score}, #{feedback})")
+    @Insert("INSERT INTO submission_answer(submissionId, questionId, answerContent, score, feedback) VALUES(#{submissionId}, #{questionId}, #{answerContent}, #{score}, #{feedback})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(SubmissionAnswer answer);
 
     @Delete("DELETE FROM submission_answer WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE submission_answer SET submission_id = #{submissionId}, question_id = #{questionId}, answer_content = #{answerContent}, score = #{score}, feedback = #{feedback} WHERE id = #{id}")
+    @Update("UPDATE submission_answer SET submissionId = #{submissionId}, questionId = #{questionId}, answerContent = #{answerContent}, score = #{score}, feedback = #{feedback} WHERE id = #{id}")
     int update(SubmissionAnswer answer);
 
     @Select("SELECT * FROM submission_answer WHERE id = #{id}")
