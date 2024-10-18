@@ -1,9 +1,6 @@
-package com.example.Service.user;
+package com.example.service.user;
 
-import com.example.model.user.SchoolAdmin;
-import com.example.model.user.Student;
 import com.example.model.user.SystemAdmin;
-import com.example.service.user.SystemAdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,7 +1,6 @@
-package com.example.Service.user;
+package com.example.service.user;
 
 import com.example.model.user.AuthorizationCode;
-import com.example.service.user.AuthorizationCodeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
