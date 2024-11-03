@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class class_group {
+public class ClassGroup {
     private Long id;
     private Long classId;
     private String name;
