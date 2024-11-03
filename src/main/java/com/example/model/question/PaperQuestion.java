@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 @Setter
 @Getter
-public class AssignmentQuestion {
+public class PaperQuestion {
 
-    private Long assignmentId;
+    private Long paperId;
     private Long questionId;
     private Integer sequence;
 

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class Assignment {
 
     private Long id;
+    private Long paperId;
     private String title;
     private String description;
     private LocalDateTime startTime;
