@@ -1,17 +1,14 @@
-package com.example.model.submission;
+package com.example.model.question;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-@Getter
-@Setter
-public class PracticeRecord {
+@Data
+public class Practice {
 
     private Long id;
     private Long studentId; // 外键，关联Student表的id
-    private Long knowledgePointId; // 外键，关联KnowledgePoint表的id
     private LocalDateTime practiceTime;
     private BigDecimal totalScore;
 
