@@ -1,7 +1,8 @@
-package com.example.service.course;
+package com.example.service.course.impl;
 
 import com.example.mapper.course.KnowledgePointMapper;
 import com.example.model.course.KnowledgePoint;
+import com.example.service.course.KnowledgePointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

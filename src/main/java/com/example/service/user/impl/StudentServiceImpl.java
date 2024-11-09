@@ -1,7 +1,8 @@
-package com.example.service.user;
+package com.example.service.user.impl;
 
 import com.example.mapper.user.StudentMapper;
 import com.example.model.user.Student;
+import com.example.service.user.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,8 @@
-package com.example.service.course;
+package com.example.service.course.impl;
 
 import com.example.mapper.course.CourseStandardMapper;
 import com.example.model.course.CourseStandard;
+import com.example.service.course.CourseStandardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

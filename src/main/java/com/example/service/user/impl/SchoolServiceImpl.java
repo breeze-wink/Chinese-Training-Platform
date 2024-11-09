@@ -1,14 +1,15 @@
-package com.example.service.user;
+package com.example.service.user.impl;
 
 import com.example.mapper.user.SchoolMapper;
 import com.example.model.user.School;
+import com.example.service.user.SchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class SchoolServiceImpl implements SchoolService{
+public class SchoolServiceImpl implements SchoolService {
     private final SchoolMapper schoolMapper;
     @Autowired
     public SchoolServiceImpl (SchoolMapper schoolMapper) {

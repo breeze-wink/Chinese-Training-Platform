@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.service.user.StudentService;
-import com.example.service.user.StudentServiceImpl;
+import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.utils.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

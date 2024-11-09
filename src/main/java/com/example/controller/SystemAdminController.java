@@ -4,7 +4,7 @@ import com.example.dto.request.SystemAdminLoginRequest;
 import com.example.dto.response.SystemAdminInfoResponse;
 import com.example.dto.response.SystemAdminLoginResponse;
 import com.example.service.user.SystemAdminService;
-import com.example.service.user.SystemAdminServiceImpl;
+import com.example.service.user.impl.SystemAdminServiceImpl;
 import com.example.model.user.SystemAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,14 +43,23 @@ public class SystemAdminController {
     @GetMapping("/{id}")
     public ResponseEntity<SystemAdminInfoResponse> getSystemAdminInfo(@PathVariable Long id) {
         SystemAdmin admin = systemAdminService.getSystemAdminById(id);
+
+        SystemAdminInfoResponse response = new SystemAdminInfoResponse();
         if (admin != null) {
-            SystemAdminInfoResponse response = new SystemAdminInfoResponse();
-            response.setId(admin.getId());
-            response.setUsername(admin.getUsername());
-            response.setEmail(admin.getEmail());
+            response.setMessage("success");
+
+            SystemAdminInfoResponse.InfoData data = new SystemAdminInfoResponse.InfoData();
+            data.setId(admin.getId());
+            data.setUsername(admin.getUsername());
+            data.setEmail(admin.getEmail());
+            response.setData(data);
+
             return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            response.setMessage("用户未找到");
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
 }

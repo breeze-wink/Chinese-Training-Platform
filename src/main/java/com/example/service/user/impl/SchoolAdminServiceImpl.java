@@ -1,7 +1,8 @@
-package com.example.service.user;
+package com.example.service.user.impl;
 
 import com.example.mapper.user.SchoolAdminMapper;
 import com.example.model.user.SchoolAdmin;
+import com.example.service.user.SchoolAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class SchoolAdminServiceImpl implements SchoolAdminService{
+public class SchoolAdminServiceImpl implements SchoolAdminService {
     private final SchoolAdminMapper schoolAdminMapper;
     @Autowired
     public SchoolAdminServiceImpl (SchoolAdminMapper schoolAdminMapper) {
