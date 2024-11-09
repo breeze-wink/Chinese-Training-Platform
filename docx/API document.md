@@ -23,7 +23,7 @@
     ```json
     {
       "message" : "success",
-      "id" : "Long"
+      "id" : 12345
     }
     ```
   - **失败响应** (`401 Unauthorized`):
@@ -85,13 +85,42 @@
     ```json
     {
       "message" : "注册成功",
-      "id" : "Long"
+      "id" : 12345
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
       "message" : "验证码错误或已过期"
+    }
+    ```
+
+### Get Student Info
+
+- **接口路径**：`/api/student/{id}`
+- **请求方法**：GET
+- **接口说明**：学生用户通过用户 ID 获取自己的信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 用户的唯一标识符
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "id": 12345,
+      "username": "string",
+      "email": "string",
+      "name": "string",
+      "grade": 12,
+      "schoolId": 6789
+    }
+    ```
+  - **失败响应** (`404 Not Found`):
+    ```json
+    {
+      "message": "用户未找到"
     }
     ```
 
@@ -118,7 +147,7 @@
     ```json
     {
       "message" : "success",
-      "id" : "Long"
+      "id" : 12345
     }
     ```
   - **失败响应** (`401 Unauthorized`):
@@ -139,7 +168,7 @@
     - 请求体(`JSON` 格式)：
     ```json
     {
-      "authorizationCode": "string" // 授权码
+      "authorizationCode": "string", // 授权码
       "email" : "string" // 教师的邮箱地址
     }
     ```
@@ -180,7 +209,7 @@
     ```json
     {
       "message" : "注册成功",
-      "id" : "Long"
+      "id" : 12345
     }
     ```
   - **失败响应** (`400 Bad Request`):
@@ -190,9 +219,37 @@
     }
     ```
 
+### Get Teacher Info
+
+- **接口路径**：`/api/teacher/{id}`
+- **请求方法**：GET
+- **接口说明**：教师用户通过用户 ID 获取自己的信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 用户的唯一标识符
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "id": 12345,
+      "name": "string",
+      "email": "string",
+      "phoneNumber": "string",
+      "schoolId": 6789
+    }
+    ```
+  - **失败响应** (`404 Not Found`):
+    ```json
+    {
+      "message": "用户未找到"
+    }
+    ```
+
 ## SystemAdmin
 
-### Login
+### Login `finished`
 
 - **接口路径**：`/api/system-admin/login`
 - **请求方法**：POST
@@ -213,13 +270,39 @@
     ```json
     {
       "message" : "success",
-      "id" : "Long"
+      "id" : 12345
     }
     ```
   - **失败响应** (`401 Unauthorized`):
     ```json
     {
       "message" : "用户名或密码错误"
+    }
+    ```
+
+### Get SystemAdmin Info `finished`
+
+- **接口路径**：`/api/system-admin/{id}`
+- **请求方法**：GET
+- **接口说明**：系统管理员用户通过用户 ID 获取自己的信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 用户的唯一标识符
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "id": 12345,
+      "username": "string",
+      "email": "string"
+    }
+    ```
+  - **失败响应** (`404 Not Found`):
+    ```json
+    {
+      "message": "用户未找到"
     }
     ```
 
@@ -246,12 +329,39 @@
     ```json
     {
       "message" : "success",
-      "id" : "Long"
+      "id" : 12345
     }
     ```
   - **失败响应** (`401 Unauthorized`):
     ```json
     {
       "message" : "用户名或密码错误"
+    }
+    ```
+
+### Get SchoolAdmin Info
+
+- **接口路径**：`/api/school-admin/{id}`
+- **请求方法**：GET
+- **接口说明**：学校管理员用户通过用户 ID 获取自己的信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 用户的唯一标识符
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "id": 12345,
+      "username": "string",
+      "email": "string",
+      "schoolId": 6789
+    }
+    ```
+  - **失败响应** (`404 Not Found`):
+    ```json
+    {
+      "message": "用户未找到"
     }
     ```

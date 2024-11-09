@@ -9,4 +9,6 @@ public interface SystemAdminService {
     int updateSystemAdmin(SystemAdmin systemAdmin);
     SystemAdmin getSystemAdminById(Long id);
     List<SystemAdmin> getAllSystemAdmins();
+
+    SystemAdmin authenticate(String account, String password);
 }

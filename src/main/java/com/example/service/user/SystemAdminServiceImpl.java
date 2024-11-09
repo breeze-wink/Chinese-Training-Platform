@@ -43,4 +43,13 @@ public class SystemAdminServiceImpl implements SystemAdminService{
     public List<SystemAdmin> getAllSystemAdmins() {
         return systemAdminMapper.selectAll();
     }
+
+    @Override
+    public SystemAdmin authenticate(String account, String password) {
+        SystemAdmin systemAdmin = systemAdminMapper.findByAccountOrEmail(account);
+        if (systemAdmin.getPassword().equals(password)) {
+            return systemAdmin;
+        }
+        return null;
+    }
 }
