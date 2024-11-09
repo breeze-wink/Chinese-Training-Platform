@@ -1,16 +1,13 @@
 package com.example.model.submission;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
-@Setter
-@Getter
+@Data
 public class PracticeAnswer {
     private Long id;
-    private Long practiceRecordId; // 外键，关联PracticeRecord表的id
-    private Long questionId; // 外键，关联Question表的id
+    private Long practiceQuestionId;
     private String answerContent;
     private BigDecimal score;
     private String feedback;
