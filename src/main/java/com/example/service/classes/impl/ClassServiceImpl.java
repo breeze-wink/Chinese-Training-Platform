@@ -1,10 +1,11 @@
-package com.example.service.classes;
+package com.example.service.classes.impl;
 import com.example.mapper.user.TeacherMapper;
 import com.example.mapper.classes.ClassStudentMapper;
 import com.example.model.classes.Class;
 import java.util.Date;
 import com.example.mapper.classes.ClassMapper;
 import com.example.model.classes.ClassStudent;
+import com.example.service.classes.ClassService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ import java.util.Random;
 
 
 @Service
-public class ClassServiceImpl implements ClassService{
+public class ClassServiceImpl implements ClassService {
     private final ClassMapper classMapper;
     private final ClassStudentMapper classStudentMapper;
     private final TeacherMapper teacherMapper;

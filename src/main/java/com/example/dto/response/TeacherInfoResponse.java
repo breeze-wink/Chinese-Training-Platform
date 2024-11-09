@@ -5,15 +5,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SystemAdminInfoResponse {
+public class TeacherInfoResponse {
     private String message;
     private InfoData data;
 
     @Getter
     @Setter
     public static class InfoData {
-        private Long id;
-        private String username;
+        private String name;
         private String email;
+        private String phoneNumber;
+        private String schoolName;
     }
 }

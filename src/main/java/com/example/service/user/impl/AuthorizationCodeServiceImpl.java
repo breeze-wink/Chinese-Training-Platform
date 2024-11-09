@@ -1,14 +1,15 @@
-package com.example.service.user;
+package com.example.service.user.impl;
 
 import com.example.mapper.user.AuthorizationCodeMapper;
 import com.example.model.user.AuthorizationCode;
+import com.example.service.user.AuthorizationCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class AuthorizationCodeServiceImpl implements AuthorizationCodeService{
+public class AuthorizationCodeServiceImpl implements AuthorizationCodeService {
     private final AuthorizationCodeMapper authorizationCodeMapper;
     @Autowired
     public AuthorizationCodeServiceImpl (AuthorizationCodeMapper authorizationCodeMapper) {

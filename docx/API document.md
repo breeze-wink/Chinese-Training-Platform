@@ -29,7 +29,8 @@
   - **失败响应** (`401 Unauthorized`):
     ```json
     {
-      "message" : "用户名或密码错误"
+      "message" : "用户名或密码错误",
+      "id" : null
     }
     ```
 
@@ -37,8 +38,9 @@
 
 - **接口路径**：`/api/student/send-verification`
 - **请求方法**：POST
-- **接口说明**：学生用户通过邮箱发送验证码。
+- **接口说明**：学生用户通过邮箱发送验证码(`邮箱合法性在前端检查`)
 - **请求说明**
+  
   - 请求头: `Content-Type` : `application/json`
   - 请求参数:
     - 请求体(`JSON` 格式)：
@@ -59,7 +61,8 @@
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message" : "邮箱格式不正确"
+      "message" : "string", // 邮箱已注册
+      "verificationCode" : null
     }
     ```
 
@@ -75,13 +78,14 @@
     ```json
     {
       "email" : "string", // 学生的邮箱地址
-      "verificationCode" : "string", // 验证码
-      "password" : "string" // 密码
+      "password" : "string", // 密码
+      "confirmPassword" : "string"
     }
     ```
 - **响应说明**
   - 响应格式: `JSON`
-  - **成功响应** (`201 Created`):
+  - **成功响应** (`200 OK`):
+    
     ```json
     {
       "message" : "注册成功",
@@ -91,7 +95,8 @@
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message" : "验证码错误或已过期"
+      "message" : "验证码错误或已过期",
+      "id" : null
     }
     ```
 
@@ -109,24 +114,28 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "id": 12345,
-      "username": "string",
-      "email": "string",
-      "name": "string",
-      "grade": 12,
-      "schoolId": 6789
+      "message": "success",
+      "data": {
+        "id": 12345,
+        "username": "string",
+        "email": "string",
+        "name": "string",
+        "grade": 12,
+        "schoolId": 6789
+      }
     }
     ```
   - **失败响应** (`404 Not Found`):
     ```json
     {
-      "message": "用户未找到"
+      "message": "用户未找到",
+      "data": null
     }
     ```
 
 ## Teacher
 
-### Login
+### Login `finished`
 
 - **接口路径**：`/api/teacher/login`
 - **请求方法**：POST
@@ -153,11 +162,12 @@
   - **失败响应** (`401 Unauthorized`):
     ```json
     {
-      "message" : "用户名或密码错误"
+      "message" : "用户名或密码错误",
+      "id" : null
     }
     ```
 
-### Send Verification Code
+### Send Verification Code `finished`
 
 - **接口路径**：`/api/teacher/send-verification`
 - **请求方法**：POST
@@ -178,34 +188,41 @@
     ```json
     {
       "message" : "验证码已发送",
-      "verificationCode" : "string"
+      "verificationCode" : "string",
+      "schoolId": 12345
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message" : "邮箱格式不正确"
+      "message" : "String", // 授权码不可用 or 邮箱已注册 
+      "verificationCode" : null,
+      "schoolId": null
     }
     ```
 
-### Register
+### Register `finished`
 
 - **接口路径**：`/api/teacher/register`
 - **请求方法**：POST
 - **接口说明**：教师用户通过邮箱、密码进行注册。
 - **请求说明**
+  
   - 请求头: `Content-Type` : `application/json`
   - 请求参数:
     - 请求体(`JSON` 格式)：
     ```json
     {
       "email" : "string", // 教师的邮箱地址
-      "password" : "string" // 密码
+      "password" : "string", // 密码
+      "confirmPassword" : "string",
+      "schoolId" : 12345
     }
     ```
 - **响应说明**
   - 响应格式: `JSON`
-  - **成功响应** (`201 Created`):
+  - **成功响应** (`200 OK`):
+    
     ```json
     {
       "message" : "注册成功",
@@ -215,11 +232,12 @@
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message" : "验证码或授权码错误"
+      "message" : "密码输入不一致",
+      "id" : null
     }
     ```
 
-### Get Teacher Info
+### Get Teacher Info `finished`
 
 - **接口路径**：`/api/teacher/{id}`
 - **请求方法**：GET
@@ -233,17 +251,21 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "id": 12345,
-      "name": "string",
-      "email": "string",
-      "phoneNumber": "string",
-      "schoolId": 6789
+      "message" : "success",
+      "data": {
+          "name": "string",
+          "email": "string",
+          "phoneNumber": "string",
+          "schoolName": "string"
+      }
     }
     ```
   - **失败响应** (`404 Not Found`):
+    
     ```json
     {
-      "message": "用户未找到"
+      "message": "用户未找到",
+      "data" : null
     }
     ```
 
@@ -276,7 +298,8 @@
   - **失败响应** (`401 Unauthorized`):
     ```json
     {
-      "message" : "用户名或密码错误"
+      "message" : "用户名或密码错误",
+      "id" : null
     }
     ```
 
@@ -294,15 +317,18 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "id": 12345,
-      "username": "string",
-      "email": "string"
+      "message": "success",
+      "data": {
+          "username": "string",
+          "email": "string"
+      }
     }
     ```
   - **失败响应** (`404 Not Found`):
     ```json
     {
-      "message": "用户未找到"
+      "message": "用户未找到",
+      "data": null
     }
     ```
 
@@ -335,7 +361,8 @@
   - **失败响应** (`401 Unauthorized`):
     ```json
     {
-      "message" : "用户名或密码错误"
+      "message" : "用户名或密码错误",
+      "id" : null
     }
     ```
 
@@ -353,15 +380,19 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "id": 12345,
-      "username": "string",
-      "email": "string",
-      "schoolId": 6789
+      "message" : "success",
+      "data": {
+          "id": 12345,
+          "username": "string",
+          "email": "string",
+          "schoolId": 6789
+      }
     }
     ```
   - **失败响应** (`404 Not Found`):
     ```json
     {
-      "message": "用户未找到"
+      "message": "用户未找到",
+      "data": null
     }
     ```

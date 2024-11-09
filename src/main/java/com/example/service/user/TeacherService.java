@@ -12,5 +12,9 @@ public interface TeacherService {
     Teacher getTeacherById(Long id);
     List<Teacher> getAllTeachers();
 
+    Teacher authenticate(String email, String password);
+
+    boolean existTeacher(String email);
+
     Long getTeacherSchoolId(Long teacherId);
 }

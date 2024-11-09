@@ -1,7 +1,8 @@
-package com.example.service.user;
+package com.example.service.user.impl;
 
 import com.example.mapper.user.TeacherMapper;
 import com.example.model.user.Teacher;
+import com.example.service.user.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class TeacherServiceImpl implements TeacherService{
+public class TeacherServiceImpl implements TeacherService {
     private final TeacherMapper teacherMapper;
 
     @Autowired
@@ -45,6 +46,20 @@ public class TeacherServiceImpl implements TeacherService{
     @Transactional
     public List<Teacher> getAllTeachers() {
         return teacherMapper.selectAll();
+    }
+
+    @Override
+    public Teacher authenticate(String email, String password) {
+        Teacher teacher = teacherMapper.findByEmail(email);
+        if (teacher.getPassword().equals(password)) {
+            return teacher;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean existTeacher(String email) {
+        return teacherMapper.findByEmail(email) != null;
     }
 
     @Override
