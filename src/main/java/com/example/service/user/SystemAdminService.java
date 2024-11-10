@@ -1,6 +1,7 @@
 package com.example.service.user;
 
 import com.example.model.user.SystemAdmin;
+
 import java.util.List;
 
 public interface SystemAdminService {

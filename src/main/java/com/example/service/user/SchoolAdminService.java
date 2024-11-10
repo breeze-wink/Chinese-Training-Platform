@@ -1,6 +1,7 @@
 package com.example.service.user;
 
 import com.example.model.user.SchoolAdmin;
+
 import java.util.List;
 
 public interface SchoolAdminService {

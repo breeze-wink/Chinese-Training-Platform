@@ -1,6 +1,7 @@
 package com.example.service.course;
 
 import com.example.model.course.KnowledgePoint;
+
 import java.util.List;
 
 public interface KnowledgePointService {
