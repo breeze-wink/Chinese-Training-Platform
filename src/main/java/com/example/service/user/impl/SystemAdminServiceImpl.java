@@ -6,6 +6,7 @@ import com.example.service.user.SystemAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -48,9 +49,8 @@ public class SystemAdminServiceImpl implements SystemAdminService {
     @Override
     public SystemAdmin authenticate(String account, String password) {
         SystemAdmin systemAdmin = systemAdminMapper.findByAccountOrEmail(account);
-        if (systemAdmin.getPassword().equals(password)) {
-            return systemAdmin;
-        }
-        return null;
+        if (systemAdmin == null || !systemAdmin.getPassword().equals(password))
+            return null;
+        return systemAdmin;
     }
 }
