@@ -10,4 +10,7 @@ public interface StudentService {
     int updateStudent(Student student);
     Student getStudentById(Long id);
     List<Student> getAllStudents();
+    Student authenticate(String account, String password);
+    boolean existStudent(String email);
+    boolean existStudentUsername(String username);
 }

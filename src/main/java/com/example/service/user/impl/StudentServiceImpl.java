@@ -1,6 +1,7 @@
 package com.example.service.user.impl;
 
 import com.example.mapper.user.StudentMapper;
+import com.example.model.user.SchoolAdmin;
 import com.example.model.user.Student;
 import com.example.service.user.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,24 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> getAllStudents() {
         return studentMapper.selectAll();
+    }
+
+    @Override
+    public Student authenticate(String account, String password) {
+        Student student = studentMapper.findByAccountOrEmail(account);
+        if (student != null && student.getPassword().equals(password)) {
+            return student;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean existStudent(String email) {
+        return studentMapper.findByEmail(email) != null;
+    }
+
+    @Override
+    public boolean existStudentUsername(String username) {
+        return studentMapper.findByUsername(username) != null;
     }
 }

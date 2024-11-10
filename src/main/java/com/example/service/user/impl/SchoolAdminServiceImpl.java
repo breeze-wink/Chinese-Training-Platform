@@ -37,6 +37,9 @@ public class SchoolAdminServiceImpl implements SchoolAdminService {
     @Override
     @Transactional
     public SchoolAdmin getSchoolAdminById(Long id) {
+        if (schoolAdminMapper.selectById(id) == null) {
+            return null;
+        }
         return schoolAdminMapper.selectById(id);
     }
 
@@ -44,5 +47,14 @@ public class SchoolAdminServiceImpl implements SchoolAdminService {
     @Transactional
     public List<SchoolAdmin> getAllSchoolAdmins() {
         return schoolAdminMapper.selectAll();
+    }
+
+    @Override
+    public SchoolAdmin authenticate(String account, String password) {
+        SchoolAdmin schoolAdmin = schoolAdminMapper.findByAccountOrEmail(account);
+        if (schoolAdmin != null && schoolAdmin.getPassword().equals(password)) {
+            return schoolAdmin;
+        }
+        return null;
     }
 }

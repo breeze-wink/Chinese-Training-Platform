@@ -1,5 +1,6 @@
 package com.example.mapper.user;
 import com.example.model.user.SchoolAdmin;
+import com.example.model.user.SystemAdmin;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -19,6 +20,9 @@ public interface SchoolAdminMapper {
 
     @Select("SELECT * FROM school_admin WHERE id = #{id}")
     SchoolAdmin selectById(Long id);
+
+    @Select("SELECT * FROM school_admin WHERE username = #{account} OR email = #{account}")
+    SchoolAdmin findByAccountOrEmail(String account);
 
     @Select("SELECT * FROM school_admin")
     List<SchoolAdmin> selectAll();
