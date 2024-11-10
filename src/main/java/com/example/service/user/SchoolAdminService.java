@@ -9,4 +9,6 @@ public interface SchoolAdminService {
     int updateSchoolAdmin(SchoolAdmin schoolAdmin);
     SchoolAdmin getSchoolAdminById(Long id);
     List<SchoolAdmin> getAllSchoolAdmins();
+
+    SchoolAdmin authenticate(String account, String password);
 }

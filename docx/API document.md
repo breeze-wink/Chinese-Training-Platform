@@ -78,6 +78,7 @@
     ```json
     {
       "email" : "string", // 学生的邮箱地址
+      "username" : "string",
       "password" : "string", // 密码
       "confirmPassword" : "string"
     }
@@ -116,12 +117,11 @@
     {
       "message": "success",
       "data": {
-        "id": 12345,
         "username": "string",
         "email": "string",
         "name": "string",
         "grade": 12,
-        "schoolId": 6789
+        "schoolName": "string"
       }
     }
     ```
@@ -382,10 +382,9 @@
     {
       "message" : "success",
       "data": {
-          "id": 12345,
           "username": "string",
           "email": "string",
-          "schoolId": 6789
+          "schoolName": "string"
       }
     }
     ```
