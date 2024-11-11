@@ -1,10 +1,10 @@
 # 接口文档
 
-## Student
+## Student 
 
-### Login
+### Login `finished`
 
-- **接口路径**：`/api/student/login`
+- **接口路径**：`/api/student/login` 
 - **请求方法**：POST
 - **接口说明**：学生用户通过账号和密码进行登录。
 - **请求说明**
@@ -34,7 +34,7 @@
     }
     ```
 
-### Send Verification Code
+### Send Verification Code `finished`
 
 - **接口路径**：`/api/student/send-verification`
 - **请求方法**：POST
@@ -66,7 +66,7 @@
     }
     ```
 
-### Register
+### Register `finished`
 
 - **接口路径**：`/api/student/register`
 - **请求方法**：POST
@@ -101,7 +101,7 @@
     }
     ```
 
-### Get Student Info
+### Get Student Info `finished`
 
 - **接口路径**：`/api/student/{id}`
 - **请求方法**：GET
@@ -334,7 +334,7 @@
 
 ## SchoolAdmin
 
-### Login
+### Login `finished`
 
 - **接口路径**：`/api/school-admin/login`
 - **请求方法**：POST
@@ -366,7 +366,7 @@
     }
     ```
 
-### Get SchoolAdmin Info
+### Get SchoolAdmin Info `finished`
 
 - **接口路径**：`/api/school-admin/{id}`
 - **请求方法**：GET
