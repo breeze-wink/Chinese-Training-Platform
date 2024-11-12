@@ -25,4 +25,7 @@ public interface GroupStudentMapper {
 
     @Select("SELECT * FROM group_student WHERE studentId = #{studentId}")
     List<GroupStudent> selectByStudentId(Long studentId);
+
+    @Delete("DELETE FROM group_student WHERE groupId = #{groupId}")
+    int removeGroup(Long groupId);
 }
