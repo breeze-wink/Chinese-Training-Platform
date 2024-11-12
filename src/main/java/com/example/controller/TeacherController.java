@@ -98,7 +98,7 @@ public class TeacherController {
 
         teacherService.addTeacher(teacher);
         response.setId(teacher.getId());
-
+        response.setMessage("注册成功");
         return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}")
