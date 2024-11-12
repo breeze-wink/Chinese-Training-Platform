@@ -23,9 +23,7 @@ public interface ClassStudentMapper {
     @Select("SELECT * FROM class_student WHERE studentId = #{studentId}")
     List<ClassStudent> selectByStudentId(Long studentId);
 
-    @Delete("DELETE FROM class_student WHERE class_id = #{classID}")
+    @Delete("DELETE FROM class_student WHERE classId = #{classID}")
     int removeClass(Long classId);
 
-    @Select("SELECT id FROM class WHERE invite_code = #{inviteCode}")
-    long selectIdByInviteCode(String inviteCode);
 }

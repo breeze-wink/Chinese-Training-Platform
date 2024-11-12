@@ -1,16 +1,20 @@
 package com.example.service.classes.impl;
 
+import com.example.mapper.classes.ClassGroupMapper;
 import com.example.mapper.classes.ClassMapper;
 import com.example.mapper.classes.ClassStudentMapper;
 import com.example.mapper.user.TeacherMapper;
 import com.example.model.classes.Class;
+import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
+import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 
@@ -18,12 +22,17 @@ import java.util.Random;
 public class ClassServiceImpl implements ClassService {
     private final ClassMapper classMapper;
     private final ClassStudentMapper classStudentMapper;
+    private final ClassGroupMapper classGroupMapper;
     private final TeacherMapper teacherMapper;
     @Autowired
-    public ClassServiceImpl(ClassMapper classMapper, ClassStudentMapper classStudentMapper, TeacherMapper teacherMapper) {
+    private ClassGroupService classGroupService;
+    @Autowired
+    public ClassServiceImpl(ClassMapper classMapper, ClassStudentMapper classStudentMapper, TeacherMapper teacherMapper, ClassGroupService classGroupService, ClassGroupMapper classGroupMapper) {
         this.classMapper = classMapper;
         this.classStudentMapper = classStudentMapper;
         this.teacherMapper = teacherMapper;
+        this.classGroupService = classGroupService;
+        this.classGroupMapper = classGroupMapper;
     }
 
     @Override
@@ -45,15 +54,21 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
+    @Transactional
     public int removeClass(Long classId) {
+        List<ClassGroup> classGroups = classGroupMapper.selectByClassId(classId);
+        for(ClassGroup classGroup : classGroups){
+            classGroupService.removeGroup(classGroup.getId());
+        }
         classStudentMapper.removeClass(classId);
         return classMapper.delete(classId);
     }
 
     @Override
+    @Transactional
     public int joinClass(String inviteCode, Long studentId){
         ClassStudent classStudent = new ClassStudent();
-        classStudent.setClassId(classStudentMapper.selectIdByInviteCode(inviteCode));
+        classStudent.setClassId(classMapper.selectIdByInviteCode(inviteCode));
         classStudent.setStudentId(studentId);
         Date now = new Date();
         now.setTime(now.getTime() + 28800000);
@@ -62,7 +77,12 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Override
-    public int removeStudent(Long classId, Long studentId){
+    @Transactional
+    public int removeStudentFromClass(Long classId, Long studentId){
+        List<ClassGroup> classGroups = classGroupMapper.selectByClassId(classId);
+        for(ClassGroup classGroup : classGroups){
+            classGroupService.removeStudentFromGroup(classGroup.getId(), studentId);
+        }
         return classStudentMapper.delete(classId, studentId);
     }
 }
