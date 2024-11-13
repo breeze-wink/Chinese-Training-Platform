@@ -132,6 +132,200 @@
       "data": null
     }
     ```
+    
+### Edit Personal Information
+- **接口路径**：`/api/student/{id}/editInformation`
+- **请求方法**：`POST`
+- **接口说明**：学生用户通过进入编辑，更新个人信息。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+```json
+{
+  "username": "string",
+  "name": "string",
+  "grade": "int"
+}
+```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "个人信息更新成功",
+      "data": {
+         "username": "string",
+         "name": "string",
+         "grade": "int”
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+      ```json
+      {
+        "message": "个人信息更新失败",
+        "data": null
+     }
+      ```
+
+### Change Emai
+- **接口路径**：`/api/student/{id}/changeEmail`
+- **请求方法**：`POST`
+- **接口说明**：学生用户更换邮箱输入正确验证码后，更换邮箱。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+```json
+{
+  "email”: “string"
+}
+```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "邮箱更换成功",
+      "data": {
+          "email": "string”
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "邮箱更换失败",
+ 	  "data": null
+    }
+    ```
+
+### Send Verification Code To Change Student’s Email
+- **接口路径**：`/api/student/{id}/ChangeEmail/send-verification`
+- **请求方法**：`POST`
+- **接口说明**：学生用户点击账号信息管理的更换绑定邮箱中发送验证码。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+      "email": "string"
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+  {
+    "message": "验证码发送成功",
+    "data": {
+    "verificationCode" : "string"
+    }
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+    "message": "验证码发送失败",
+    "data": null
+  }
+  ```
+
+### Change Password
+- **接口路径**：`/api/student/{id}/changePassword`
+- **请求方法**：`POST`
+- **接口说明**：学生用户点击账号信息管理的修改密码进行修改。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    “oldPassword”: “string”
+    “newPassword”: “string”
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+  {
+    "message": "密码更改成功"
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+      "message": "密码更改失败"
+  }
+  ```
+
+### Account Deactivation
+- **接口路径**：`/api/student/{id}/accountDeactivation`
+- **请求方法**：`DELETE`
+- **接口说明**：学生注销账号。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+  无
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+  {
+    "message": "账号注销成功"
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+      	"message": "账号注销失败"
+  }
+  ```
+
+### Join Class
+- **接口路径**：`/api/student/{id}/joinClass`
+- **请求方法**：`POST`
+- **接口说明**：学生加入一个班级。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "inviteCode": "string”
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+  {
+    "message": "成功加入班级",
+    "data": {
+      "className”: "string"
+    }
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+     "message": "加入班级失败",
+  	 "data": null
+  }
+  ```
+
+
+
+
+
+
+
+
+
 
 ## Teacher
 
