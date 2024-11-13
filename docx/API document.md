@@ -288,7 +288,7 @@
   }
   ```
 
-### Join Class
+### Join Class `finished`
 - **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
