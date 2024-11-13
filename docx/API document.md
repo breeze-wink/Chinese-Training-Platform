@@ -269,7 +269,107 @@
       "data" : null
     }
     ```
+### Update Username 
 
+- **接口路径**：`/api/teacher/{teacherId}/updateUsername`
+- **请求方法**：POST
+- **接口说明**：教师用户修改自己的用户名。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username": "newUsername"
+    }
+    ```
+    - `username`：教师希望修改的新用户名。
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "用户名修改成功",
+    }
+    ```
+  - **失败响应** (`400 Bad Request` 或 `409 Conflict`):
+    ```json
+    {
+      "message": "用户名修改失败，用户名已存在或其他错误",
+    }
+    ```
+
+### Update Phone Number 
+
+- **接口路径**：`/api/teacher/{teacherId}/updatePhoneNumber`
+- **请求方法**：POST
+- **接口说明**：教师用户修改自己的手机号。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "phoneNumber": "newPhoneNumber"
+    }
+    ```
+    - `phoneNumber`：教师希望修改的新手机号。
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "手机号修改成功",
+    }
+    ```
+  - **失败响应** (`400 Bad Request` 或 `409 Conflict`):
+    ```json
+    {
+      "message": "手机号修改失败，手机号已存在或格式错误",
+    }
+    ```
+
+### View Curriculum Standard `finished`
+
+- **接口路径**：`/api/teacher/{teacherId}/viewCurriculumStandard`
+- **请求方法**：GET
+- **接口说明**：教师用户查看课程标准（课标），课标内容为一篇文章，分点列出。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "课标获取成功",
+      "curriculumStandard": [
+        {
+          "point": "第一部分：基本要求",
+          "description": "在此部分，学生应掌握的基本知识点包括数学基础、物理实验技能等。"
+        },
+        {
+          "point": "第二部分：教学目标",
+          "description": "明确学生应达到的学业目标，如提高问题解决能力、培养批判性思维等。"
+        },
+        {
+          "point": "第三部分：课程内容",
+          "description": "课程内容涉及到的知识点包括：1. 代数基础；2. 函数的应用等。"
+        }
+      ]
+    }
+    ```
+  - **失败响应** (`404 Not Found` 或 `500 Internal Server Error`):
+    ```json
+    {
+      "message": "课标获取失败，未找到相关课标信息",
+      "curriculumStandard": null
+    }
+    ```
 
 ### Create Class `finished`
 
