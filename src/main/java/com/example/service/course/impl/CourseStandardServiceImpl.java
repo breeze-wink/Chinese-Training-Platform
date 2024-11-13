@@ -11,9 +11,12 @@ import java.util.List;
 
 @Service
 public class CourseStandardServiceImpl implements CourseStandardService {
+    private final CourseStandardMapper courseStandardMapper;
 
     @Autowired
-    private CourseStandardMapper courseStandardMapper;
+    public CourseStandardServiceImpl(CourseStandardMapper courseStandardMapper) {
+        this.courseStandardMapper = courseStandardMapper;
+    }
 
     @Override
     @Transactional
