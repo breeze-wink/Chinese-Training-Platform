@@ -28,5 +28,5 @@ public interface ClassMapper {
     Clazz inviteCodeCheck(String inviteCode);
 
     @Select("SELECT id FROM class WHERE inviteCode = #{inviteCode}")
-    long selectIdByInviteCode(String inviteCode);
+    Long selectIdByInviteCode(String inviteCode);
 }

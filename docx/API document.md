@@ -133,7 +133,7 @@
     }
     ```
     
-### Edit Personal Information
+### Edit Personal Information `finished`
 - **接口路径**：`/api/student/{id}/edit-information`
 - **请求方法**：`POST`
 - **接口说明**：学生用户通过进入编辑，更新个人信息。
@@ -169,7 +169,7 @@
      }
      ```
 
-### Change Email
+### Change Email `finished`
 
 - **接口路径**：`/api/student/{id}/change-email`
 - **请求方法**：`POST`
@@ -203,7 +203,7 @@
     }
     ```
 
-### Send Verification Code To Change Student’s Email
+### Send Verification Code To Change Student’s Email `finished`
 - **接口路径**：`/api/student/{id}/change-email/send-verification`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的更换绑定邮箱中发送验证码。
@@ -235,7 +235,7 @@
   }
   ```
 
-### Change Password
+### Change Password `finished`
 - **接口路径**：`/api/student/{id}/change-password`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的修改密码进行修改。
@@ -264,7 +264,7 @@
   }
   ```
 
-### Account Deactivation
+### Account Deactivation `finished`
 - **接口路径**：`/api/student/{id}/account-deactivation`
 - **请求方法**：`DELETE`
 - **接口说明**：学生注销账号。

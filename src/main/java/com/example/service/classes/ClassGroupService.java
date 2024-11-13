@@ -5,6 +5,8 @@ import com.example.model.classes.ClassGroup;
 import java.util.List;
 
 public interface ClassGroupService {
+    int addClassGroup(ClassGroup classGroup);
+    int updateClassGroup(ClassGroup classGroup);
     int createGroup(Long classId, String groupName, String groupDescription);
     int removeGroup(Long groupId);
     int addStudentToGroup(Long groupId, Long studentId);
