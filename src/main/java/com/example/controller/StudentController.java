@@ -21,12 +21,14 @@ public class StudentController {
     private final StudentService studentService;
     private final EmailService emailService;
     private final SchoolService schoolService;
+
     @Autowired
     public StudentController(StudentServiceImpl studentService, EmailService emailService, SchoolService schoolService) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.schoolService = schoolService;
     }
+
     @PostMapping("/login")
     public ResponseEntity<StudentLoginResponse> login(@RequestBody StudentLoginRequest request) {
         String account = request.getAccount();
@@ -45,6 +47,7 @@ public class StudentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
+
     @PostMapping("/send-verification")
     public ResponseEntity<StudentVerifyResponse> sendVerificationCode(@RequestBody StudentVerifyRequest request) throws MessagingException {
         String email = request.getEmail();
@@ -58,12 +61,13 @@ public class StudentController {
         response.setMessage("验证码已发送");
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/register")
     public ResponseEntity<StudentRegisterResponse> studentRegister(@RequestBody StudentRegisterRequest request) {
         StudentRegisterResponse response = new StudentRegisterResponse();
         String password = request.getPassword();
         String confirmPassword = request.getConfirmPassword();
-        if(studentService.existStudentUsername(request.getUsername())){
+        if (studentService.existStudentUsername(request.getUsername())) {
             response.setMessage("用户名已存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
@@ -81,6 +85,7 @@ public class StudentController {
         response.setMessage("注册成功");
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<StudentInfoResponse> getStudentInfo(@PathVariable Long id) {
         StudentInfoResponse response = new StudentInfoResponse();

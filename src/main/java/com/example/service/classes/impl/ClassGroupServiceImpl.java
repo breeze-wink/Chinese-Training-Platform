@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class ClassGroupServiceImpl implements ClassGroupService {
     private final ClassGroupMapper classGroupMapper;
@@ -45,5 +47,17 @@ public class ClassGroupServiceImpl implements ClassGroupService {
     @Transactional
     public int removeStudentFromGroup(Long groupId, Long studentId){
         return groupStudentMapper.delete(groupId, studentId);
+    }
+
+    @Override
+    @Transactional
+    public ClassGroup getGroupById(Long groupId){
+        return classGroupMapper.selectById(groupId);
+    }
+
+    @Override
+    @Transactional
+    public List<ClassGroup> getAllGroups(){
+        return classGroupMapper.selectAll();
     }
 }
