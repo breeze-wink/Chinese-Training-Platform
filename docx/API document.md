@@ -1307,10 +1307,11 @@
 
 ### Create Course Standard
 
-- **接口路径**：`/api/admin/createCourseStandard`
+- **接口路径**：`/api/admin/create-course-standard`
 - **请求方法**：POST
 - **接口说明**：系统管理员创建新课标，传输课标标题和课标描述。
 - **请求说明**：
+  
   - 请求参数：无路径参数。
   - 请求体(`JSON` 格式)：
     ```json
@@ -1320,8 +1321,10 @@
     }
     ```
 - **响应说明**：
+  
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
+    
     ```json
     {
       "message": "课标创建成功",
@@ -1340,7 +1343,7 @@
 
 ### Delete Course Standard
 
-- **接口路径**：`/api/admin/deleteCourseStandard/{courseStandardId}`
+- **接口路径**：`/api/admin/delete-course-standard/{courseStandardId}`
 - **请求方法**：DELETE
 - **接口说明**：系统管理员删除指定的课标。
 - **请求说明**：
@@ -1365,7 +1368,7 @@
 
 ### Update Course Standard
 
-- **接口路径**：`/api/admin/updateCourseStandard/{courseStandardId}`
+- **接口路径**：`/api/admin/update-course-standard/{courseStandardId}`
 - **请求方法**：PUT
 - **接口说明**：系统管理员更新指定的课标信息。
 - **请求说明**：
@@ -1397,7 +1400,7 @@
 
 ### Query Course Standard
 
-- **接口路径**：`/api/admin/queryCourseStandard/{courseStandardId}`
+- **接口路径**：`/api/admin/query-course-standard/{courseStandardId}`
 - **请求方法**：GET
 - **接口说明**：系统管理员查询指定课标信息。
 - **请求说明**：
@@ -1426,7 +1429,7 @@
 
 ### Create Knowledge Point
 
-- **接口路径**：`/api/admin/createKnowledgePoint`
+- **接口路径**：`/api/admin/create-knowledge-point`
 - **请求方法**：POST
 - **接口说明**：系统管理员创建新知识点，传输知识点标题、描述以及对应的课标ID。
 - **请求说明**：
@@ -1451,6 +1454,7 @@
     }
     ```
   - **失败响应** (`400 Bad Request`):
+    
     ```json
     {
       "message": "知识点创建失败",
@@ -1460,13 +1464,14 @@
 
 ### Delete Knowledge Point
 
-- **接口路径**：`/api/admin/deleteKnowledgePoint/{knowledgePointId}`
+- **接口路径**：`/api/admin/delete-knowledge-point/{knowledgePointId}`
 - **请求方法**：DELETE
 - **接口说明**：系统管理员删除指定的知识点。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
 - **响应说明**：
+  
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
@@ -1485,7 +1490,7 @@
 
 ### Update Knowledge Point
 
-- **接口路径**：`/api/admin/updateKnowledgePoint/{knowledgePointId}`
+- **接口路径**：`/api/admin/update-knowledge-point/{knowledgePointId}`
 - **请求方法**：PUT
 - **接口说明**：系统管理员更新指定的知识点信息。
 - **请求说明**：
@@ -1518,10 +1523,11 @@
 
 ### Query Knowledge Point
 
-- **接口路径**：`/api/admin/queryKnowledgePoint/{knowledgePointId}`
+- **接口路径**：`/api/admin/query-knowledge-point/{knowledgePointId}`
 - **请求方法**：GET
 - **接口说明**：系统管理员查询指定知识点信息。
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
 - **响应说明**：
@@ -1615,7 +1621,7 @@
 
 ### Create Teacher
 
-- **接口路径**：`/api/schoolAdmin/createTeacher`
+- **接口路径**：`/api/school-admin/create-teacher`
 - **请求方法**：POST
 - **接口说明**：学校管理员创建新老师账号，传输老师姓名、邮箱、密码、手机号以及学校ID。
 - **请求说明**：
@@ -1651,7 +1657,7 @@
 
 ### Delete Teacher
 
-- **接口路径**：`/api/schoolAdmin/deleteTeacher/{id}`
+- **接口路径**：`/api/school-admin/delete-teacher/{id}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的老师账号。
 - **请求说明**：
@@ -1676,7 +1682,7 @@
 
 ### Update Teacher
 
-- **接口路径**：`/api/schoolAdmin/updateTeacher/{id}`
+- **接口路径**：`/api/school-admin/update-teacher/{id}`
 - **请求方法**：PUT
 - **接口说明**：学校管理员更新指定的老师账号信息。
 - **请求说明**：
@@ -1711,7 +1717,7 @@
 
 ### Query Teacher
 
-- **接口路径**：`/api/schoolAdmin/queryTeacher/{id}`
+- **接口路径**：`/api/school-admin/query-teacher/{id}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定老师账号信息。
 - **请求说明**：
@@ -1742,7 +1748,7 @@
 
 ### Create Student
 
-- **接口路径**：`/api/schoolAdmin/createStudent`
+- **接口路径**：`/api/school-admin/create-student`
 - **请求方法**：POST
 - **接口说明**：学校管理员创建新学生账号，传输学生用户名、邮箱、密码、姓名、年级以及学校ID。
 - **请求说明**：
@@ -1779,7 +1785,7 @@
 
 ### Delete Student
 
-- **接口路径**：`/api/schoolAdmin/deleteStudent/{id}`
+- **接口路径**：`/api/school-admin/delete-student/{id}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的学生账号。
 - **请求说明**：
@@ -1804,7 +1810,7 @@
 
 ### Update Student
 
-- **接口路径**：`/api/schoolAdmin/updateStudent/{id}`
+- **接口路径**：`/api/school-admin/update-student/{id}`
 - **请求方法**：PUT
 - **接口说明**：学校管理员更新指定的学生账号信息。
 - **请求说明**：
@@ -1840,7 +1846,7 @@
 
 ### Query Student
 
-- **接口路径**：`/api/schoolAdmin/queryStudent/{id}`
+- **接口路径**：`/api/school-admin/query-student/{id}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定学生账号信息。
 - **请求说明**：
@@ -1872,7 +1878,7 @@
 
 ### Generate Authorization Code
 
-- **接口路径**：`/api/schoolAdmin/generateAuthorizationCode`
+- **接口路径**：`/api/school-admin/generate-authorization-code`
 - **请求方法**：POST
 - **接口说明**：学校管理员生成授权码，用于授权用户访问特定资源。
 - **请求说明**：
