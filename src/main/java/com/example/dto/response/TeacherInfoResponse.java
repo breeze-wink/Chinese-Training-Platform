@@ -13,6 +13,7 @@ public class TeacherInfoResponse {
     @Setter
     public static class InfoData {
         private String name;
+        private String username;
         private String email;
         private String phoneNumber;
         private String schoolName;

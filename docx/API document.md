@@ -170,6 +170,7 @@
      ```
 
 ### Change Email
+
 - **接口路径**：`/api/student/{id}/change-email`
 - **请求方法**：`POST`
 - **接口说明**：学生用户更换邮箱输入正确验证码后，更换邮箱。
@@ -183,6 +184,7 @@
 }
 ```
 - **响应说明**
+  
   - 响应格式: `JSON`
   - **成功响应** (`200 OK`):
     ```json
@@ -464,12 +466,14 @@
       "data" : null
     }
     ```
-### Update Username 
 
-- **接口路径**：`/api/teacher/{teacherId}/updateUsername`
+### Update Username `finished`
+
+- **接口路径**：`/api/teacher/{id}/update-username`
 - **请求方法**：POST
 - **接口说明**：教师用户修改自己的用户名。
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
     - 请求体(`JSON` 格式)：
@@ -479,7 +483,7 @@
     }
     ```
     - `username`：教师希望修改的新用户名。
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -488,16 +492,17 @@
       "message": "用户名修改成功",
     }
     ```
-  - **失败响应** (`400 Bad Request` 或 `409 Conflict`):
+  - **失败响应** (`400 Bad Request`):
+    
     ```json
     {
       "message": "用户名修改失败，用户名已存在或其他错误",
     }
     ```
 
-### Update Phone Number 
+### Update Phone Number `finished`
 
-- **接口路径**：`/api/teacher/{teacherId}/updatePhoneNumber`
+- **接口路径**：`/api/teacher/{id}/update-phoneNumber`
 - **请求方法**：POST
 - **接口说明**：教师用户修改自己的手机号。
 - **请求说明**：
@@ -519,56 +524,44 @@
       "message": "手机号修改成功",
     }
     ```
-  - **失败响应** (`400 Bad Request` 或 `409 Conflict`):
+  - **失败响应** (`400 Bad Request`):
+    
     ```json
     {
       "message": "手机号修改失败，手机号已存在或格式错误",
     }
     ```
 
-### View Curriculum Standard 
+### View Curriculum Standard
 
-- **接口路径**：`/api/teacher/{teacherId}/viewCurriculumStandard`
-- **请求方法**：GET
-- **接口说明**：教师用户查看课程标准（课标），课标内容为一篇文章，分点列出。
+- **接口路径**：`/api/teacher/{id}/view-curriculum-standard`
+
+- **请求方法**：`GET`
+
+- **接口说明**：教师用户查看课程标准（课标），以 PDF 文件形式返回。
+
 - **请求说明**：
-  - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
+
+  - 路径参数：
+    - `id`：教师的唯一标识符。
   - 请求体：无
 
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
+- 响应说明：
+
+  - 成功响应 (`200 OK`)
+    - 响应类型为 `application/pdf`，返回 PDF 文件内容，附带 `Content-Disposition` 头以 inline 方式显示。
+
+  - **失败响应** (`404 Not Found`):
+
     ```json
     {
-      "message": "课标获取成功",
-      "curriculumStandard": [
-        {
-          "point": "第一部分：基本要求",
-          "description": "在此部分，学生应掌握的基本知识点包括数学基础、物理实验技能等。"
-        },
-        {
-          "point": "第二部分：教学目标",
-          "description": "明确学生应达到的学业目标，如提高问题解决能力、培养批判性思维等。"
-        },
-        {
-          "point": "第三部分：课程内容",
-          "description": "课程内容涉及到的知识点包括：1. 代数基础；2. 函数的应用等。"
-        }
-      ]
-    }
-    ```
-  - **失败响应** (`404 Not Found` 或 `500 Internal Server Error`):
-    ```json
-    {
-      "message": "课标获取失败，未找到相关课标信息",
-      "curriculumStandard": null
+      "message": "课标获取失败，未找到相关课标信息"
     }
     ```
 
-### Create Class 
+### Create Class
 
-- **接口路径**：`/api/teacher/{id}/createClass`
+- **接口路径**：`/api/teacher/{id}/create-class`
 - **请求方法**：POST
 - **接口说明**：教师用户创建新班级，传输班级名称和班级描述，获得班级码。
 - **请求说明**：
@@ -605,7 +598,8 @@
 
 ### Create Group 
 
-- **接口路径**：`/api/teacher/{id}/createGroup`
+- **接口路径**：`/api/teacher/{id}/create-group`
+
 - **请求方法**：POST
 - **接口说明**：教师用户为指定班级创建一个小组，并指定小组成员（学生ID数组）。
   - **请求说明**：
@@ -639,9 +633,9 @@
     }
     ```
 
-### Get Classes Information 
+### Get Classes Information
 
-- **接口路径**：`/api/teacher/{id}/getClasses`
+- **接口路径**：`/api/teacher/{id}/get-classes`
 - **请求方法**：GET
 - **接口说明**：教师用户获取其班级的信息。
 - **请求说明**：
@@ -683,7 +677,7 @@
 
 ### Get Groups Information 
 
-- **接口路径**：`/api/teacher/{id}/getGroups`
+- **接口路径**：`/api/teacher/{id}/get-groups`
 - **请求方法**：GET
 - **接口说明**：教师用户获取其小组的信息。
 - **请求说明**：
@@ -722,7 +716,7 @@
     ```
 ### Get Class Members Information 
 
-- **接口路径**：`/api/teacher/{id}/getClassMembers`
+- **接口路径**：`/api/teacher/{id}/get-class-members`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个班级的学生信息，包括学生姓名和学生ID。
 - **请求说明**：
@@ -760,15 +754,16 @@
 
 ### Get Student's Average Homework Score and Class Rank 
 
-- **接口路径**：`/api/teacher/{id}/getStudentAverageHomework`
+- **接口路径**：`/api/teacher/{id}/get-student-situation`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个学生的作业平均分和班级排名。
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 教师的唯一标识符
     - 查询参数（Query Parameter）：`studentId` - 学生的唯一标识符
   - 请求体：无
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -789,9 +784,9 @@
     }
     ```
 
-### Get Student's Five Dimensional Scores 
+### Get Student's Five Dimensional Scores
 
-- **接口路径**：`/api/teacher/{id}/getStudentFiveDimensionalScores`
+- **接口路径**：`/api/teacher/{id}/get-student-five-dimensional-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个学生的五维数据得分率。
 - **请求说明**：
@@ -823,9 +818,10 @@
     }
     ```
 
-### Get Student's Weakness Scores 
 
-- **接口路径**：`/api/teacher/{id}/getStudentWeaknessScores`
+### Get Student's Weakness Scores
+
+- **接口路径**：`/api/teacher/{id}/get-student-weakness-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个学生的短板得分，包括短板名称和得分率。
 - **请求说明**：
@@ -867,7 +863,7 @@
 
 ### Get Student's Historical Homework Scores 
 
-- **接口路径**：`/api/teacher/{id}/getStudentHistoricalHomeworkScores`
+- **接口路径**：`/api/teacher/{id}/get-student-historical-homework-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个学生的历史作业得分率列表。
 - **请求说明**：
@@ -895,7 +891,7 @@
 
 ### Get Class's Historical Average Score 
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/historicalAverageScores`
+- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/historical-average-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个班级的历史平均分列表。
 - **请求说明**：
@@ -1023,7 +1019,7 @@
 
 ### Get Group's Historical Scores 
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/historicalScores`
+- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/historical-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户查看某个小组的历史得分率，并包括当次作业的截止时间。
 - **请求说明**：
@@ -1115,7 +1111,7 @@
 
 ### Generate Exam Paper 
 
-- **接口路径**：`/api/teacher/{teacherId}/generateExam`
+- **接口路径**：`/api/teacher/{teacherId}/generate-exam`
 - **请求方法**：GET
 - **接口说明**：教师用户自动生成试卷，返回题目信息。
 - **请求说明**：
@@ -1170,7 +1166,7 @@
 
 ### Generate Custom Exam Paper 
 
-- **接口路径**：`/api/teacher/{teacherId}/generateCustomExam`
+- **接口路径**：`/api/teacher/{teacherId}/generate-custom-exam`
 - **请求方法**：POST
 - **接口说明**：教师用户根据自定义的题目设置信息生成试卷，返回题目信息。
 - **请求说明**：
@@ -1245,10 +1241,6 @@
 
 
 
-
-
-
-
 ## SystemAdmin
 
 ### Login `finished`
@@ -1311,6 +1303,251 @@
       "data": null
     }
     ```
+
+
+### Create Course Standard
+
+- **接口路径**：`/api/admin/createCourseStandard`
+- **请求方法**：POST
+- **接口说明**：系统管理员创建新课标，传输课标标题和课标描述。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "title": "string", // 课标标题
+      "description": "string" // 课标描述
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "课标创建成功",
+      "data": {
+        "courseStandardId": "string" // 新创建的课标ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "课标创建失败",
+      "data": null
+    }
+    ```
+
+### Delete Course Standard
+
+- **接口路径**：`/api/admin/deleteCourseStandard/{courseStandardId}`
+- **请求方法**：DELETE
+- **接口说明**：系统管理员删除指定的课标。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`courseStandardId` - 课标的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "课标删除成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "课标删除失败",
+      "data": null
+    }
+    ```
+
+### Update Course Standard
+
+- **接口路径**：`/api/admin/updateCourseStandard/{courseStandardId}`
+- **请求方法**：PUT
+- **接口说明**：系统管理员更新指定的课标信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`courseStandardId` - 课标的唯一标识符
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "title": "string", // 更新后的课标标题
+      "description": "string" // 更新后的课标描述
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "课标更新成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "课标更新失败",
+      "data": null
+    }
+    ```
+
+### Query Course Standard
+
+- **接口路径**：`/api/admin/queryCourseStandard/{courseStandardId}`
+- **请求方法**：GET
+- **接口说明**：系统管理员查询指定课标信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`courseStandardId` - 课标的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "课标信息查询成功",
+      "data": {
+        "courseStandardId": "string",
+        "title": "string",
+        "description": "string"
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "课标信息查询失败",
+      "data": null
+    }
+    ```
+
+### Create Knowledge Point
+
+- **接口路径**：`/api/admin/createKnowledgePoint`
+- **请求方法**：POST
+- **接口说明**：系统管理员创建新知识点，传输知识点标题、描述以及对应的课标ID。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "title": "string", // 知识点标题
+      "description": "string", // 知识点描述
+      "courseStandardId": "string" // 对应的课标ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "知识点创建成功",
+      "data": {
+        "knowledgePointId": "string" // 新创建的知识点ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "知识点创建失败",
+      "data": null
+    }
+    ```
+
+### Delete Knowledge Point
+
+- **接口路径**：`/api/admin/deleteKnowledgePoint/{knowledgePointId}`
+- **请求方法**：DELETE
+- **接口说明**：系统管理员删除指定的知识点。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "知识点删除成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "知识点删除失败",
+      "data": null
+    }
+    ```
+
+### Update Knowledge Point
+
+- **接口路径**：`/api/admin/updateKnowledgePoint/{knowledgePointId}`
+- **请求方法**：PUT
+- **接口说明**：系统管理员更新指定的知识点信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "title": "string", // 更新后的知识点标题
+      "description": "string", // 更新后的知识点描述
+      "courseStandardId": "string" // 更新后的对应课标ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "知识点更新成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "知识点更新失败",
+      "data": null
+    }
+    ```
+
+### Query Knowledge Point
+
+- **接口路径**：`/api/admin/queryKnowledgePoint/{knowledgePointId}`
+- **请求方法**：GET
+- **接口说明**：系统管理员查询指定知识点信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "知识点信息查询成功",
+      "data": {
+        "knowledgePointId": "string",
+        "title": "string",
+        "description": "string",
+        "courseStandardId": "string"
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "知识点信息查询失败",
+      "data": null
+    }
+    ```
+
+
+
 
 ## SchoolAdmin
 
@@ -1375,3 +1612,296 @@
       "data": null
     }
     ```
+
+### Create Teacher
+
+- **接口路径**：`/api/schoolAdmin/createTeacher`
+- **请求方法**：POST
+- **接口说明**：学校管理员创建新老师账号，传输老师姓名、邮箱、密码、手机号以及学校ID。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name": "string", // 老师姓名
+      "email": "string", // 老师邮箱
+      "password": "string", // 老师密码
+      "phone_number": "string", // 老师手机号
+      "school_id": "bigint" // 学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号创建成功",
+      "data": {
+        "id": "bigint" // 新创建的老师账号ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号创建失败",
+      "data": null
+    }
+    ```
+
+### Delete Teacher
+
+- **接口路径**：`/api/schoolAdmin/deleteTeacher/{id}`
+- **请求方法**：DELETE
+- **接口说明**：学校管理员删除指定的老师账号。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号删除成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号删除失败",
+      "data": null
+    }
+    ```
+
+### Update Teacher
+
+- **接口路径**：`/api/schoolAdmin/updateTeacher/{id}`
+- **请求方法**：PUT
+- **接口说明**：学校管理员更新指定的老师账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name": "string", // 更新后的老师姓名
+      "email": "string", // 更新后的老师邮箱
+      "password": "string", // 更新后的老师密码
+      "phone_number": "string", // 更新后的老师手机号
+      "school_id": "bigint" // 更新后的学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号更新成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号更新失败",
+      "data": null
+    }
+    ```
+
+### Query Teacher
+
+- **接口路径**：`/api/schoolAdmin/queryTeacher/{id}`
+- **请求方法**：GET
+- **接口说明**：学校管理员查询指定老师账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号信息查询成功",
+      "data": {
+        "id": "bigint",
+        "name": "string",
+        "email": "string",
+        "phone_number": "string",
+        "school_id": "bigint"
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号信息查询失败",
+      "data": null
+    }
+    ```
+
+### Create Student
+
+- **接口路径**：`/api/schoolAdmin/createStudent`
+- **请求方法**：POST
+- **接口说明**：学校管理员创建新学生账号，传输学生用户名、邮箱、密码、姓名、年级以及学校ID。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username": "string", // 学生用户名
+      "email": "string", // 学生邮箱
+      "password": "string", // 学生密码
+      "name": "string", // 学生姓名
+      "grade": "int", // 学生年级
+      "school_id": "bigint" // 学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号创建成功",
+      "data": {
+        "id": "bigint" // 新创建的学生账号ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号创建失败",
+      "data": null
+    }
+    ```
+
+### Delete Student
+
+- **接口路径**：`/api/schoolAdmin/deleteStudent/{id}`
+- **请求方法**：DELETE
+- **接口说明**：学校管理员删除指定的学生账号。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号删除成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号删除失败",
+      "data": null
+    }
+    ```
+
+### Update Student
+
+- **接口路径**：`/api/schoolAdmin/updateStudent/{id}`
+- **请求方法**：PUT
+- **接口说明**：学校管理员更新指定的学生账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username": "string", // 更新后的学生用户名
+      "email": "string", // 更新后的学生邮箱
+      "password": "string", // 更新后的学生密码
+      "name": "string", // 更新后的学生姓名
+      "grade": "int", // 更新后的学生年级
+      "school_id": "bigint" // 更新后的学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号更新成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号更新失败",
+      "data": null
+    }
+    ```
+
+### Query Student
+
+- **接口路径**：`/api/schoolAdmin/queryStudent/{id}`
+- **请求方法**：GET
+- **接口说明**：学校管理员查询指定学生账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号信息查询成功",
+      "data": {
+        "id": "bigint",
+        "username": "string",
+        "email": "string",
+        "name": "string",
+        "grade": "int",
+        "school_id": "bigint"
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号信息查询失败",
+      "data": null
+    }
+    ```
+
+### Generate Authorization Code
+
+- **接口路径**：`/api/schoolAdmin/generateAuthorizationCode`
+- **请求方法**：POST
+- **接口说明**：学校管理员生成授权码，用于授权用户访问特定资源。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "school_id": "bigint" // 学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "授权码生成成功",
+      "data": {
+        "code": "string", // 生成的授权码
+        "school_id": "bigint" // 学校ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "授权码生成失败",
+      "data": null
+    }
+    ```
+
+
+

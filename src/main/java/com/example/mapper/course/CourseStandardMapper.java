@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface CourseStandardMapper {
 
-    @Insert("INSERT INTO course_standard(title, description) VALUES(#{title}, #{description})")
+    @Insert("INSERT INTO course_standard(title, content) VALUES(#{title}, #{content})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(CourseStandard standard);
 
     @Delete("DELETE FROM course_standard WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE course_standard SET title = #{title}, description = #{description} WHERE id = #{id}")
+    @Update("UPDATE course_standard SET title = #{title}, content = #{content} WHERE id = #{id}")
     int update(CourseStandard standard);
 
     @Select("SELECT * FROM course_standard WHERE id = #{id}")

@@ -8,6 +8,6 @@ public class CourseStandard {
 
     private Long id;
     private String title;
-    private String description;
+    private byte[] content;
 
 }

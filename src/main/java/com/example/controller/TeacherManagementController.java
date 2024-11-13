@@ -1,12 +1,7 @@
 package com.example.controller;
 
-import com.example.dto.request.TeacherLoginRequest;
-import com.example.dto.request.TeacherRegisterRequest;
-import com.example.dto.request.TeacherVerifyRequest;
-import com.example.dto.response.TeacherInfoResponse;
-import com.example.dto.response.TeacherLoginResponse;
-import com.example.dto.response.TeacherRegisterResponse;
-import com.example.dto.response.TeacherVerifyResponse;
+import com.example.dto.request.*;
+import com.example.dto.response.*;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.Teacher;
 import com.example.service.user.AuthorizationCodeService;
@@ -23,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/teacher")
-public class TeacherController {
+public class TeacherManagementController {
     private final TeacherService teacherService;
     private final AuthorizationCodeService authorizationCodeService;
 
@@ -31,10 +26,10 @@ public class TeacherController {
     private final EmailService emailService;
 
     @Autowired
-    public TeacherController(TeacherServiceImpl teacherService,
-                             AuthorizationCodeServiceImpl authorizationCodeService,
-                             EmailService emailService,
-                             SchoolService schoolService) {
+    public TeacherManagementController(TeacherServiceImpl teacherService,
+                                       AuthorizationCodeServiceImpl authorizationCodeService,
+                                       EmailService emailService,
+                                       SchoolService schoolService) {
         this.teacherService = teacherService;
         this.authorizationCodeService = authorizationCodeService;
         this.emailService = emailService;
@@ -113,6 +108,7 @@ public class TeacherController {
         response.setMessage("Success");
         TeacherInfoResponse.InfoData data = new TeacherInfoResponse.InfoData();
         data.setName(teacher.getName());
+        data.setUsername(teacher.getUsername());
         data.setPhoneNumber(teacher.getPhoneNumber());
         data.setEmail(teacher.getEmail());
         data.setSchoolName(schoolService.getSchoolById(teacher.getSchoolId()).getName());
@@ -120,4 +116,43 @@ public class TeacherController {
 
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/{id}/update-username")
+    public ResponseEntity<Message> updateUsername(@PathVariable Long id, @RequestBody TeacherUpdateUsernameRequest request) {
+        Message response = new Message();
+        String newName = request.getUsername();
+        Teacher teacher = teacherService.getTeacherById(id);
+        if (teacher == null) {
+            response.setMessage("Id错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if (teacherService.existUsername(newName)) {
+            response.setMessage("用户名已存在，修改失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        //开始执行
+        teacher.setUsername(newName);
+        teacherService.updateTeacher(teacher);
+
+        response.setMessage("用户名修改成功");
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/{id}/update-phoneNumber")
+    public ResponseEntity<Message> updatePhoneNumber(@PathVariable Long id, @RequestBody TeacherUpdatePhoneNumberRequest request) {
+        Message response = new Message();
+        String newNumber = request.getPhoneNumber();
+        Teacher teacher = teacherService.getTeacherById(id);
+        if (teacher == null) {
+            response.setMessage("Id错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        //开始执行
+        teacher.setPhoneNumber(newNumber);
+        teacherService.updateTeacher(teacher);
+
+        response.setMessage("手机号修改成功");
+        return ResponseEntity.ok(response);
+    }
+
 }
