@@ -549,7 +549,6 @@
 - 响应说明：
 
   - 成功响应 (`200 OK`)
-
     - 响应类型为 `application/pdf`，返回 PDF 文件内容，附带 `Content-Disposition` 头以 inline 方式显示。
 
   - **失败响应** (`404 Not Found`):
@@ -600,6 +599,7 @@
 ### Create Group 
 
 - **接口路径**：`/api/teacher/{id}/create-group`
+
 - **请求方法**：POST
 - **接口说明**：教师用户为指定班级创建一个小组，并指定小组成员（学生ID数组）。
   - **请求说明**：
@@ -817,6 +817,7 @@
       "data": null
     }
     ```
+
 
 ### Get Student's Weakness Scores
 
@@ -1366,3 +1367,296 @@
       "data": null
     }
     ```
+
+### Create Teacher
+
+- **接口路径**：`/api/schoolAdmin/createTeacher`
+- **请求方法**：POST
+- **接口说明**：学校管理员创建新老师账号，传输老师姓名、邮箱、密码、手机号以及学校ID。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name": "string", // 老师姓名
+      "email": "string", // 老师邮箱
+      "password": "string", // 老师密码
+      "phone_number": "string", // 老师手机号
+      "school_id": "bigint" // 学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号创建成功",
+      "data": {
+        "id": "bigint" // 新创建的老师账号ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号创建失败",
+      "data": null
+    }
+    ```
+
+### Delete Teacher
+
+- **接口路径**：`/api/schoolAdmin/deleteTeacher/{id}`
+- **请求方法**：DELETE
+- **接口说明**：学校管理员删除指定的老师账号。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号删除成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号删除失败",
+      "data": null
+    }
+    ```
+
+### Update Teacher
+
+- **接口路径**：`/api/schoolAdmin/updateTeacher/{id}`
+- **请求方法**：PUT
+- **接口说明**：学校管理员更新指定的老师账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name": "string", // 更新后的老师姓名
+      "email": "string", // 更新后的老师邮箱
+      "password": "string", // 更新后的老师密码
+      "phone_number": "string", // 更新后的老师手机号
+      "school_id": "bigint" // 更新后的学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号更新成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号更新失败",
+      "data": null
+    }
+    ```
+
+### Query Teacher
+
+- **接口路径**：`/api/schoolAdmin/queryTeacher/{id}`
+- **请求方法**：GET
+- **接口说明**：学校管理员查询指定老师账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "老师账号信息查询成功",
+      "data": {
+        "id": "bigint",
+        "name": "string",
+        "email": "string",
+        "phone_number": "string",
+        "school_id": "bigint"
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "老师账号信息查询失败",
+      "data": null
+    }
+    ```
+
+### Create Student
+
+- **接口路径**：`/api/schoolAdmin/createStudent`
+- **请求方法**：POST
+- **接口说明**：学校管理员创建新学生账号，传输学生用户名、邮箱、密码、姓名、年级以及学校ID。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username": "string", // 学生用户名
+      "email": "string", // 学生邮箱
+      "password": "string", // 学生密码
+      "name": "string", // 学生姓名
+      "grade": "int", // 学生年级
+      "school_id": "bigint" // 学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号创建成功",
+      "data": {
+        "id": "bigint" // 新创建的学生账号ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号创建失败",
+      "data": null
+    }
+    ```
+
+### Delete Student
+
+- **接口路径**：`/api/schoolAdmin/deleteStudent/{id}`
+- **请求方法**：DELETE
+- **接口说明**：学校管理员删除指定的学生账号。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号删除成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号删除失败",
+      "data": null
+    }
+    ```
+
+### Update Student
+
+- **接口路径**：`/api/schoolAdmin/updateStudent/{id}`
+- **请求方法**：PUT
+- **接口说明**：学校管理员更新指定的学生账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username": "string", // 更新后的学生用户名
+      "email": "string", // 更新后的学生邮箱
+      "password": "string", // 更新后的学生密码
+      "name": "string", // 更新后的学生姓名
+      "grade": "int", // 更新后的学生年级
+      "school_id": "bigint" // 更新后的学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号更新成功",
+      "data": null
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号更新失败",
+      "data": null
+    }
+    ```
+
+### Query Student
+
+- **接口路径**：`/api/schoolAdmin/queryStudent/{id}`
+- **请求方法**：GET
+- **接口说明**：学校管理员查询指定学生账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号信息查询成功",
+      "data": {
+        "id": "bigint",
+        "username": "string",
+        "email": "string",
+        "name": "string",
+        "grade": "int",
+        "school_id": "bigint"
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号信息查询失败",
+      "data": null
+    }
+    ```
+
+### Generate Authorization Code
+
+- **接口路径**：`/api/schoolAdmin/generateAuthorizationCode`
+- **请求方法**：POST
+- **接口说明**：学校管理员生成授权码，用于授权用户访问特定资源。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "school_id": "bigint" // 学校ID
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "授权码生成成功",
+      "data": {
+        "code": "string", // 生成的授权码
+        "school_id": "bigint" // 学校ID
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "授权码生成失败",
+      "data": null
+    }
+    ```
+
+
+
