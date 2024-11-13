@@ -54,6 +54,11 @@ public class CourseStandardServiceImpl implements CourseStandardService {
     }
 
     @Override
+    public CourseStandard getCourseStandardAhead() {
+        return courseStandardMapper.getAheadStandard();
+    }
+
+    @Override
     public List<CourseStandard> getAllCourseStandards() {
         return courseStandardMapper.selectAll();
     }

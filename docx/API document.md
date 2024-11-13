@@ -532,7 +532,7 @@
     }
     ```
 
-### View Curriculum Standard
+### View Curriculum Standard  `finished`
 
 - **接口路径**：`/api/teacher/{id}/view-curriculum-standard`
 
@@ -1281,9 +1281,10 @@
 - **请求方法**：GET
 - **接口说明**：系统管理员用户通过用户 ID 获取自己的信息。
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 用户的唯一标识符
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -1304,135 +1305,148 @@
     }
     ```
 
+### Create Course Standard `finished`
 
-### Create Course Standard
+- **接口路径**：`/api/system-admin/create-course-standard`
 
-- **接口路径**：`/api/admin/create-course-standard`
 - **请求方法**：POST
-- **接口说明**：系统管理员创建新课标，传输课标标题和课标描述。
+
+- **接口说明**：系统管理员创建新课标，传输课标 PDF 文件。
+
 - **请求说明**：
+
+  - 请求参数：
+    - `executedDate` (必填) - 操作执行的时间。示例: `2024-11-11`
   
-  - 请求参数：无路径参数。
-  - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "title": "string", // 课标标题
-      "description": "string" // 课标描述
-    }
-    ```
+  - 请求体：
+    - 文件 (`Multipart/Form-Data`)：`file` - 课标的 PDF 文件
+
 - **响应说明**：
-  
+
   - 响应格式：`JSON`
+
   - **成功响应** (`200 OK`):
-    
+
     ```json
     {
       "message": "课标创建成功",
-      "data": {
-        "courseStandardId": "string" // 新创建的课标ID
-      }
+      "courseStandardId": 12345 // 新创建的课标ID
     }
     ```
+
   - **失败响应** (`400 Bad Request`):
+
     ```json
     {
       "message": "课标创建失败",
-      "data": null
+      "courseStandardId": null
+    }
+    ```
+
+### Update Course Standard `finished`
+
+- **接口路径**：`/api/system-admin/update-course-standard/{id}`
+
+- **请求方法**：PUT
+
+- **接口说明**：系统管理员更新指定的课标 PDF 文件。
+
+- **请求说明**：
+
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 课标的唯一标识符
+    - `executedDate` (必填) - 操作执行的时间。
+  
+  - 请求体：
+    - 文件 (`Multipart/Form-Data`)：`file` - 更新后的课标 PDF 文件
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "课标更新成功"
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "课标更新失败"
+    }
+    ```
+
+
+### Query Course Standard
+
+- **接口路径**：`/api/system-admin/query-course-standard/{courseStandardId}`
+- **接口说明**：系统管理员查看课程标准（课标），以 PDF 文件形式返回。
+- **请求说明**：
+
+  - 路径参数：
+    - `courseStandardId`：课程的唯一标识符。
+  - 请求体：无
+
+- 响应说明：
+
+  - 成功响应 (`200 OK`)
+
+    - 响应类型为 `application/pdf`，返回 PDF 文件内容，附带 `Content-Disposition` 头以 inline 方式显示。
+
+  - **失败响应** (`404 Not Found`):
+
+    ```json
+    {
+      "message": "课标获取失败，未找到相关课标信息"
     }
     ```
 
 ### Delete Course Standard
 
-- **接口路径**：`/api/admin/delete-course-standard/{courseStandardId}`
+- **接口路径**：`/api/admin/deleteCourseStandard/{id}`
+
 - **请求方法**：DELETE
+
 - **接口说明**：系统管理员删除指定的课标。
-- **请求说明**：
+
+- 请求说明：
+
   - 请求参数：
-    - 路径参数（Path Variable）：`courseStandardId` - 课标的唯一标识符
-- **响应说明**：
+    - 路径参数（Path Variable）：`id` - 课标的唯一标识符
+
+- 响应说明：
+
   - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
+
+  - 成功响应(`200 OK`):
+
+    ```
     {
       "message": "课标删除成功",
-      "data": null
     }
     ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
+
+    
+
+  - 失败响应(`400 Bad Request`):
+
+    ```
     {
       "message": "课标删除失败",
-      "data": null
-    }
-    ```
-
-### Update Course Standard
-
-- **接口路径**：`/api/admin/update-course-standard/{courseStandardId}`
-- **请求方法**：PUT
-- **接口说明**：系统管理员更新指定的课标信息。
-- **请求说明**：
-  - 请求参数：
-    - 路径参数（Path Variable）：`courseStandardId` - 课标的唯一标识符
-  - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "title": "string", // 更新后的课标标题
-      "description": "string" // 更新后的课标描述
-    }
-    ```
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "课标更新成功",
-      "data": null
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "课标更新失败",
-      "data": null
-    }
-    ```
-
-### Query Course Standard
-
-- **接口路径**：`/api/admin/query-course-standard/{courseStandardId}`
-- **请求方法**：GET
-- **接口说明**：系统管理员查询指定课标信息。
-- **请求说明**：
-  - 请求参数：
-    - 路径参数（Path Variable）：`courseStandardId` - 课标的唯一标识符
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "课标信息查询成功",
-      "data": {
-        "courseStandardId": "string",
-        "title": "string",
-        "description": "string"
-      }
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "课标信息查询失败",
-      "data": null
     }
     ```
 
 ### Create Knowledge Point
 
-- **接口路径**：`/api/admin/create-knowledge-point`
+- **接口路径**：`/api/system-admin/create-knowledge-point`
 - **请求方法**：POST
 - **接口说明**：系统管理员创建新知识点，传输知识点标题、描述以及对应的课标ID。
 - **请求说明**：
+  
   - 请求参数：无路径参数。
   - 请求体(`JSON` 格式)：
     ```json
@@ -1464,7 +1478,7 @@
 
 ### Delete Knowledge Point
 
-- **接口路径**：`/api/admin/delete-knowledge-point/{knowledgePointId}`
+- **接口路径**：`/api/system-admin/delete-knowledge-point/{knowledgePointId}`
 - **请求方法**：DELETE
 - **接口说明**：系统管理员删除指定的知识点。
 - **请求说明**：
@@ -1490,7 +1504,7 @@
 
 ### Update Knowledge Point
 
-- **接口路径**：`/api/admin/update-knowledge-point/{knowledgePointId}`
+- **接口路径**：`/api/system-admin/update-knowledge-point/{knowledgePointId}`
 - **请求方法**：PUT
 - **接口说明**：系统管理员更新指定的知识点信息。
 - **请求说明**：
@@ -1523,7 +1537,7 @@
 
 ### Query Knowledge Point
 
-- **接口路径**：`/api/admin/query-knowledge-point/{knowledgePointId}`
+- **接口路径**：`/api/system-admin/query-knowledge-point/{knowledgePointId}`
 - **请求方法**：GET
 - **接口说明**：系统管理员查询指定知识点信息。
 - **请求说明**：
