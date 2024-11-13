@@ -157,7 +157,7 @@
       "data": {
          "username": "string",
          "name": "string",
-         "grade": "int”
+         "grade": "int"
       }
     }
     ```
@@ -167,7 +167,7 @@
         "message": "个人信息更新失败",
         "data": null
      }
-      ```
+     ```
 
 ### Change Emai
 - **接口路径**：`/api/student/{id}/changeEmail`
@@ -179,7 +179,7 @@
 - 请求体(`JSON` 格式)：
 ```json
 {
-  "email”: “string"
+  "email": "string"
 }
 ```
 - **响应说明**
@@ -189,15 +189,15 @@
     {
       "message": "邮箱更换成功",
       "data": {
-          "email": "string”
-      }
+          "email": "string"
+         },
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
       "message": "邮箱更换失败",
- 	  "data": null
+      "data": null
     }
     ```
 
@@ -243,8 +243,8 @@
 - 请求体(`JSON` 格式)：
   ```json
   {
-    “oldPassword”: “string”
-    “newPassword”: “string”
+    "oldPassword": "string",
+    "newPassword": "string"
   }
   ```
 - **响应说明**
@@ -296,7 +296,7 @@
 - 请求体(`JSON` 格式)：
   ```json
   {
-    "inviteCode": "string”
+    "inviteCode": "string"
   }
   ```
 - **响应说明**
@@ -306,7 +306,7 @@
   {
     "message": "成功加入班级",
     "data": {
-      "className”: "string"
+      "className" : "string"
     }
   }
   ```
@@ -449,6 +449,7 @@
       "message" : "success",
       "data": {
           "name": "string",
+          "username": "string",
           "email": "string",
           "phoneNumber": "string",
           "schoolName": "string"
@@ -525,7 +526,7 @@
     }
     ```
 
-### View Curriculum Standard `finished`
+### View Curriculum Standard 
 
 - **接口路径**：`/api/teacher/{teacherId}/viewCurriculumStandard`
 - **请求方法**：GET
@@ -565,7 +566,7 @@
     }
     ```
 
-### Create Class `finished`
+### Create Class 
 
 - **接口路径**：`/api/teacher/{id}/createClass`
 - **请求方法**：POST
@@ -602,8 +603,7 @@
     }
     ```
 
-
-### Create Group `finished`
+### Create Group 
 
 - **接口路径**：`/api/teacher/{id}/createGroup`
 - **请求方法**：POST
@@ -639,7 +639,7 @@
     }
     ```
 
-### Get Classes Information `finished`
+### Get Classes Information 
 
 - **接口路径**：`/api/teacher/{id}/getClasses`
 - **请求方法**：GET
@@ -681,7 +681,7 @@
 
 ---
 
-### Get Groups Information `finished`
+### Get Groups Information 
 
 - **接口路径**：`/api/teacher/{id}/getGroups`
 - **请求方法**：GET
@@ -720,7 +720,7 @@
       "data": null
     }
     ```
-### Get Class Members Information `finished`
+### Get Class Members Information 
 
 - **接口路径**：`/api/teacher/{id}/getClassMembers`
 - **请求方法**：GET
@@ -758,7 +758,7 @@
     ```
 
 
-### Get Student's Average Homework Score and Class Rank `finished`
+### Get Student's Average Homework Score and Class Rank 
 
 - **接口路径**：`/api/teacher/{id}/getStudentAverageHomework`
 - **请求方法**：GET
@@ -789,7 +789,7 @@
     }
     ```
 
-### Get Student's Five Dimensional Scores `finished`
+### Get Student's Five Dimensional Scores 
 
 - **接口路径**：`/api/teacher/{id}/getStudentFiveDimensionalScores`
 - **请求方法**：GET
@@ -823,7 +823,7 @@
     }
     ```
 
-### Get Student's Weakness Scores `finished`
+### Get Student's Weakness Scores 
 
 - **接口路径**：`/api/teacher/{id}/getStudentWeaknessScores`
 - **请求方法**：GET
@@ -865,7 +865,7 @@
     ```
 
 
-### Get Student's Historical Homework Scores `finished`
+### Get Student's Historical Homework Scores 
 
 - **接口路径**：`/api/teacher/{id}/getStudentHistoricalHomeworkScores`
 - **请求方法**：GET
@@ -893,7 +893,7 @@
     }
     ```
 
-### Get Class's Historical Average Score `finished`
+### Get Class's Historical Average Score 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/historicalAverageScores`
 - **请求方法**：GET
@@ -929,7 +929,7 @@
       "data": null
     }
     ```
-### Disband Class `finished`
+### Disband Class 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/disband`
 - **请求方法**：DELETE
@@ -956,7 +956,7 @@
     ```
 
 
-### Remove Student from Class `finished`
+### Remove Student from Class 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/students/{studentId}/remove`
 - **请求方法**：DELETE
@@ -983,7 +983,7 @@
     }
     ```
 
-### Get Group Members `finished`
+### Get Group Members 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/members`
 - **请求方法**：GET
@@ -1021,7 +1021,7 @@
     }
     ```
 
-### Get Group's Historical Scores `finished`
+### Get Group's Historical Scores 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/historicalScores`
 - **请求方法**：GET
@@ -1058,7 +1058,7 @@
     }
     ```
 
-### Disband Group `finished`
+### Disband Group 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/disband`
 - **请求方法**：DELETE
@@ -1085,7 +1085,7 @@
     }
     ```
 
-### Remove Student from Group `finished`
+### Remove Student from Group 
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/students/{studentId}/remove`
 - **请求方法**：DELETE
@@ -1113,7 +1113,7 @@
     }
     ```
 
-### Generate Exam Paper `finished`
+### Generate Exam Paper 
 
 - **接口路径**：`/api/teacher/{teacherId}/generateExam`
 - **请求方法**：GET
@@ -1168,7 +1168,7 @@
     }
     ```
 
-### Generate Custom Exam Paper `finished`
+### Generate Custom Exam Paper 
 
 - **接口路径**：`/api/teacher/{teacherId}/generateCustomExam`
 - **请求方法**：POST
