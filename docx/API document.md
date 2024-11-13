@@ -134,7 +134,7 @@
     ```
     
 ### Edit Personal Information
-- **接口路径**：`/api/student/{id}/editInformation`
+- **接口路径**：`/api/student/{id}/edit-information`
 - **请求方法**：`POST`
 - **接口说明**：学生用户通过进入编辑，更新个人信息。
 - **请求说明**
@@ -171,7 +171,7 @@
 
 ### Change Email
 
-- **接口路径**：`/api/student/{id}/changeEmail`
+- **接口路径**：`/api/student/{id}/change-email`
 - **请求方法**：`POST`
 - **接口说明**：学生用户更换邮箱输入正确验证码后，更换邮箱。
 - **请求说明**
@@ -204,7 +204,7 @@
     ```
 
 ### Send Verification Code To Change Student’s Email
-- **接口路径**：`/api/student/{id}/ChangeEmail/send-verification`
+- **接口路径**：`/api/student/{id}/change-email/send-verification`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的更换绑定邮箱中发送验证码。
 - **请求说明**
@@ -236,7 +236,7 @@
   ```
 
 ### Change Password
-- **接口路径**：`/api/student/{id}/changePassword`
+- **接口路径**：`/api/student/{id}/change-password`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的修改密码进行修改。
 - **请求说明**
@@ -265,7 +265,7 @@
   ```
 
 ### Account Deactivation
-- **接口路径**：`/api/student/{id}/accountDeactivation`
+- **接口路径**：`/api/student/{id}/account-deactivation`
 - **请求方法**：`DELETE`
 - **接口说明**：学生注销账号。
 - **请求说明**
@@ -289,7 +289,7 @@
   ```
 
 ### Join Class
-- **接口路径**：`/api/student/{id}/joinClass`
+- **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
 - **请求说明**

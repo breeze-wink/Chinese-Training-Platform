@@ -4,7 +4,7 @@ import com.example.mapper.classes.ClassGroupMapper;
 import com.example.mapper.classes.ClassMapper;
 import com.example.mapper.classes.ClassStudentMapper;
 import com.example.mapper.user.TeacherMapper;
-import com.example.model.classes.Class;
+import com.example.model.classes.Clazz;
 import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
 import com.example.service.classes.ClassGroupService;
@@ -44,7 +44,7 @@ public class ClassServiceImpl implements ClassService {
         while(classMapper.inviteCodeCheck(inviteCode) != null){
             inviteCode = charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)];
         }
-        Class clazz = new Class();
+        Clazz clazz = new Clazz();
         clazz.setName(className);
         clazz.setDescription(classDescription);
         clazz.setInviteCode(inviteCode);
@@ -84,5 +84,17 @@ public class ClassServiceImpl implements ClassService {
             classGroupService.removeStudentFromGroup(classGroup.getId(), studentId);
         }
         return classStudentMapper.delete(classId, studentId);
+    }
+
+    @Override
+    @Transactional
+    public Clazz getClassById(Long classId) {
+        return classMapper.selectById(classId);
+    }
+
+    @Override
+    @Transactional
+    public List<Clazz> getAllClasses() {
+        return classMapper.selectAll();
     }
 }
