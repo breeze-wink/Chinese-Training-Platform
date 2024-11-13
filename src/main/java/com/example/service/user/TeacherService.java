@@ -15,6 +15,7 @@ public interface TeacherService {
     Teacher authenticate(String email, String password);
 
     boolean existTeacher(String email);
+    boolean existUsername(String username);
 
     Long getTeacherSchoolId(Long teacherId);
 }
