@@ -369,6 +369,7 @@
 - **请求方法**：POST
 - **接口说明**：教师用户通过邮箱发送验证码。
 - **请求说明**
+  
   - 请求头: `Content-Type` : `application/json`
   - 请求参数:
     - 请求体(`JSON` 格式)：
@@ -554,9 +555,7 @@
   - **失败响应** (`404 Not Found`):
 
     ```json
-    {
-      "message": "课标获取失败，未找到相关课标信息"
-    }
+    响应体为空
     ```
 
 ### Create Class
@@ -1109,16 +1108,17 @@
     }
     ```
 
-### Generate Exam Paper 
+### Generate Exam Paper
 
 - **接口路径**：`/api/teacher/{teacherId}/generate-exam`
 - **请求方法**：GET
 - **接口说明**：教师用户自动生成试卷，返回题目信息。
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
   - 请求体：无
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -1305,6 +1305,52 @@
     }
     ```
 
+### Get all courseStandard `finished`
+
+- **接口路径**：`/api/system-admin/get-all-course-standards`
+
+- **请求方法**：GET
+
+- **接口说明**：系统管理员获取所有课标信息。
+
+- **请求说明**：
+
+  - 无请求参数。
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "课标获取成功",
+      "courseStandardInfos": [
+        {
+          "id": 12345,
+          "title": "string",
+          "executedDate": "string"
+        },
+        {
+          "id": 12345,
+          "title": "string",
+          "executedDate": "string"
+        }
+        ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "知识点获取失败",
+      "data": null
+    }
+    ```
+
 ### Create Course Standard `finished`
 
 - **接口路径**：`/api/system-admin/create-course-standard`
@@ -1343,6 +1389,8 @@
     }
     ```
 
+
+
 ### Update Course Standard `finished`
 
 - **接口路径**：`/api/system-admin/update-course-standard/{id}`
@@ -1380,15 +1428,14 @@
     }
     ```
 
+### Query Course Standard `finished`
 
-### Query Course Standard
-
-- **接口路径**：`/api/system-admin/query-course-standard/{courseStandardId}`
+- **接口路径**：`/api/system-admin/query-course-standard/{id}`
 - **接口说明**：系统管理员查看课程标准（课标），以 PDF 文件形式返回。
 - **请求说明**：
 
   - 路径参数：
-    - `courseStandardId`：课程的唯一标识符。
+    - `id`：课程的唯一标识符。
   - 请求体：无
 
 - 响应说明：
@@ -1400,14 +1447,12 @@
   - **失败响应** (`404 Not Found`):
 
     ```json
-    {
-      "message": "课标获取失败，未找到相关课标信息"
-    }
+    响应体为空
     ```
 
-### Delete Course Standard
+### Delete Course Standard  `finished`
 
-- **接口路径**：`/api/admin/deleteCourseStandard/{id}`
+- **接口路径**：`/api/admin/delete-course-standard/{id}`
 
 - **请求方法**：DELETE
 
@@ -1432,7 +1477,7 @@
 
     
 
-  - 失败响应(`400 Bad Request`):
+  - 失败响应(`404 Not Found`):
 
     ```
     {
@@ -1440,7 +1485,7 @@
     }
     ```
 
-### Create Knowledge Point
+### Create Knowledge Point `finished`
 
 - **接口路径**：`/api/system-admin/create-knowledge-point`
 - **请求方法**：POST
@@ -1451,20 +1496,18 @@
   - 请求体(`JSON` 格式)：
     ```json
     {
-      "title": "string", // 知识点标题
-      "description": "string", // 知识点描述
-      "courseStandardId": "string" // 对应的课标ID
+      "name": "string", // 知识点标题
+      "description": "string" // 知识点描述
     }
     ```
 - **响应说明**：
+  
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
       "message": "知识点创建成功",
-      "data": {
-        "knowledgePointId": "string" // 新创建的知识点ID
-      }
+      "knowledgePointId": 12345 // 新创建的知识点ID
     }
     ```
   - **失败响应** (`400 Bad Request`):
@@ -1472,50 +1515,50 @@
     ```json
     {
       "message": "知识点创建失败",
-      "data": null
+      "knowledgePointId": null
     }
     ```
 
-### Delete Knowledge Point
+### Delete Knowledge Point `finished`
 
-- **接口路径**：`/api/system-admin/delete-knowledge-point/{knowledgePointId}`
+- **接口路径**：`/api/system-admin/delete-knowledge-point/{id}`
 - **请求方法**：DELETE
 - **接口说明**：系统管理员删除指定的知识点。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
+    - 路径参数（Path Variable）：`id` - 知识点的唯一标识符
 - **响应说明**：
   
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
+    
     ```json
     {
       "message": "知识点删除成功",
-      "data": null
     }
     ```
   - **失败响应** (`400 Bad Request`):
+    
     ```json
     {
       "message": "知识点删除失败",
-      "data": null
     }
     ```
 
-### Update Knowledge Point
+### Update Knowledge Point `finished`
 
-- **接口路径**：`/api/system-admin/update-knowledge-point/{knowledgePointId}`
+- **接口路径**：`/api/system-admin/update-knowledge-point/{id}`
 - **请求方法**：PUT
 - **接口说明**：系统管理员更新指定的知识点信息。
 - **请求说明**：
+  
   - 请求参数：
-    - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
+    - 路径参数（Path Variable）：`id` - 知识点的唯一标识符
   - 请求体(`JSON` 格式)：
     ```json
     {
-      "title": "string", // 更新后的知识点标题
+      "name": "string", // 更新后的知识点标题
       "description": "string", // 更新后的知识点描述
-      "courseStandardId": "string" // 更新后的对应课标ID
     }
     ```
 - **响应说明**：
@@ -1524,26 +1567,64 @@
     ```json
     {
       "message": "知识点更新成功",
-      "data": null
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
       "message": "知识点更新失败",
+    }
+    ```
+### Get All Knowledge Points `finished`
+
+- **接口路径**：`/api/system-admin/get-all-knowledge-points`
+
+- **请求方法**：GET
+
+- **接口说明**：系统管理员获取所有知识点信息。
+
+- **请求说明**：
+  - 无请求参数。
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "知识点获取成功",
+      "knowledgePointInfos": [
+        {
+          "id": 12345,
+          "name": "string",
+          "description": "string"
+        },
+        {
+          "id": 12345,
+          "name": "string",
+          "description": "string"
+        }
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    
+    ```json
+    {
+      "message": "知识点获取失败",
       "data": null
     }
     ```
 
-### Query Knowledge Point
+### Query Knowledge Point `finished`
 
-- **接口路径**：`/api/system-admin/query-knowledge-point/{knowledgePointId}`
+- **接口路径**：`/api/system-admin/query-knowledge-point/{id}`
 - **请求方法**：GET
 - **接口说明**：系统管理员查询指定知识点信息。
 - **请求说明**：
   
   - 请求参数：
-    - 路径参数（Path Variable）：`knowledgePointId` - 知识点的唯一标识符
+    - 路径参数（Path Variable）：`id` - 知识点的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -1551,10 +1632,8 @@
     {
       "message": "知识点信息查询成功",
       "data": {
-        "knowledgePointId": "string",
-        "title": "string",
+        "name": "string",
         "description": "string",
-        "courseStandardId": "string"
       }
     }
     ```

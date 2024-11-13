@@ -11,9 +11,12 @@ import java.util.List;
 
 @Service
 public class KnowledgePointServiceImpl implements KnowledgePointService {
+    private final KnowledgePointMapper knowledgePointMapper;
 
     @Autowired
-    private KnowledgePointMapper knowledgePointMapper;
+    public KnowledgePointServiceImpl(KnowledgePointMapper knowledgePointMapper) {
+        this.knowledgePointMapper = knowledgePointMapper;
+    }
 
     @Override
     @Transactional

@@ -1,13 +1,11 @@
-package com.example.model.course;
+package com.example.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
-@Setter
-@Getter
-public class KnowledgePoint {
 
-    private Long id;
+@Getter
+@Setter
+public class CreateKnowledgePointRequest {
     private String name;
     private String description;
-
 }
