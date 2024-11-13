@@ -26,7 +26,7 @@ public class TeacherBusinessController {
 
     @GetMapping("/{id}/view-curriculum-standard")
     public ResponseEntity<InputStreamResource> viewCurriculumStandard(@PathVariable Long id) {
-        CourseStandard courseStandard = courseStandardService.getCourseStandardById(1L);
+        CourseStandard courseStandard = courseStandardService.getCourseStandardAhead();
         if (courseStandard == null || courseStandard.getContent() == null) {
             return ResponseEntity.status(404).body(null);
         }

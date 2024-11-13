@@ -9,5 +9,6 @@ public interface CourseStandardService {
     int removeCourseStandard(Long id);
     int updateCourseStandard(CourseStandard standard);
     CourseStandard getCourseStandardById(Long id);
+    CourseStandard getCourseStandardAhead();
     List<CourseStandard> getAllCourseStandards();
 }
