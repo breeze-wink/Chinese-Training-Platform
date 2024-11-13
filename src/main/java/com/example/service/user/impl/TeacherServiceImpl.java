@@ -63,6 +63,11 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public boolean existUsername(String username) {
+        return teacherMapper.findByUsername(username) != null;
+    }
+
+    @Override
     @Transactional
     public Long getTeacherSchoolId(Long teacherId) {
         Teacher teacher = getTeacherById(teacherId);
