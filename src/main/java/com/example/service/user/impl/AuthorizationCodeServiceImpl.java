@@ -25,8 +25,8 @@ public class AuthorizationCodeServiceImpl implements AuthorizationCodeService {
 
     @Override
     @Transactional
-    public int removeAuthorizationCode(String code) {
-        return authorizationCodeMapper.delete(code);
+    public int removeAuthorizationCode(Long schoolId) {
+        return authorizationCodeMapper.delete(schoolId);
     }
 
     @Override
@@ -36,13 +36,30 @@ public class AuthorizationCodeServiceImpl implements AuthorizationCodeService {
     }
 
     @Override
-    public AuthorizationCode getAuthorizationCodeByCode(String code) {
-        return authorizationCodeMapper.selectByCode(code);
+    public AuthorizationCode getAuthorizationCodeBySchoolId(Long schoolId) {
+        return authorizationCodeMapper.selectBySchoolId(schoolId);
     }
 
     @Override
     public List<AuthorizationCode> getAllAuthorizationCodes() {
         return authorizationCodeMapper.selectAll();
+    }
+
+    @Override
+    @Transactional
+    public Boolean codeIsExist(String code) {
+        return authorizationCodeMapper.selectByCode(code) != null;
+    }
+
+    @Override
+    @Transactional
+    public Boolean schoolIsExist(Long schoolId) {
+        return authorizationCodeMapper.selectBySchoolId(schoolId) != null;
+    }
+
+    @Override
+    public AuthorizationCode getAuthorizationCodeByCode(String code) {
+        return authorizationCodeMapper.selectByCode(code);
     }
 
 }

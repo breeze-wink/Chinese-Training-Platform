@@ -40,4 +40,11 @@ public class ClassStudentServiceImpl implements ClassStudentService {
     public ClassStudent selectByClassIdAndStudentId(Long classId, Long studentId) {
         return classStudentMapper.select(classId, studentId);
     }
+
+    @Override
+    @Transactional
+    public List<ClassStudent> getClassStudentsByStudentId(Long studentid) {
+        return classStudentMapper.selectByStudentId(studentid);
+    }
+
 }

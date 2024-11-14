@@ -115,4 +115,12 @@ public class ClassServiceImpl implements ClassService {
     public Clazz getClassByInviteCode(String inviteCode) {
         return classMapper.selectById(classMapper.selectIdByInviteCode(inviteCode));
     }
+
+    @Override
+    @Transactional
+    public List<Clazz> getClassesByTeacherId(Long teacherId) {
+        return classMapper.selectByCreatorId(teacherId);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.service.classes;
 
+import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 
 import java.util.List;
@@ -14,4 +15,8 @@ public interface ClassService {
     Clazz getClassById(Long classId);
     List<Clazz> getAllClasses();
     Clazz getClassByInviteCode(String inviteCode);
+    List<Clazz> getClassesByTeacherId(Long teacherId);
+
+
+
 }

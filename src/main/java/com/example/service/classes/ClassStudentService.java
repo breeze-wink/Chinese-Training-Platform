@@ -9,4 +9,6 @@ public interface ClassStudentService {
     int removeClassStudent(Long classId, Long studentId);
     List<ClassStudent> getClassStudentByStudentId(Long studentId);
     ClassStudent selectByClassIdAndStudentId(Long classId, Long studentId);
+
+    List<ClassStudent> getClassStudentsByStudentId(Long studentid);
 }

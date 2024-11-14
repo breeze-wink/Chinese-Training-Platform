@@ -29,4 +29,7 @@ public interface ClassMapper {
 
     @Select("SELECT id FROM class WHERE inviteCode = #{inviteCode}")
     Long selectIdByInviteCode(String inviteCode);
+
+    @Select("SELECT * FROM class WHERE creatorId = #{creatorId}")
+    List<Clazz> selectByCreatorId(Long teacherId);
 }

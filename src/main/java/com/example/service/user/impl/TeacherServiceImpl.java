@@ -73,4 +73,9 @@ public class TeacherServiceImpl implements TeacherService {
         Teacher teacher = getTeacherById(teacherId);
         return teacher.getSchoolId();
     }
+
+    @Override
+    public List<Teacher> getTeachersBySchoolId(Long schoolId) {
+        return teacherMapper.selectBySchoolId(schoolId);
+    }
 }

@@ -30,4 +30,7 @@ public interface TeacherMapper {
 
     @Select("SELECT * FROM teacher where username = #{username}")
     Teacher findByUsername(String username);
+
+    @Select("SELECT * FROM teacher where schoolId = #{schoolId}")
+    List<Teacher> selectBySchoolId(Long schoolId);
 }

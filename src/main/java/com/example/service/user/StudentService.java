@@ -13,4 +13,5 @@ public interface StudentService {
     Student authenticate(String account, String password);
     boolean existStudent(String email);
     boolean existStudentUsername(String username);
+    List<Student> getStudentsBySchoolId(Long schoolId);
 }
