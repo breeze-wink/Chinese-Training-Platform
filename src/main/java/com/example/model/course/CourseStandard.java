@@ -2,6 +2,9 @@ package com.example.model.course;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
+
 @Getter
 @Setter
 public class CourseStandard {
@@ -9,5 +12,5 @@ public class CourseStandard {
     private Long id;
     private String title;
     private byte[] content;
-
+    private LocalDate executedDate;
 }
