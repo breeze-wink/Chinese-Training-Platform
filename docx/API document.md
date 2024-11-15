@@ -308,7 +308,8 @@
   {
     "message": "成功加入班级",
     "data": {
-      "className" : "string"
+      "className" : "string",
+      "schoolName" : "string",
     }
   }
   ```
@@ -1336,7 +1337,7 @@
           "id": 12345,
           "title": "string",
           "executedDate": "string"
-        }
+        },
         ...
       ]
     }
@@ -1602,7 +1603,7 @@
           "id": 12345,
           "name": "string",
           "description": "string"
-        }
+        },
         ...
       ]
     }
@@ -2024,7 +2025,7 @@
          "name": "string",
          "grade": "int",
          "schoolId": "bigint"
-         }
+         },
         ...
       ]
     }
@@ -2065,7 +2066,7 @@
         "name": "string",
         "phoneNumber": "string",
         "schoolId": "bigint"
-         }
+         },
         ...
       ]
     }

@@ -29,13 +29,15 @@ public class EditStudentInfoController {
     private final EmailService emailService;
     private final ClassStudentService classStudentService;
     private final ClassService classService;
+    private final SchoolService schoolService;
 
     @Autowired
-    public EditStudentInfoController(StudentServiceImpl studentService, EmailService emailService, ClassStudentService classStudentService, ClassService classService) {
+    public EditStudentInfoController(StudentServiceImpl studentService, EmailService emailService, ClassStudentService classStudentService, ClassService classService, SchoolService schoolService) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.classStudentService = classStudentService;
         this.classService = classService;
+        this.schoolService = schoolService;
     }
     @PostMapping("/{id}/editInformation")
     public ResponseEntity<StudentEditInformationResponse> studentEditInformation(@PathVariable Long id, @RequestBody StudentEditInformationRequest request) {
@@ -58,6 +60,7 @@ public class EditStudentInfoController {
         data.setUsername(student.getUsername());
         data.setName(student.getName());
         data.setGrade(student.getGrade());
+        response.setData(data);
         return ResponseEntity.ok(response);
     }
 
@@ -140,6 +143,7 @@ public class EditStudentInfoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         data.setClassName(clazz.getName());
+        data.setSchoolName(schoolService.getSchoolById(clazz.getSchoolId()).getName());
         response.setData(data);
         response.setMessage("加入班级成功");
         return ResponseEntity.ok(response);

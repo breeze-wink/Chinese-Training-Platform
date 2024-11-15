@@ -12,5 +12,6 @@ public class StudentJoinClassResponse {
     @Setter
     public static class InfoData {
         private String className;
+        private String schoolName;
     }
 }
