@@ -15,5 +15,6 @@ public class SchoolAdminInfoResponse {
         private String username;
         private String email;
         private String schoolName;
+        private String authorizationCode;
     }
 }

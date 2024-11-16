@@ -1699,7 +1699,8 @@
       "data": {
           "username": "string",
           "email": "string",
-          "schoolName": "string"
+          "schoolName": "string",
+          "authorizationCode": "string"
       }
     }
     ```
