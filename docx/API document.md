@@ -559,7 +559,7 @@
     响应体为空
     ```
 
-### Create Class
+### Create Class `finished`
 
 - **接口路径**：`/api/teacher/{id}/create-class`
 - **请求方法**：POST
@@ -631,7 +631,7 @@
     }
     ```
 
-### Get Classes Information
+### Get Classes Information `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-classes`
 - **请求方法**：GET

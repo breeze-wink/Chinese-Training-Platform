@@ -6,7 +6,7 @@ import com.example.model.classes.Clazz;
 import java.util.List;
 
 public interface ClassService {
-    int createClass(String className, String classDescription, Long creatorId);
+    Clazz createClass(String className, String classDescription, Long creatorId);
     int addClass(Clazz clazz);
     int removeClass(Long classId);
     int updateClass(Clazz clazz);
