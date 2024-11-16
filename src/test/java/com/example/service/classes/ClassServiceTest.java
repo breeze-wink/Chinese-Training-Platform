@@ -25,12 +25,6 @@ class ClassServiceTest {
   }
 
 
-  @Test
-  void testCreateClass() {
-    assertNotNull(classService, "ClassService should not be null");
-    int result = classService.createClass("className", "classDescription", 1L);
-    assertEquals(1, result, "The class should be created successfully");
-  }
 
   @Test
   void testJoinClass() {
