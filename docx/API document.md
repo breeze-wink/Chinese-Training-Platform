@@ -582,17 +582,15 @@
     ```json
     {
       "message" : "班级创建成功",
-      "data": {
-          "classCode": "string",
-      }
+      "classCode": "string",
     }
     ```
   - **失败响应** (`400 Bad Request`):
-
+  
     ```json
     {
       "message": "班级创建失败",
-      "data" : null
+      "classCode" : null
     }
     ```
 
