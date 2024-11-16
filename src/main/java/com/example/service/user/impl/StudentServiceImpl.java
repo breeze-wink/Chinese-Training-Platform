@@ -64,4 +64,9 @@ public class StudentServiceImpl implements StudentService {
     public boolean existStudentUsername(String username) {
         return studentMapper.findByUsername(username) != null;
     }
+
+    @Override
+    public List<Student> getStudentsBySchoolId(Long schoolId) {
+        return studentMapper.selectBySchoolId(schoolId);
+    }
 }

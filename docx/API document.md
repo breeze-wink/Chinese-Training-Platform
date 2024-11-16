@@ -133,7 +133,7 @@
     }
     ```
     
-### Edit Personal Information
+### Edit Personal Information `finished`
 - **接口路径**：`/api/student/{id}/edit-information`
 - **请求方法**：`POST`
 - **接口说明**：学生用户通过进入编辑，更新个人信息。
@@ -169,7 +169,7 @@
      }
      ```
 
-### Change Email
+### Change Email `finished`
 
 - **接口路径**：`/api/student/{id}/change-email`
 - **请求方法**：`POST`
@@ -203,7 +203,7 @@
     }
     ```
 
-### Send Verification Code To Change Student’s Email
+### Send Verification Code To Change Student’s Email `finished`
 - **接口路径**：`/api/student/{id}/change-email/send-verification`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的更换绑定邮箱中发送验证码。
@@ -235,7 +235,7 @@
   }
   ```
 
-### Change Password
+### Change Password `finished`
 - **接口路径**：`/api/student/{id}/change-password`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的修改密码进行修改。
@@ -264,7 +264,7 @@
   }
   ```
 
-### Account Deactivation
+### Account Deactivation `finished`
 - **接口路径**：`/api/student/{id}/account-deactivation`
 - **请求方法**：`DELETE`
 - **接口说明**：学生注销账号。
@@ -288,7 +288,7 @@
   }
   ```
 
-### Join Class
+### Join Class `finished`
 - **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
@@ -308,7 +308,8 @@
   {
     "message": "成功加入班级",
     "data": {
-      "className" : "string"
+      "className" : "string",
+      "schoolName" : "string",
     }
   }
   ```
@@ -1336,7 +1337,7 @@
           "id": 12345,
           "title": "string",
           "executedDate": "string"
-        }
+        },
         ...
       ]
     }
@@ -1602,7 +1603,7 @@
           "id": 12345,
           "name": "string",
           "description": "string"
-        }
+        },
         ...
       ]
     }
@@ -1748,28 +1749,27 @@
     }
     ```
 
-### Delete Teacher
+### Delete Teacher `finished`
 
-- **接口路径**：`/api/school-admin/delete-teacher/{id}`
+- **接口路径**：`/api/school-admin/{id}/delete-teacher/{teacherid}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的老师账号。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+    - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
+    - 路径参数（Path Variable）：`teacherid` - 教师账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "老师账号删除成功",
-      "data": null
+      "message": "教师账号删除成功"
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "老师账号删除失败",
-      "data": null
+      "message": "教师账号删除失败"
     }
     ```
 
@@ -1808,14 +1808,15 @@
     }
     ```
 
-### Query Teacher
+### Query Teacher `finished`
 
-- **接口路径**：`/api/school-admin/query-teacher/{id}`
+- **接口路径**：`/api/school-admin/{id}/query-teacher/{teacherid}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定老师账号信息。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
+    - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
+    - 路径参数（Path Variable）：`teacherid` - 老师账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -1826,8 +1827,8 @@
         "id": "bigint",
         "name": "string",
         "email": "string",
-        "phone_number": "string",
-        "school_id": "bigint"
+        "phoneNumber": "string",
+        "schoolId": "bigint"
       }
     }
     ```
@@ -1876,28 +1877,27 @@
     }
     ```
 
-### Delete Student
+### Delete Student `finished`
 
-- **接口路径**：`/api/school-admin/delete-student/{id}`
+- **接口路径**：`/api/school-admin/{id}/delete-student/{studentid}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的学生账号。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+    - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
+    - 路径参数（Path Variable）：`studentid` - 学生账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "学生账号删除成功",
-      "data": null
+      "message": "学生账号删除成功"
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "学生账号删除失败",
-      "data": null
+      "message": "学生账号删除失败"
     }
     ```
 
@@ -1937,14 +1937,15 @@
     }
     ```
 
-### Query Student
+### Query Student `finished`
 
-- **接口路径**：`/api/school-admin/query-student/{id}`
+- **接口路径**：`/api/school-admin/{id}/query-student/{studentid}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定学生账号信息。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
+    - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
+    - 路径参数（Path Variable）：`studentid` - 学生账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -1957,7 +1958,7 @@
         "email": "string",
         "name": "string",
         "grade": "int",
-        "school_id": "bigint"
+        "schoolId": "bigint"
       }
     }
     ```
@@ -1969,38 +1970,111 @@
     }
     ```
 
-### Generate Authorization Code
+### Generate Authorization Code `finished`
 
-- **接口路径**：`/api/school-admin/generate-authorization-code`
-- **请求方法**：POST
-- **接口说明**：学校管理员生成授权码，用于授权用户访问特定资源。
+- **接口路径**：`/api/school-admin/{id}/generate-authorization-code`
+- **请求方法**：GET
+- **接口说明**：学校管理员生成授权码，用于授权用户访问特定资源。(无授权码时生成，已有时更新)
 - **请求说明**：
-  - 请求参数：无路径参数。
-  - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "school_id": "bigint" // 学校ID
-    }
-    ```
+  - 请求参数：
+   - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
       "message": "授权码生成成功",
-      "data": {
-        "code": "string", // 生成的授权码
-        "school_id": "bigint" // 学校ID
-      }
+      "code": "string", // 生成的授权码
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
       "message": "授权码生成失败",
+      "code": null
+    }
+    ```
+
+### Query All Students `finished`
+
+- **接口路径**：`/api/school-admin/{id}/query-all-students`
+- **请求方法**：GET
+- **接口说明**：学校管理员查询校内学生账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生账号信息查询成功",
+      "data": [
+        {
+        "id": "bigint",
+        "username": "string",
+        "email": "string",
+        "name": "string",
+        "grade": "int",
+        "schoolId": "bigint"
+         },
+         {
+         "id": "bigint",
+         "username": "string",
+         "email": "string",
+         "name": "string",
+         "grade": "int",
+         "schoolId": "bigint"
+         },
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生账号信息查询失败",
       "data": null
     }
     ```
 
+### Query All Teachers `finished`
 
-
+- **接口路径**：`/api/school-admin/{id}/query-all-teachers`
+- **请求方法**：GET
+- **接口说明**：学校管理员查询校内教师账号信息。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "教师账号信息查询成功",
+      "data": [
+        {
+        "id": "bigint",
+        "email": "string",
+        "name": "string",
+        "phoneNumber": "string",
+        "schoolId": "bigint"
+         },
+         {
+         "id": "bigint",
+        "email": "string",
+        "name": "string",
+        "phoneNumber": "string",
+        "schoolId": "bigint"
+         },
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "教师账号信息查询失败",
+      "data": null
+    }
+    ```

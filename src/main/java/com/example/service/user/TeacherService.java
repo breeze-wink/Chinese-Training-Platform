@@ -18,4 +18,5 @@ public interface TeacherService {
     boolean existUsername(String username);
 
     Long getTeacherSchoolId(Long teacherId);
+    List<Teacher> getTeachersBySchoolId(Long schoolId);
 }

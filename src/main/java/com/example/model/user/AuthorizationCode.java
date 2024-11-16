@@ -10,7 +10,5 @@ public class AuthorizationCode {
 
     private String code;
     private Long schoolId; // 外键，关联School表的id
-    private LocalDateTime expirationDate;
-    private Integer usageLimit;
 
 }

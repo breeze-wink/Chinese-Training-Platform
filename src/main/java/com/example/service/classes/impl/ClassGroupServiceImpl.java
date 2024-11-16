@@ -20,6 +20,17 @@ public class ClassGroupServiceImpl implements ClassGroupService {
         this.classGroupMapper = classGroupMapper;
         this.groupStudentMapper = groupStudentMapper;
     }
+
+    @Override
+    @Transactional
+    public int addClassGroup(ClassGroup classGroup){
+        return classGroupMapper.insert(classGroup);
+    }
+    @Override
+    @Transactional
+    public int updateClassGroup(ClassGroup classGroup){
+        return classGroupMapper.update(classGroup);
+    }
     @Override
     @Transactional
     public int createGroup(Long classId, String groupName, String groupDescription){

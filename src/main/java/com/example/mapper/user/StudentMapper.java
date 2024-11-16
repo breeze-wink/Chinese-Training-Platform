@@ -34,4 +34,7 @@ public interface StudentMapper {
 
     @Select("SELECT * FROM student")
     List<Student> selectAll();
+
+    @Select("SELECT * FROM student WHERE schoolId = #{schoolId}")
+    List<Student> selectBySchoolId(Long schoolId);
 }

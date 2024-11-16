@@ -55,6 +55,12 @@ public class ClassServiceImpl implements ClassService {
 
     @Override
     @Transactional
+    public int addClass(Clazz clazz){
+        return classMapper.insert(clazz);
+    }
+
+    @Override
+    @Transactional
     public int removeClass(Long classId) {
         List<ClassGroup> classGroups = classGroupMapper.selectByClassId(classId);
         for(ClassGroup classGroup : classGroups){
@@ -62,6 +68,12 @@ public class ClassServiceImpl implements ClassService {
         }
         classStudentMapper.removeClass(classId);
         return classMapper.delete(classId);
+    }
+
+    @Override
+    @Transactional
+    public int updateClass(Clazz clazz) {
+        return classMapper.update(clazz);
     }
 
     @Override
@@ -97,4 +109,18 @@ public class ClassServiceImpl implements ClassService {
     public List<Clazz> getAllClasses() {
         return classMapper.selectAll();
     }
+
+    @Override
+    @Transactional
+    public Clazz getClassByInviteCode(String inviteCode) {
+        return classMapper.selectById(classMapper.selectIdByInviteCode(inviteCode));
+    }
+
+    @Override
+    @Transactional
+    public List<Clazz> getClassesByTeacherId(Long teacherId) {
+        return classMapper.selectByCreatorId(teacherId);
+    }
+
+
 }
