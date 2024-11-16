@@ -4,8 +4,10 @@ import com.example.dto.request.SchoolAdminLoginRequest;
 import com.example.dto.response.SchoolAdminInfoResponse;
 import com.example.dto.response.SchoolAdminLoginResponse;
 import com.example.mapper.user.SchoolAdminMapper;
+import com.example.model.user.AuthorizationCode;
 import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
+import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.impl.SchoolAdminServiceImpl;
@@ -19,11 +21,13 @@ import org.springframework.web.bind.annotation.*;
 public class SchoolAdminController {
     private final SchoolAdminService schoolAdminService;
     private final SchoolService schoolService;
+    private final AuthorizationCodeService authorizationCodeService;
 
     @Autowired
-    public SchoolAdminController(SchoolAdminServiceImpl schoolAdminService, SchoolService schoolService) {
+    public SchoolAdminController(SchoolAdminServiceImpl schoolAdminService, SchoolService schoolService, AuthorizationCodeService authorizationCodeService) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
+        this.authorizationCodeService = authorizationCodeService;
     }
 
     @PostMapping("/login")
@@ -50,12 +54,19 @@ public class SchoolAdminController {
         SchoolAdmin admin = schoolAdminService.getSchoolAdminById(id);
         SchoolAdminInfoResponse response = new SchoolAdminInfoResponse();
         if (admin != null) {
+            AuthorizationCode code = authorizationCodeService.getAuthorizationCodeBySchoolId(admin.getSchoolId());
             response.setMessage("success");
             School school = schoolService.getSchoolById(admin.getSchoolId());
             SchoolAdminInfoResponse.InfoData data = new SchoolAdminInfoResponse.InfoData();
             data.setUsername(admin.getUsername());
             data.setEmail(admin.getEmail());
             data.setSchoolName(school.getName());
+            if(code == null){
+                data.setAuthorizationCode("无");
+            }
+            else{
+                data.setAuthorizationCode(code.getCode());
+            }
             response.setData(data);
 
             return ResponseEntity.ok(response);
