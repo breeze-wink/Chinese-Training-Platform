@@ -13,7 +13,6 @@ import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/student")
-public class EditStudentInfoController {
+public class StudentInfoController {
     private final StudentService studentService;
     private final EmailService emailService;
     private final ClassStudentService classStudentService;
@@ -32,7 +31,7 @@ public class EditStudentInfoController {
     private final SchoolService schoolService;
 
     @Autowired
-    public EditStudentInfoController(StudentServiceImpl studentService, EmailService emailService, ClassStudentService classStudentService, ClassService classService, SchoolService schoolService) {
+    public StudentInfoController(StudentServiceImpl studentService, EmailService emailService, ClassStudentService classStudentService, ClassService classService, SchoolService schoolService) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.classStudentService = classStudentService;

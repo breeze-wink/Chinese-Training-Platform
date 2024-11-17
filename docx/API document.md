@@ -321,7 +321,7 @@
   }
   ```
 
-### Get Essay Info 
+### Get Essay Info `finished`
 
 - **接口路径**：`/api/student/{id}/essay/get-info/{essayId}`
 - **请求方法**：`GET`
@@ -345,7 +345,7 @@
     响应体为空
     ```
     
-### View Essays
+### View Essays `finished`
 
 - **接口路径**：`/api/student/{id}/view-essays`
 
@@ -368,7 +368,7 @@
     ```json
     {
       "message": "作文列表获取成功",
-      "courseStandardInfos": [
+      "data": [
         {
           "id": 12345,
           "title": "string",
