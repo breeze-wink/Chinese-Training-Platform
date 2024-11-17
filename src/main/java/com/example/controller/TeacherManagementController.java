@@ -105,7 +105,7 @@ public class TeacherManagementController {
             response.setMessage("用户未找到");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        response.setMessage("Success");
+        response.setMessage("success");
         TeacherInfoResponse.InfoData data = new TeacherInfoResponse.InfoData();
         data.setName(teacher.getName());
         data.setUsername(teacher.getUsername());
