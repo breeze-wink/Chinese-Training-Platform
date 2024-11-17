@@ -56,12 +56,10 @@ public class TeacherBusinessController {
         if (clazz == null) {
             response.setMessage("班级创建失败");
             response.setClassCode(null);
-            response.setClassId(null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         response.setMessage("班级创建成功");
         response.setClassCode(clazz.getInviteCode());
-        response.setClassId(clazz.getId());
         return ResponseEntity.ok(response);
     }
 

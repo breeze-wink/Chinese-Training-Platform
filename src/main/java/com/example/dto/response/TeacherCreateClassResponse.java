@@ -8,5 +8,4 @@ import lombok.Setter;
 public class TeacherCreateClassResponse {
     private String message;
     private String classCode;
-    private Long classId;
 }
