@@ -321,8 +321,74 @@
   }
   ```
 
+### Get Essay Info 
 
+- **接口路径**：`/api/student/essay/get-info/{id}`
+- **请求方法**：`GET`
+- **接口说明**：用户查看作文内容，以 PDF 文件形式返回。
+- **请求说明**：
 
+  - 路径参数：
+    - `id`：作文的唯一标识符。
+  - 请求体：无
+
+- 响应说明：
+
+  - 成功响应 (`200 OK`)
+
+    - 响应类型为 `application/pdf`，返回 PDF 文件内容，附带 `Content-Disposition` 头以 inline 方式显示。
+
+  - **失败响应** (`404 Not Found`):
+
+    ```json
+    响应体为空
+    ```
+    
+### View Essays
+
+- **接口路径**：`/api/student/view-essays`
+
+- **请求方法**：`GET`
+
+- **接口说明**：用户查看作文列表，返回作文除内容外的信息。
+
+- **请求说明**：
+
+  - 请求体：无
+
+- 响应说明：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "作文列表获取成功",
+      "courseStandardInfos": [
+        {
+          "id": 12345,
+          "title": "string",
+          "annotation": "string"
+        },
+        {
+          "id": 12345,
+          "title": "string",
+          "annotation": "string"
+        },
+        ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "作文列表获取失败",
+      "data": null
+    }
+    ```
 
 
 
