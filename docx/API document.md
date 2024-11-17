@@ -323,13 +323,14 @@
 
 ### Get Essay Info 
 
-- **接口路径**：`/api/student/essay/get-info/{id}`
+- **接口路径**：`/api/student/{id}/essay/get-info/{essayId}`
 - **请求方法**：`GET`
 - **接口说明**：用户查看作文内容，以 PDF 文件形式返回。
 - **请求说明**：
 
   - 路径参数：
-    - `id`：作文的唯一标识符。
+    - `id`：学生的唯一标识符
+    - `essayId`: 作文的唯一标识符
   - 请求体：无
 
 - 响应说明：
@@ -346,13 +347,15 @@
     
 ### View Essays
 
-- **接口路径**：`/api/student/view-essays`
+- **接口路径**：`/api/student/{id}/view-essays`
 
 - **请求方法**：`GET`
 
 - **接口说明**：用户查看作文列表，返回作文除内容外的信息。
 
 - **请求说明**：
+  - 路径参数：
+    - `id`：学生的唯一标识符
 
   - 请求体：无
 
@@ -369,12 +372,10 @@
         {
           "id": 12345,
           "title": "string",
-          "annotation": "string"
         },
         {
           "id": 12345,
           "title": "string",
-          "annotation": "string"
         },
         ...
       ]
