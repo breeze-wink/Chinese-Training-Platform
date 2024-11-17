@@ -16,7 +16,7 @@ public class TeacherGetClassesResponse {
     public static class InfoData {
         private Long classId;
         private String className;
-        private String description;
-        private String inviteCode;
+        private String classDescription;
+        private String classCode;
     }
 }

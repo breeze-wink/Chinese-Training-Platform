@@ -74,8 +74,8 @@ public class TeacherBusinessController {
             TeacherGetClassesResponse.InfoData infoData = new TeacherGetClassesResponse.InfoData();
             infoData.setClassId(clazz.getId());
             infoData.setClassName(clazz.getName());
-            infoData.setDescription(clazz.getDescription());
-            infoData.setInviteCode(clazz.getInviteCode());
+            infoData.setClassDescription(clazz.getDescription());
+            infoData.setClassCode(clazz.getInviteCode());
             infoDataList.add(infoData);
         }
         response.setData(infoDataList);
