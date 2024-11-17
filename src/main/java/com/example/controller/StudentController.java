@@ -2,18 +2,27 @@ package com.example.controller;
 
 import com.example.dto.request.*;
 import com.example.dto.response.*;
+import com.example.model.essay.Essay;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.Student;
 import com.example.model.user.Teacher;
+import com.example.service.essay.EssayService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/student")
@@ -21,12 +30,14 @@ public class StudentController {
     private final StudentService studentService;
     private final EmailService emailService;
     private final SchoolService schoolService;
+    private final EssayService essayService;
 
     @Autowired
-    public StudentController(StudentServiceImpl studentService, EmailService emailService, SchoolService schoolService) {
+    public StudentController(StudentServiceImpl studentService, EmailService emailService, SchoolService schoolService, EssayService essayService) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.schoolService = schoolService;
+        this.essayService = essayService;
     }
 
     @PostMapping("/login")
@@ -108,4 +119,37 @@ public class StudentController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}/view-essays")
+    public ResponseEntity<GetEssaysResponse> getEssays(@PathVariable Long id) {
+        GetEssaysResponse response = new GetEssaysResponse();
+        List<Essay> essays = essayService.getAllEssays();
+        List<GetEssaysResponse.InfoData> data = new ArrayList<>();
+        for(Essay essay : essays){
+            GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
+            infoData.setId(essay.getId());
+            infoData.setTitle(essay.getTitle());
+            data.add(infoData);
+        }
+        response.setInfoData(data);
+        response.setMessage("作文查询成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/essay/get-info/{essayId}")
+    public ResponseEntity<InputStreamResource> getEssayInfo(@PathVariable Long id, @PathVariable Long essayId) {
+        Essay essay = essayService.getEssayById(essayId);
+        if (essay == null) {
+            return ResponseEntity.notFound().build();
+        }
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(essay.getContent());
+        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + essay.getTitle())
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(essay.getContent().length)
+                .body(resource);
+    }
+
 }
