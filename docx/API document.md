@@ -121,7 +121,8 @@
         "email": "string",
         "name": "string",
         "grade": 12,
-        "schoolName": "string"
+        "schoolName": "string",
+        "className": "string"
       }
     }
     ```

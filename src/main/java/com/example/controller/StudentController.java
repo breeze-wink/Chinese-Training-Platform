@@ -2,10 +2,13 @@ package com.example.controller;
 
 import com.example.dto.request.*;
 import com.example.dto.response.*;
+import com.example.model.classes.ClassStudent;
 import com.example.model.essay.Essay;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.Student;
 import com.example.model.user.Teacher;
+import com.example.service.classes.ClassService;
+import com.example.service.classes.ClassStudentService;
 import com.example.service.essay.EssayService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
@@ -31,13 +34,17 @@ public class StudentController {
     private final EmailService emailService;
     private final SchoolService schoolService;
     private final EssayService essayService;
+    private final ClassStudentService classStudentService;
+    private final ClassService classService;
 
     @Autowired
-    public StudentController(StudentServiceImpl studentService, EmailService emailService, SchoolService schoolService, EssayService essayService) {
+    public StudentController(StudentServiceImpl studentService, EmailService emailService, SchoolService schoolService, EssayService essayService, ClassStudentService classStudentService, ClassService classService) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.schoolService = schoolService;
         this.essayService = essayService;
+        this.classStudentService = classStudentService;
+        this.classService = classService;
     }
 
     @PostMapping("/login")
@@ -101,6 +108,11 @@ public class StudentController {
     public ResponseEntity<StudentInfoResponse> getStudentInfo(@PathVariable Long id) {
         StudentInfoResponse response = new StudentInfoResponse();
         Student student = studentService.getStudentById(id);
+        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(id);
+        ClassStudent classStudent = null;
+        if(classStudents.size() == 1){
+            classStudent = classStudents.get(0);
+        }
         if (student == null) {
             response.setMessage("用户未找到");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -112,9 +124,14 @@ public class StudentController {
         data.setName(student.getName());
         data.setGrade(student.getGrade());
         data.setSchoolName(null);
+        data.setClassName(null);
         if (student.getSchoolId() != null) {
             data.setSchoolName(schoolService.getSchoolById(student.getSchoolId()).getName());
         }
+        if(classStudent != null){
+            data.setClassName(classService.getClassById(classStudent.getClassId()).getName());
+        }
+
         response.setData(data);
 
         return ResponseEntity.ok(response);
