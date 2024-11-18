@@ -3,12 +3,15 @@ package com.example.service.classes.impl;
 import com.example.mapper.classes.ClassGroupMapper;
 import com.example.mapper.classes.ClassMapper;
 import com.example.mapper.classes.ClassStudentMapper;
+import com.example.mapper.user.StudentMapper;
 import com.example.mapper.user.TeacherMapper;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
+import com.example.model.user.Student;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
+import com.example.service.user.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,15 +27,17 @@ public class ClassServiceImpl implements ClassService {
     private final ClassStudentMapper classStudentMapper;
     private final ClassGroupMapper classGroupMapper;
     private final TeacherMapper teacherMapper;
+    private final StudentMapper studentMapper;
     @Autowired
     private ClassGroupService classGroupService;
     @Autowired
-    public ClassServiceImpl(ClassMapper classMapper, ClassStudentMapper classStudentMapper, TeacherMapper teacherMapper, ClassGroupService classGroupService, ClassGroupMapper classGroupMapper) {
+    public ClassServiceImpl(ClassMapper classMapper, ClassStudentMapper classStudentMapper, TeacherMapper teacherMapper, ClassGroupService classGroupService, ClassGroupMapper classGroupMapper, StudentMapper studentMapper) {
         this.classMapper = classMapper;
         this.classStudentMapper = classStudentMapper;
         this.teacherMapper = teacherMapper;
         this.classGroupService = classGroupService;
         this.classGroupMapper = classGroupMapper;
+        this.studentMapper = studentMapper;
     }
 
     @Override
@@ -86,7 +91,10 @@ public class ClassServiceImpl implements ClassService {
         Date now = new Date();
         now.setTime(now.getTime() + 28800000);
         classStudent.setJoinDate(now);
-        return classStudentMapper.insert(classStudent);
+        classStudentMapper.insert(classStudent);
+        Student student = studentMapper.selectById(studentId);
+        student.setSchoolId(classMapper.selectById(classStudent.getClassId()).getSchoolId());
+        return studentMapper.update(student);
     }
 
     @Override

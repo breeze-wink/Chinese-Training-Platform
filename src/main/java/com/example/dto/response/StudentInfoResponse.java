@@ -17,5 +17,6 @@ public class StudentInfoResponse {
         private String name;
         private Integer grade;
         private String schoolName;
+        private String className;
     }
 }
