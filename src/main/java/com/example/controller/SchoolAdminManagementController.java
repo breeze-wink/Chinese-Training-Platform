@@ -9,7 +9,9 @@ import com.example.model.user.SchoolAdmin;
 import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
+import com.example.service.user.impl.AuthorizationCodeServiceImpl;
 import com.example.service.user.impl.SchoolAdminServiceImpl;
+import com.example.service.user.impl.SchoolServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,9 @@ public class SchoolAdminManagementController {
     private final AuthorizationCodeService authorizationCodeService;
 
     @Autowired
-    public SchoolAdminManagementController(SchoolAdminServiceImpl schoolAdminService, SchoolService schoolService, AuthorizationCodeService authorizationCodeService) {
+    public SchoolAdminManagementController(SchoolAdminServiceImpl schoolAdminService,
+                                           SchoolService schoolService,
+                                           AuthorizationCodeService authorizationCodeService) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
         this.authorizationCodeService = authorizationCodeService;

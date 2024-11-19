@@ -10,5 +10,6 @@ public interface ClassStudentService {
     List<ClassStudent> getClassStudentByStudentId(Long studentId);
     ClassStudent selectByClassIdAndStudentId(Long classId, Long studentId);
 
-    List<ClassStudent> getClassStudentsByStudentId(Long studentid);
+    List<ClassStudent> getClassStudentsByStudentId(Long studentId);
+    List<ClassStudent> getClassStudentsByClassId(Long classId);
 }

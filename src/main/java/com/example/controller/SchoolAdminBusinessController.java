@@ -30,7 +30,12 @@ public class SchoolAdminBusinessController {
     private final StudentService studentService;
     private final ClassStudentService classStudentService;
     @Autowired
-    public SchoolAdminBusinessController(SchoolAdminService schoolAdminService, ClassService classService, TeacherService teacherService, AuthorizationCodeService authorizationCodeService, StudentService studentService, ClassStudentService classStudentService) {
+    public SchoolAdminBusinessController(SchoolAdminService schoolAdminService,
+                                         ClassService classService,
+                                         TeacherService teacherService,
+                                         AuthorizationCodeService authorizationCodeService,
+                                         StudentService studentService,
+                                         ClassStudentService classStudentService) {
         this.schoolAdminService = schoolAdminService;
         this.classService = classService;
         this.teacherService = teacherService;

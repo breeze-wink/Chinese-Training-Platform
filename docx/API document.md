@@ -741,7 +741,7 @@
 
 ---
 
-### Get Groups Information `waiting`
+### Get Groups Information `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-groups`
 - **请求方法**：GET
@@ -782,7 +782,7 @@
     }
     ```
 
-### Get Class Members Information `waiting`
+### Get Class Members Information `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-class-members`
 - **请求方法**：GET
@@ -994,15 +994,15 @@
     }
     ```
 
-### Disband Class `waiting`
+### Disband Class `finished`
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/disband`
+- **接口路径**：`/api/teacher/{id}/classes/disband`
 - **请求方法**：DELETE
 - **接口说明**：教师用户解散某个班级。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Query Parameter）：`classId` - 班级的唯一标识符
   - 请求体：无
 
 - **响应说明**：

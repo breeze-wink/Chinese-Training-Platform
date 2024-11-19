@@ -2,19 +2,21 @@ package com.example.controller;
 
 import com.example.dto.request.CreateGroupRequest;
 import com.example.dto.request.TeacherCreateClassRequest;
-import com.example.dto.response.GetGroupsResponse;
-import com.example.dto.response.Message;
-import com.example.dto.response.TeacherCreateClassResponse;
-import com.example.dto.response.TeacherGetClassesResponse;
+import com.example.dto.response.*;
 import com.example.model.classes.ClassGroup;
+import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.course.CourseStandard;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
+import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.impl.ClassGroupServiceImpl;
 import com.example.service.classes.impl.ClassServiceImpl;
+import com.example.service.classes.impl.ClassStudentServiceImpl;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
+import com.example.service.user.StudentService;
+import com.example.service.user.impl.StudentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -33,13 +35,19 @@ public class TeacherBusinessController {
     private final CourseStandardService courseStandardService;
     private final ClassService classService;
     private final ClassGroupService classGroupService;
+    private final ClassStudentService classStudentService;
+    private final StudentService studentService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
-                                     ClassGroupServiceImpl classGroupService) {
+                                     ClassGroupServiceImpl classGroupService,
+                                     ClassStudentServiceImpl classStudentService,
+                                     StudentServiceImpl studentService) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
         this.classGroupService = classGroupService;
+        this.classStudentService = classStudentService;
+        this.studentService = studentService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -111,11 +119,12 @@ public class TeacherBusinessController {
             info.setClassName(clazz.getName());
             response.getData().add(info);
         }
+        response.setMessage("小组信息获取成功");
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/create-group")
-    public ResponseEntity<Message> createGroup(@RequestBody CreateGroupRequest request) {
+    public ResponseEntity<Message> createGroup(@RequestBody CreateGroupRequest request ) {
         Message response = new Message();
 
         try {
@@ -132,4 +141,33 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    @GetMapping("/{id}/get-class-members")
+    public ResponseEntity<TeacherGetClassMembersResponse> getClassMembers(@PathVariable Long id, @RequestParam Long classId) {
+        TeacherGetClassMembersResponse response = new TeacherGetClassMembersResponse();
+        List<ClassStudent> classStudents = classStudentService.getClassStudentsByClassId(classId);
+        List<TeacherGetClassMembersResponse.InfoData> infoDataList = new ArrayList<>();
+        for (ClassStudent classStudent : classStudents) {
+            TeacherGetClassMembersResponse.InfoData infoData = new TeacherGetClassMembersResponse.InfoData();
+            infoData.setStudentId(classStudent.getStudentId());
+            infoData.setStudentName(studentService.getStudentById(classStudent.getStudentId()).getName());
+            infoDataList.add(infoData);
+        }
+        response.setData(infoDataList);
+        response.setMessage("班级成员信息获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/classes/disband")
+    public ResponseEntity<Message> disbandClass(@PathVariable Long id, @RequestParam Long classId) {
+        Message response = new Message();
+        if (classService.removeClass(classId) == 1) {
+            response.setMessage("班级解散成功");
+            return ResponseEntity.ok(response);
+        } else {
+            response.setMessage("班级解散失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 }
