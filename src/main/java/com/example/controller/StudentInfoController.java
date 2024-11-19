@@ -31,7 +31,11 @@ public class StudentInfoController {
     private final SchoolService schoolService;
 
     @Autowired
-    public StudentInfoController(StudentServiceImpl studentService, EmailService emailService, ClassStudentService classStudentService, ClassService classService, SchoolService schoolService) {
+    public StudentInfoController(StudentServiceImpl studentService,
+                                 EmailService emailService,
+                                 ClassStudentService classStudentService,
+                                 ClassService classService,
+                                 SchoolService schoolService) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.classStudentService = classStudentService;
