@@ -7,10 +7,11 @@ import java.util.List;
 public interface ClassGroupService {
     int addClassGroup(ClassGroup classGroup);
     int updateClassGroup(ClassGroup classGroup);
-    int createGroup(Long classId, String groupName, String groupDescription);
+    ClassGroup createGroup(Long classId, String groupName, String groupDescription);
     int removeGroup(Long groupId);
     int addStudentToGroup(Long groupId, Long studentId);
     int removeStudentFromGroup(Long groupId, Long studentId);
+    List<ClassGroup> getGroupsByClassId(Long classId);
     ClassGroup getGroupById(Long groupId);
     List<ClassGroup> getAllGroups();
 }

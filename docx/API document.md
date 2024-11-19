@@ -662,9 +662,9 @@
     }
     ```
 
-### Create Group 
+### Create Group `finished`
 
-- **接口路径**：`/api/teacher/{id}/create-group`
+- **接口路径**：`/api/teacher/{id}/create-group` 
 
 - **请求方法**：POST
 - **接口说明**：教师用户为指定班级创建一个小组，并指定小组成员（学生ID数组）。
@@ -676,8 +676,8 @@
       {
          "classId": "string", // 所属班级的唯一标识符
          "groupName": "string", // 小组名称
-         "studentIds": ["string", "string", "string"], // 学生ID的列表
-         "groupDescription" : "string" // 班级描述
+         "studentIds": [number, number, number], // 学生ID的列表
+         "groupDescription" : "string" // 小组描述
       
       }
       ```
@@ -741,7 +741,7 @@
 
 ---
 
-### Get Groups Information 
+### Get Groups Information `waiting`
 
 - **接口路径**：`/api/teacher/{id}/get-groups`
 - **请求方法**：GET
@@ -749,8 +749,9 @@
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 用户的唯一标识符
+    - 查询参数 : classId - 班级的唯一标识
   - 请求体：无
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -780,7 +781,8 @@
       "data": null
     }
     ```
-### Get Class Members Information 
+
+### Get Class Members Information `waiting`
 
 - **接口路径**：`/api/teacher/{id}/get-class-members`
 - **请求方法**：GET
@@ -991,7 +993,8 @@
       "data": null
     }
     ```
-### Disband Class 
+
+### Disband Class `waiting`
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/disband`
 - **请求方法**：DELETE
@@ -1120,7 +1123,7 @@
     }
     ```
 
-### Disband Group 
+### Disband Group
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/disband`
 - **请求方法**：DELETE

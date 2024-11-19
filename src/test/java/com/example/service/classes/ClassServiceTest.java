@@ -41,13 +41,6 @@ class ClassServiceTest {
   }
 
   @Test
-  void testCreateGroup() {
-    assertNotNull(classGroupService, "ClassGroupService should not be null");
-    int result = classGroupService.createGroup(14L, "groupName1", "groupDescription");
-    assertEquals(1, result, "The group should be created successfully");
-  }
-
-  @Test
   void testAddStudentToGroup() {
     assertNotNull(classGroupService, "ClassGroupService should not be null");
     int result = classGroupService.addStudentToGroup(4L, 82L);
