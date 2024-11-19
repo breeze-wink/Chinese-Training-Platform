@@ -1,11 +1,17 @@
 package com.example.controller;
 
+import com.example.dto.request.CreateGroupRequest;
 import com.example.dto.request.TeacherCreateClassRequest;
+import com.example.dto.response.GetGroupsResponse;
+import com.example.dto.response.Message;
 import com.example.dto.response.TeacherCreateClassResponse;
 import com.example.dto.response.TeacherGetClassesResponse;
+import com.example.model.classes.ClassGroup;
 import com.example.model.classes.Clazz;
 import com.example.model.course.CourseStandard;
+import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
+import com.example.service.classes.impl.ClassGroupServiceImpl;
 import com.example.service.classes.impl.ClassServiceImpl;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
@@ -26,10 +32,14 @@ import java.util.List;
 public class TeacherBusinessController {
     private final CourseStandardService courseStandardService;
     private final ClassService classService;
+    private final ClassGroupService classGroupService;
     @Autowired
-    public TeacherBusinessController(CourseStandardServiceImpl courseStandardService, ClassServiceImpl classService) {
+    public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
+                                     ClassServiceImpl classService,
+                                     ClassGroupServiceImpl classGroupService) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
+        this.classGroupService = classGroupService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -81,5 +91,47 @@ public class TeacherBusinessController {
         response.setData(infoDataList);
         response.setMessage("班级信息获取成功");
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/{id}/get-groups")
+    public ResponseEntity<GetGroupsResponse> getGroups(@PathVariable Long id, @RequestParam Long classId) {
+        List<ClassGroup> groups = classGroupService.getGroupsByClassId(classId);
+        GetGroupsResponse response = new GetGroupsResponse();
+
+        if (groups.isEmpty()) {
+            response.setMessage("获取小组信息失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        response.setData(new ArrayList<>());
+
+        for (ClassGroup group : groups) {
+            GetGroupsResponse.GroupInfo info = new GetGroupsResponse.GroupInfo();
+            info.setGroupId(group.getId());
+            info.setGroupName(group.getName());
+            info.setGroupDescription(group.getDescription());
+            Clazz clazz = classService.getClassById(group.getClassId());
+            info.setClassName(clazz.getName());
+            response.getData().add(info);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/create-group")
+    public ResponseEntity<Message> createGroup(@RequestBody CreateGroupRequest request) {
+        Message response = new Message();
+
+        try {
+            ClassGroup group = classGroupService.createGroup(request.getClassId(), request.getGroupName(), request.getGroupDescription());
+            Long groupId = group.getId();
+            for (Long studentId : request.getStudentIds()) {
+                classGroupService.addStudentToGroup(groupId, studentId);
+            }
+
+            response.setMessage("小组创建成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("小组创建失败" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

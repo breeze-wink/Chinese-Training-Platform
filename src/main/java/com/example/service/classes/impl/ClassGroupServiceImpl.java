@@ -33,12 +33,13 @@ public class ClassGroupServiceImpl implements ClassGroupService {
     }
     @Override
     @Transactional
-    public int createGroup(Long classId, String groupName, String groupDescription){
+    public ClassGroup createGroup(Long classId, String groupName, String groupDescription){
         ClassGroup classGroup = new ClassGroup();
         classGroup.setClassId(classId);
         classGroup.setName(groupName);
         classGroup.setDescription(groupDescription);
-        return classGroupMapper.insert(classGroup);
+        classGroupMapper.insert(classGroup);
+        return classGroup;
     }
     @Override
     @Transactional
@@ -58,6 +59,11 @@ public class ClassGroupServiceImpl implements ClassGroupService {
     @Transactional
     public int removeStudentFromGroup(Long groupId, Long studentId){
         return groupStudentMapper.delete(groupId, studentId);
+    }
+
+    @Override
+    public List<ClassGroup> getGroupsByClassId(Long classId) {
+        return classGroupMapper.selectByClassId(classId);
     }
 
     @Override
