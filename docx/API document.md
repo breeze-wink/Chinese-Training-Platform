@@ -694,7 +694,7 @@
         ```
 
 
-### Continue practice
+### Continue Practice
 
 - **接口路径**：`/api/student/{id}/continue-practice`
 - **请求方法**：`POST`

@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface PracticeMapper {
 
-    @Insert("INSERT INTO practice(studentId, practiceTime, totalScore) VALUES(#{studentId}, #{practiceTime}, #{totalScore})")
+    @Insert("INSERT INTO practice(studentId, name, practiceTime, totalScore) VALUES(#{studentId}, #{name}, #{practiceTime}, #{totalScore})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Practice record);
 
     @Delete("DELETE FROM practice WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE practice SET studentId = #{studentId}, practiceTime = #{practiceTime}, totalScore = #{totalScore} WHERE id = #{id}")
+    @Update("UPDATE practice SET studentId = #{studentId}, name = #{name}, practiceTime = #{practiceTime}, totalScore = #{totalScore} WHERE id = #{id}")
     int update(Practice record);
 
     @Select("SELECT * FROM practice WHERE id = #{id}")
@@ -23,4 +23,8 @@ public interface PracticeMapper {
 
     @Select("SELECT * FROM practice")
     List<Practice> selectAll();
+
+    @Select("SELECT * FROM practice WHERE studentId = #{studentId}")
+    List<Practice> selectByStudentId(Long studentId);
+
 }
