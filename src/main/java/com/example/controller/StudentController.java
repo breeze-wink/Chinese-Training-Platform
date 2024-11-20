@@ -38,7 +38,7 @@ public class StudentController {
     private final ClassService classService;
 
     @Autowired
-    public StudentController(StudentServiceImpl studentService,
+    public StudentController(StudentService studentService,
                              EmailService emailService,
                              SchoolService schoolService,
                              EssayService essayService,
