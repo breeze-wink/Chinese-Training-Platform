@@ -391,6 +391,60 @@
       "data": null
     }
     ```
+    
+
+### Get Knowledge Points
+
+- **接口路径**：`/api/student/{id}/practice/get-knowledge-points`
+
+- **请求方法**：`GET`
+
+- **接口说明**：学生用户自定义生成试卷时，获取可选知识点。
+
+- **请求说明**：
+  - 路径参数：
+    - `id`：学生的唯一标识符
+
+  - 请求体：无
+
+- 响应说明：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "知识点获取成功",
+      "data": [
+        {
+          "id": "long",
+          "name": "string",
+          "description": "string",
+          "type": ["积累与运用", "阅读理解"]
+        },
+        {
+          "id": "long",
+          "name": "string",
+          "description": "string",
+          "type": ["积累与运用", "阅读理解"]
+        },
+        ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "知识点获取失败",
+      "data": null
+    }
+    ```
+    
+
+
 ### Generate Practice Self-Define
 
 - **接口路径**：`/api/student/{id}/practice/generate-define`
