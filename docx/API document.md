@@ -343,7 +343,7 @@
   - **失败响应** (`404 Not Found`):
 
     ```json
-    响应体为空
+      响应体为空
     ```
     
 ### View Essays `finished`
@@ -377,8 +377,7 @@
         {
           "id": 12345,
           "title": "string",
-        },
-        ...
+        }
       ]
     }
     ```
@@ -391,9 +390,435 @@
       "data": null
     }
     ```
+### Generate Practice Self-Define
+
+- **接口路径**：`/api/student/{id}/practice/generate-define`
+- **请求方法**：`POST`
+- **接口说明**：学生用户自定义生成新的练习题。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+  - 请求参数: - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  -查询参数（Query Parameter）:`num` - 题目数量
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "data": [
+    {
+      "knowledgePointId": "long"
+    },
+    {
+      "knowledgePointId": "long"
+    }
+    ]
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+    {
+      "message": "题目发送成功",
+      "data": [
+        {
+          "practiceQuestionId" : "long",
+          "questionContent": "string",
+          "type": "string",//数据类型暂不确定
+          "questionOptions": "string",
+          "sequence": "int"
+        },
+        {
+          "practiceQuestionId" : "long",
+          "questionContent": "string",
+          "type": "string",//数据类型暂不确定
+          "questionOptions": "string",
+          "sequence": "int"
+        },
+      ]
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+    "message": "考点和题目发送失败",
+    "practiceId" ： null
+     "data": null
+  }
+  ```
 
 
+### Generate Practice Auto
 
+- **接口路径**：`/api/student/{id}/practice/generate-auto`
+- **请求方法**：`POST`
+- **接口说明**：学生用户自动生成新的练习题。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+  无
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+    {
+      "message": "题目发送成功",
+      "data": [
+      {
+        "practiceQuestionId" : "long",
+        "questionContent": "string",
+        "type": "string",//数据类型暂不确定
+        "questionOptions": "string",
+        "sequence": "int"
+      },
+      {
+        "practiceQuestionId" : "long",
+        "questionContent": "string",
+        "type": "string",//数据类型暂不确定
+        "questionOptions": "string",
+        "sequence": "int"
+      }
+    ]
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+    "message": "题目发送失败",
+    "practiceId" : null
+    "data": null
+  }
+  ```
+
+
+### Complete Practice
+
+- **接口路径**：`/api/student/{id}/practice/complete`
+- **请求方法**：`POST`
+- **接口说明**：学生用户完成练习题，提交答案。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "data" : [
+    {
+      "practiceQuestionId" : "long",
+      "answerContent" : "string"
+    },
+    {
+      "practiceQuestionId" : "long",
+      "answerContent" : "string"
+    },
+  ]
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "练习提交成功",
+      "score" : "double"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "练习提交失败",
+      "score": null
+    }
+    ```
+
+
+### Get Answer
+
+- **接口路径**：`/api/student/{id}/practice/get-answer`
+- **请求方法**：GET
+- **接口说明**：学生查看完成的试卷参考答案和提交答案。
+- **请求说明**：
+- 请求参数：
+  - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 查询参数（Query Parameter）：`practiceId` - 练习试卷的唯一标识符
+  - 请求体：无
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success",
+      "data" : 
+      [
+        {
+          "questionContent" : "string",
+          "questionType" : "string",
+          "questionOptions" : "string",
+          "answer" : "string",
+          "studentAnswer" : "string"
+        },
+        {
+          "questionContent" : "string",
+          "questionType" : "string",
+          "questionOptions" : "string",
+          "answer" : "string",
+          "studentAnswer" : "string"
+        }
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "答案获取失败",
+      "data" : null
+    }
+    ```
+
+### Save Answer
+
+- **接口路径**：`/api/student/{id}/practice/save`
+- **请求方法**：`POST`
+- **接口说明**：学生用户暂存已回答的练习题。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "data" : [
+      {
+        "practiceQuestionId" : "long",
+        "answerContent" : "string"
+      },
+      {
+        "practiceQuestionId" : "long",
+        "answerContent" : "string"
+      }
+    ]
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "暂存成功"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "暂存失败"
+    }
+    ```
+
+
+### Get Unfinished Practice List
+
+- **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
+- **请求方法**：`GET`
+- **接口说明**：学生用户获取未完成练习列表。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+        {
+          "message" : "获取成功",
+          "data" : [
+              {
+                "practiceId" : "long",
+                "practiceName" : "string"
+              },
+              {
+                "practiceId" : "long",
+                "practiceName" : "string"
+              },
+          ]
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "获取失败",
+          "data" : null
+        }
+        ```
+
+
+### Get Finished Practice List
+
+- **接口路径**：`/api/student/{id}/get-finished-practice-list`
+- **请求方法**：`GET`
+- **接口说明**：学生用户获取已完成练习列表。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+        {
+          "message" : "获取成功",
+          "data" : [
+              {
+                "practiceId" : "long",
+                "practiceName" : "string",
+                "practiceTime" : "string",
+                "totalScore" : "double"
+              },
+              {
+                "practiceId" : "long",
+                "practiceName" : "string",
+                "practiceTime" : "string",
+                "totalScore" : "double"
+              },
+          ]
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "获取失败",
+          "data" : null
+        }
+        ```
+
+
+### Continue practice
+
+- **接口路径**：`/api/student/{id}/continue-practice`
+- **请求方法**：`POST`
+- **接口说明**：学生用户继续练习的答题。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+
+```json
+{
+  "practiceId" : "long"
+}
+```
+- **响应说明**
+  - 响应格式: `JSON`
+    - **成功响应** (`200 OK`):
+      ```json
+      {
+        "message" : "获取成功",
+        "data" : [
+            {
+              "sequence" : "int",
+              "questionContent" : "string",
+              "questionType" : "string",
+              "questionOptions" : "string",
+              "answerContent" : "string"
+            },
+            {
+              "sequence" : "int",
+              "questionContent" : "string",
+              "questionType" : "string",
+              "questionOptions" : "string",
+              "answerContent" : "string"
+            },
+        ]
+      }
+      ```
+    - **失败响应** (`400 Bad Request`):
+      ```json
+      {
+        "message": "获取失败",
+        "data" : null
+      }
+      ```
+
+
+### Get Unfinished Assignment List
+- **接口路径**：`/api/student/{id}/get-unfinished-assignment-list`
+- **请求方法**：`GET`
+- **接口说明**：学生用户获取作业列表。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+          {
+          "message" : "获取成功"，
+          "data" : [
+              {
+                "assignmentId" : "long",
+                "title" : "string",
+                "description" : "string",
+                "startTime" : "string",
+                "endTime" : "string"
+              },
+              {
+                "assignmentId" : "long",
+                "title" : "string",
+                "description" : "string",
+                "startTime" : "string",
+                "endTime" : "string"
+              },
+          ]
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "获取失败"，
+          "data" : null
+        }
+        ```
+
+
+### Get Finished Assignment List
+- **接口路径**：`/api/student/{id}/get-finished-assignment-list`
+- **请求方法**：`GET`
+- **接口说明**：学生用户获取作业列表。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+        {
+          "message" : "获取成功"，
+          "data" : [
+              {
+                "assignmentId" : "long",
+                "title" : "string",
+                "description" : "string",
+                "startTime" : "string",
+                "endTime" : "string",
+                "totalScore" : "double"
+              },
+              {
+                "assignmentId" : "long",
+                "title" : "string",
+                "description" : "string",
+                "startTime" : "string",
+                "endTime" : "string",
+                "totalScore" : "double"
+              },
+          ]
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "获取失败"，
+          "data" : null
+        }
+        ```
 
 
 
