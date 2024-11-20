@@ -25,7 +25,7 @@ public class SchoolAdminManagementController {
     private final AuthorizationCodeService authorizationCodeService;
 
     @Autowired
-    public SchoolAdminManagementController(SchoolAdminServiceImpl schoolAdminService,
+    public SchoolAdminManagementController(SchoolAdminService schoolAdminService,
                                            SchoolService schoolService,
                                            AuthorizationCodeService authorizationCodeService) {
         this.schoolAdminService = schoolAdminService;

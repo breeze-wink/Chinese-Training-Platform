@@ -377,7 +377,8 @@
         {
           "id": 12345,
           "title": "string",
-        }
+        },
+        ...
       ]
     }
     ```
@@ -397,18 +398,20 @@
 - **接口说明**：学生用户自定义生成新的练习题。
 - **请求说明**
 - 请求头: `Content-Type` : `application/json`
-  - 请求参数: - 路径参数（Path Variable）：`id` - 学生的唯一标识符
-  -查询参数（Query Parameter）:`num` - 题目数量
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+    - 查询参数（Query Parameter）:`num` - 题目数量
 - 请求体(`JSON` 格式)：
   ```json
   {
     "data": [
-    {
-      "knowledgePointId": "long"
-    },
-    {
-      "knowledgePointId": "long"
-    }
+      {
+        "knowledgePointId": "long"
+      },
+      {
+        "knowledgePointId": "long"
+      },
+      ...
     ]
   }
   ```
@@ -422,25 +425,26 @@
         {
           "practiceQuestionId" : "long",
           "questionContent": "string",
-          "type": "string",//数据类型暂不确定
+          "type": "string",
           "questionOptions": "string",
           "sequence": "int"
         },
         {
           "practiceQuestionId" : "long",
           "questionContent": "string",
-          "type": "string",//数据类型暂不确定
+          "type": "string",
           "questionOptions": "string",
           "sequence": "int"
         },
+        ...
       ]
-  }
+    }
   ```
   - **失败响应** (`400 Bad Request`):
   ```json
   {
     "message": "考点和题目发送失败",
-    "practiceId" ： null
+    "practiceId" : null,
      "data": null
   }
   ```
@@ -466,17 +470,18 @@
       {
         "practiceQuestionId" : "long",
         "questionContent": "string",
-        "type": "string",//数据类型暂不确定
+        "type": "string",
         "questionOptions": "string",
         "sequence": "int"
       },
       {
         "practiceQuestionId" : "long",
         "questionContent": "string",
-        "type": "string",//数据类型暂不确定
+        "type": "string",
         "questionOptions": "string",
         "sequence": "int"
-      }
+      },
+      ...
     ]
   }
   ```
@@ -484,7 +489,7 @@
   ```json
   {
     "message": "题目发送失败",
-    "practiceId" : null
+    "practiceId" : null,
     "data": null
   }
   ```
@@ -750,7 +755,7 @@
       - **成功响应** (`200 OK`):
         ```json
           {
-          "message" : "获取成功"，
+          "message" : "获取成功",
           "data" : [
               {
                 "assignmentId" : "long",
@@ -772,7 +777,7 @@
       - **失败响应** (`400 Bad Request`):
         ```json
         {
-          "message": "获取失败"，
+          "message": "获取失败",
           "data" : null
         }
         ```
@@ -791,7 +796,7 @@
       - **成功响应** (`200 OK`):
         ```json
         {
-          "message" : "获取成功"，
+          "message" : "获取成功",
           "data" : [
               {
                 "assignmentId" : "long",
@@ -815,7 +820,7 @@
       - **失败响应** (`400 Bad Request`):
         ```json
         {
-          "message": "获取失败"，
+          "message": "获取失败",
           "data" : null
         }
         ```
