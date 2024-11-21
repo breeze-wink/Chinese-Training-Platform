@@ -28,6 +28,11 @@ public class PracticeAnswerServiceImpl implements PracticeAnswerService {
     }
 
     @Override
+    public int updatePracticeAnswer(PracticeAnswer practiceAnswer) {
+        return practiceAnswerMapper.update(practiceAnswer);
+    }
+
+    @Override
     @Transactional
     public int deletePracticeAnswerByPracticeQuestionId(Long practiceQuestionId) {
         return practiceAnswerMapper.deletePracticeQuestionByPracticeId(practiceQuestionId);

@@ -393,7 +393,7 @@
     ```
     
 
-### Get Knowledge Points
+### Get Knowledge Points `finished` `???`
 
 - **接口路径**：`/api/student/{id}/practice/get-knowledge-points`
 
@@ -445,7 +445,7 @@
     
 
 
-### Generate Practice Self-Define
+### Generate Practice Self-Define `finished` `???` `修改了api文档`
 
 - **接口路径**：`/api/student/{id}/practice/generate-define`
 - **请求方法**：`POST`
@@ -454,10 +454,11 @@
 - 请求头: `Content-Type` : `application/json`
   - 请求参数:
     - 路径参数（Path Variable）：`id` - 学生的唯一标识符
-    - 查询参数（Query Parameter）:`num` - 题目数量
 - 请求体(`JSON` 格式)：
   ```json
   {
+    "num" : "int",
+    "name" : "string",
     "data": [
       {
         "knowledgePointId": "long"
@@ -498,8 +499,7 @@
   ```json
   {
     "message": "考点和题目发送失败",
-    "practiceId" : null,
-     "data": null
+    "data": null
   }
   ```
 
@@ -549,7 +549,7 @@
   ```
 
 
-### Complete Practice
+### Complete Practice `finished` `???`
 
 - **接口路径**：`/api/student/{id}/practice/complete`
 - **请求方法**：`POST`
@@ -633,7 +633,7 @@
     }
     ```
 
-### Save Answer
+### Save Answer `finished` `???`
 
 - **接口路径**：`/api/student/{id}/practice/save`
 - **请求方法**：`POST`
@@ -672,7 +672,7 @@
     ```
 
 
-### Get Unfinished Practice List
+### Get Unfinished Practice List `finished` `???`
 
 - **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
 - **请求方法**：`GET`
@@ -708,7 +708,7 @@
         ```
 
 
-### Get Finished Practice List
+### Get Finished Practice List `finished` `???`
 
 - **接口路径**：`/api/student/{id}/get-finished-practice-list`
 - **请求方法**：`GET`
@@ -748,7 +748,7 @@
         ```
 
 
-### Continue Practice
+### Continue Practice `修改了api文档` `finished` `???`
 
 - **接口路径**：`/api/student/{id}/continue-practice`
 - **请求方法**：`POST`
@@ -771,6 +771,7 @@
         "message" : "获取成功",
         "data" : [
             {
+              "practiceQuestionId" : "long",
               "sequence" : "int",
               "questionContent" : "string",
               "questionType" : "string",
@@ -778,6 +779,7 @@
               "answerContent" : "string"
             },
             {
+              "practiceQuestionId" : "long",
               "sequence" : "int",
               "questionContent" : "string",
               "questionType" : "string",
