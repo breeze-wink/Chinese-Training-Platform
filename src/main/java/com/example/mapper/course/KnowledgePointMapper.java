@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface KnowledgePointMapper {
 
-    @Insert("INSERT INTO knowledge_point(name, description) VALUES(#{name}, #{description})")
+    @Insert("INSERT INTO knowledge_point(name, description, type) VALUES(#{name}, #{description}, #{type})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(KnowledgePoint point);
 
     @Delete("DELETE FROM knowledge_point WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE knowledge_point SET name = #{name}, description = #{description} WHERE id = #{id}")
+    @Update("UPDATE knowledge_point SET name = #{name}, description = #{description}, type = #{type} WHERE id = #{id}")
     int update(KnowledgePoint point);
 
     @Select("SELECT * FROM knowledge_point WHERE id = #{id}")

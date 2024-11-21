@@ -10,7 +10,7 @@ public interface PracticeQuestionMapper {
 
     @Insert("INSERT INTO practice_question (practiceId, questionId, sequence) VALUES (#{practiceId}, #{questionId}, #{sequence})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insertPracticeQuestion(PracticeQuestion practiceQuestion);
+    int insertPracticeQuestion(PracticeQuestion practiceQuestion);
 
     @Select("SELECT * FROM practice_question WHERE id = #{id}")
     PracticeQuestion selectPracticeQuestionById(Long id);
@@ -19,8 +19,11 @@ public interface PracticeQuestionMapper {
     List<PracticeQuestion> selectPracticeQuestionsByPracticeId(Long practiceId);
 
     @Update("UPDATE practice_question SET practiceId = #{practiceId}, questionId = #{questionId}, sequence = #{sequence} WHERE id = #{id}")
-    void updatePracticeQuestion(PracticeQuestion practiceQuestion);
+    int updatePracticeQuestion(PracticeQuestion practiceQuestion);
 
     @Delete("DELETE FROM practice_question WHERE id = #{id}")
-    void deletePracticeQuestion(Long id);
+    int deletePracticeQuestion(Long id);
+
+    @Delete("DELETE FROM practice_question WHERE practiceId = #{practiceId}")
+    int deletePracticeQuestionByPracticeId(Long practiceId);
 }

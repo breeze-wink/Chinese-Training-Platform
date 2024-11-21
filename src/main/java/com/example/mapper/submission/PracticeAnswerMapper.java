@@ -23,4 +23,10 @@ public interface PracticeAnswerMapper {
 
     @Select("SELECT * FROM practice_answer")
     List<PracticeAnswer> selectAll();
+
+    @Select("DELETE FROM practice_answer WHERE practiceQuestionId = #{practiceQuestionId}")
+    int deletePracticeQuestionByPracticeId(Long practiceQuestionId);
+
+    @Select("SELECT * FROM practice_answer WHERE practiceQuestionId = #{practiceQuestionId}")
+    PracticeAnswer selectByPracticeQuestionId(Long practiceQuestionId);
 }
