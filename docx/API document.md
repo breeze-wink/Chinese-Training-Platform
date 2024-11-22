@@ -590,7 +590,7 @@
     ```
 
 
-### Get Answer
+### Get Answer `finished` `???`
 
 - **接口路径**：`/api/student/{id}/practice/get-answer`
 - **请求方法**：GET

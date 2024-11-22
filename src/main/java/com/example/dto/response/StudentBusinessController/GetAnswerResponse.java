@@ -1,0 +1,23 @@
+package com.example.dto.response.StudentBusinessController;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+public class GetAnswerResponse {
+    private String message;
+    private List<InfoData> data;
+
+    @Getter
+    @Setter
+    public static class InfoData {
+        private String questionContent;
+        private String questionType;
+        private String questionOptions;
+        private String answer;
+        private String studentAnswer;
+    }
+}
