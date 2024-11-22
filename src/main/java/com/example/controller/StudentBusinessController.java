@@ -220,4 +220,23 @@ public class StudentBusinessController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}/practice/get-answer")
+    public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) {
+        GetAnswerResponse response = new GetAnswerResponse();
+        List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
+        List<GetAnswerResponse.InfoData> data = new ArrayList<>();
+        for(PracticeQuestion practiceQuestion : practiceQuestions){
+            GetAnswerResponse.InfoData infoData = new GetAnswerResponse.InfoData();
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
+            infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
+            infoData.setQuestionOptions(questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions());
+            infoData.setAnswer(questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer());
+            infoData.setStudentAnswer(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("答案获取成功");
+        return ResponseEntity.ok(response);
+    }
+
 }
