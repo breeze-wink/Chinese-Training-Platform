@@ -1113,6 +1113,31 @@
     响应体为空
     ```
 
+### View Knowledge Point  
+
+- **接口路径**：`/api/teacher/{id}/view-knowledge-point`
+
+- **请求方法**：`GET`
+
+- **接口说明**：教师用户查看知识点，以 PDF 文件形式返回。
+
+- **请求说明**：
+
+  - 路径参数：
+    - `id`：教师的唯一标识符。
+  - 请求体：无
+
+- 响应说明：
+
+  - 成功响应 (`200 OK`)
+    - 响应类型为 `application/pdf`，返回 PDF 文件内容，附带 `Content-Disposition` 头以 inline 方式显示。
+
+  - **失败响应** (`404 Not Found`):
+
+    ```json
+    响应体为空
+    ```
+
 ### Create Class `finished`
 
 - **接口路径**：`/api/teacher/{id}/create-class`
