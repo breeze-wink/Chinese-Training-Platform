@@ -103,11 +103,6 @@ public class TeacherBusinessController {
         List<ClassGroup> groups = classGroupService.getGroupsByClassId(classId);
         GetGroupsResponse response = new GetGroupsResponse();
 
-        if (groups.isEmpty()) {
-            response.setMessage("获取小组信息失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
         response.setData(new ArrayList<>());
 
         for (ClassGroup group : groups) {
