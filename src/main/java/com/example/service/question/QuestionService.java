@@ -9,4 +9,6 @@ public interface QuestionService {
     int deleteQuestion(Long id);
     Question getQuestionById(Long id);
     List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId);
+
+    List<Question> getAllQuestions();
 }
