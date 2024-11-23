@@ -26,4 +26,7 @@ public interface SchoolAdminMapper {
 
     @Select("SELECT * FROM school_admin")
     List<SchoolAdmin> selectAll();
+
+    @Select("SELECT * FROM school_admin WHERE username = #{name}")
+    SchoolAdmin selectByName(String name);
 }

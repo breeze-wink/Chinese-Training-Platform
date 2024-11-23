@@ -1,24 +1,31 @@
 package com.example.service.classes.impl;
 
 import com.example.mapper.classes.ClassGroupMapper;
+import com.example.mapper.classes.ClassMapper;
 import com.example.mapper.classes.GroupStudentMapper;
 import com.example.model.classes.ClassGroup;
+import com.example.model.classes.Clazz;
 import com.example.model.classes.GroupStudent;
 import com.example.service.classes.ClassGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ClassGroupServiceImpl implements ClassGroupService {
     private final ClassGroupMapper classGroupMapper;
+    private final ClassMapper classMapper;
     private final GroupStudentMapper groupStudentMapper;
     @Autowired
-    public ClassGroupServiceImpl(ClassGroupMapper classGroupMapper, GroupStudentMapper groupStudentMapper) {
+    public ClassGroupServiceImpl(ClassGroupMapper classGroupMapper,
+                                 GroupStudentMapper groupStudentMapper,
+                                 ClassMapper classMapper) {
         this.classGroupMapper = classGroupMapper;
         this.groupStudentMapper = groupStudentMapper;
+        this.classMapper = classMapper;
     }
 
     @Override
@@ -62,8 +69,14 @@ public class ClassGroupServiceImpl implements ClassGroupService {
     }
 
     @Override
-    public List<ClassGroup> getGroupsByClassId(Long classId) {
-        return classGroupMapper.selectByClassId(classId);
+    public List<ClassGroup> getGroupsByCreatorId(Long creatorId) {
+        List<Clazz> clazzes = classMapper.selectByCreatorId(creatorId);
+
+        List<ClassGroup> groups = new ArrayList<>();
+        for (Clazz  clazz  :  clazzes) {
+            groups.addAll(classGroupMapper.selectByClassId(clazz.getId()));
+        }
+        return groups;
     }
 
     @Override

@@ -444,7 +444,6 @@
     ```
     
 
-
 ### Generate Practice Self-Define `finished` `???` `修改了api文档`
 
 - **接口路径**：`/api/student/{id}/practice/generate-define`
@@ -1230,12 +1229,14 @@
 ### Get Groups Information `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-groups`
+
 - **请求方法**：GET
+
 - **接口说明**：教师用户获取其小组的信息。
+
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 用户的唯一标识符
-    - 查询参数 : classId - 班级的唯一标识
   - 请求体：无
   
 - **响应说明**：
@@ -2202,44 +2203,46 @@
     ```
     
 
-
-### Creating School Administrator Account
+### Creating School Administrator Account `finished`
 
 - **接口路径**：`/api/system-admin/create-school-admin`
+
 - **请求方法**：POST
+
 - **接口说明**：系统管理员可以通过此接口创建一个新的学校管理员账号。
 
 - **请求说明**：
 
-  - **请求体**：
-    - **JSON**：
-      - `name`：学校管理员的名称，必填项。
-      - `password`：学校管理员的密码，由系统生成。
+  - **请求体**：`JSON`
+    
+    ```json
+    {
+        "name" :  "用户名",
+        "password" : "密码",
+        "schoolId" : "学校id"
+    }
+    ```
 
 - **响应说明**：
+  
   - **响应格式**：JSON
-
+  
   - **成功响应** （200 OK）：
     ```json
     {
       "message": "账号生成成功",
-      "data": {
-        "name": "string",
-        "password": "string"
-      }
     }
     ```
-
+    
   - **失败响应** （400 Bad Request）：
     ```json
     {
       "message": "账号生成失败",
-      "data": null
     }
     ```
-
   
-##  Get All Questions
+  
+###  Get All Questions
 
 - **接口路径**：`/api/system-admin/get-all-questions`
 - **请求方法**：GET
@@ -2273,7 +2276,7 @@
     }
     ```
 
-## Delete Question
+### Delete Question
 
 - **接口路径**：`/api/system-admin/delete-question/{id}`
 - **请求方法**：DELETE

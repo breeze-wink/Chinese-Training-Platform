@@ -11,7 +11,7 @@ public interface ClassGroupService {
     int removeGroup(Long groupId);
     int addStudentToGroup(Long groupId, Long studentId);
     int removeStudentFromGroup(Long groupId, Long studentId);
-    List<ClassGroup> getGroupsByClassId(Long classId);
+    List<ClassGroup> getGroupsByCreatorId(Long classId);
     ClassGroup getGroupById(Long groupId);
     List<ClassGroup> getAllGroups();
 }

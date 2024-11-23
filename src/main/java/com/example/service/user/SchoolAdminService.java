@@ -12,4 +12,6 @@ public interface SchoolAdminService {
     List<SchoolAdmin> getAllSchoolAdmins();
 
     SchoolAdmin authenticate(String account, String password);
+
+    boolean checkExistSchool(String name);
 }
