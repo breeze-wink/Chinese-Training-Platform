@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class StudentBusinessController {
         List<Practice> practices = practiceService.getPracticesByStudentId(id);
         List<GetUnfinishedPractices.InfoData> data = new ArrayList<>();
         for(Practice practice : practices){
-            if(practice.getPracticeTime() == null){
+            if(practice.getPracticeTime() == null ){
                 GetUnfinishedPractices.InfoData infoData = new GetUnfinishedPractices.InfoData();
                 infoData.setPracticeId(practice.getId());
                 infoData.setPracticeName(practice.getName());
@@ -78,7 +79,10 @@ public class StudentBusinessController {
                 infoData.setPracticeId(practice.getId());
                 infoData.setPracticeName(practice.getName());
                 infoData.setPracticeTime(practice.getPracticeTime().toString());
-                infoData.setTotalScore(practice.getTotalScore().doubleValue());
+                infoData.setTotalScore(null);
+                if(practice.getTotalScore() != null){
+                    infoData.setTotalScore(practice.getTotalScore().doubleValue());
+                }
                 data.add(infoData);
             }
         }
@@ -182,38 +186,40 @@ public class StudentBusinessController {
         double totalScore = 0.0;
         for(CompletePracticeRequest.InfoData infoData : request.getData()){
             PracticeQuestion practiceQuestion = practiceQuestionService.getPracticeQuestionById(infoData.getPracticeQuestionId());
-            PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(infoData.getPracticeQuestionId());
-            PracticeAnswer practiceAnswer1 = new PracticeAnswer();
-            practiceAnswer1.setPracticeQuestionId(infoData.getPracticeQuestionId());
-            practiceAnswer1.setAnswerContent(infoData.getAnswerContent());
+            PracticeAnswer practiceAnswer = new PracticeAnswer();
+            practiceAnswer.setPracticeQuestionId(infoData.getPracticeQuestionId());
+            practiceAnswer.setAnswerContent(infoData.getAnswerContent());
             Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
             if(Objects.equals(question.getType(), "CHOICE")){
                 if(question.getAnswer().equals(practiceAnswer.getAnswerContent())){
-                    practiceAnswer1.setScore(BigDecimal.valueOf(1.0));
+                    practiceAnswer.setScore(BigDecimal.valueOf(1.0));
                     score += 1.0;
                     totalScore += 1.0;
                 }
                 else{
-                    practiceAnswer1.setScore(BigDecimal.valueOf(0.0));
+                    practiceAnswer.setScore(BigDecimal.valueOf(0.0));
                     totalScore += 1.0;
                 }
             }
-            if(practiceAnswer == null){
-                practiceAnswerService.addPracticeAnswer(practiceAnswer1);
+            PracticeAnswer testPracticeAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(infoData.getPracticeQuestionId());
+            if(testPracticeAnswer == null){
+                practiceAnswerService.addPracticeAnswer(practiceAnswer);
             }
             else{
-                practiceAnswerService.updatePracticeAnswer(practiceAnswer1);
+                practiceAnswer.setId(testPracticeAnswer.getId());
+                practiceAnswerService.updatePracticeAnswer(practiceAnswer);
             }
         }
         double finalScore;
         if(totalScore != 0){
-            finalScore = score / totalScore;
+            finalScore = score / totalScore * 100;
             practice.setTotalScore(BigDecimal.valueOf(finalScore));
         }
         else{
             finalScore = 0.0;
             practice.setTotalScore(BigDecimal.valueOf(finalScore));
         }
+        practice.setPracticeTime(LocalDateTime.now());
         practiceService.updatePractice(practice);
         response.setScore(finalScore);
         response.setMessage("练习提交成功");
