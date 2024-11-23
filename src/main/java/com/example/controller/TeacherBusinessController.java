@@ -99,8 +99,8 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}/get-groups")
-    public ResponseEntity<GetGroupsResponse> getGroups(@PathVariable Long id, @RequestParam Long classId) {
-        List<ClassGroup> groups = classGroupService.getGroupsByClassId(classId);
+    public ResponseEntity<GetGroupsResponse> getGroups(@PathVariable Long id) {
+        List<ClassGroup> groups = classGroupService.getGroupsByCreatorId(id);
         GetGroupsResponse response = new GetGroupsResponse();
 
         response.setData(new ArrayList<>());

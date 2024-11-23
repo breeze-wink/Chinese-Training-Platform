@@ -22,6 +22,9 @@ public interface TeacherMapper {
     @Select("SELECT * FROM teacher WHERE id = #{id}")
     Teacher selectById(Long id);
 
+    @Select("SELECT * FROM teacher WHERE email = #{email} or username = #{account}")
+    List<Teacher> findByAccount(String account);
+
     @Select("SELECT * FROM teacher WHERE email = #{email}")
     Teacher findByEmail(String email);
 

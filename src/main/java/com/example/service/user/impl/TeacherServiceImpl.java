@@ -50,11 +50,14 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher authenticate(String email, String password) {
-        Teacher teacher = teacherMapper.findByEmail(email);
-        if (teacher == null || !teacher.getPassword().equals(password))
-            return null;
+        List<Teacher> teachers = teacherMapper.findByAccount(email);
 
-        return teacher;
+        for (Teacher teacher : teachers) {
+            if (teacher.getPassword().equals(password)) {
+                return teacher;
+            }
+        }
+        return null;
     }
 
     @Override

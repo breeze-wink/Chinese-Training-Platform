@@ -28,4 +28,5 @@ public interface ClassGroupMapper {
 
     @Select("SELECT * FROM class_group WHERE classId = #{classId}")
     List<ClassGroup> selectByClassId(Long classId);
+
 }
