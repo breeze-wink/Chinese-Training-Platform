@@ -393,7 +393,7 @@
     ```
     
 
-### Get Knowledge Points `finished` `???`
+### Get Knowledge Points `finished`
 
 - **接口路径**：`/api/student/{id}/practice/get-knowledge-points`
 
@@ -444,7 +444,8 @@
     ```
     
 
-### Generate Practice Self-Define `finished` `???` `修改了api文档`
+
+### Generate Practice Self-Define `finished` 
 
 - **接口路径**：`/api/student/{id}/practice/generate-define`
 - **请求方法**：`POST`
@@ -548,7 +549,7 @@
   ```
 
 
-### Complete Practice `finished` `???`
+### Complete Practice `finished`
 
 - **接口路径**：`/api/student/{id}/practice/complete`
 - **请求方法**：`POST`
@@ -589,7 +590,7 @@
     ```
 
 
-### Get Answer `finished` `???`
+### Get Answer `finished`
 
 - **接口路径**：`/api/student/{id}/practice/get-answer`
 - **请求方法**：GET
@@ -632,7 +633,7 @@
     }
     ```
 
-### Save Answer `finished` `???`
+### Save Answer `finished`
 
 - **接口路径**：`/api/student/{id}/practice/save`
 - **请求方法**：`POST`
@@ -671,7 +672,7 @@
     ```
 
 
-### Get Unfinished Practice List `finished` `???`
+### Get Unfinished Practice List `finished`
 
 - **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
 - **请求方法**：`GET`
@@ -707,7 +708,7 @@
         ```
 
 
-### Get Finished Practice List `finished` `???`
+### Get Finished Practice List `finished`
 
 - **接口路径**：`/api/student/{id}/get-finished-practice-list`
 - **请求方法**：`GET`
@@ -747,7 +748,7 @@
         ```
 
 
-### Continue Practice `修改了api文档` `finished` `???`
+### Continue Practice `修改了api文档` `finished`
 
 - **接口路径**：`/api/student/{id}/continue-practice`
 - **请求方法**：`POST`
