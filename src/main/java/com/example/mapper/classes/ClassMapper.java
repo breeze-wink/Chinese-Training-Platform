@@ -15,7 +15,7 @@ public interface ClassMapper {
     @Delete("DELETE FROM class WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE class SET name = #{name}, description = #{description}, inviteCode = #{inviteCode}, creatorId = #{creatorId}, school_id = #{schoolId} WHERE id = #{id}")
+    @Update("UPDATE class SET name = #{name}, description = #{description}, inviteCode = #{inviteCode}, creatorId = #{creatorId}, schoolId = #{schoolId} WHERE id = #{id}")
     int update(Clazz clazz);
 
     @Select("SELECT * FROM class WHERE id = #{id}")

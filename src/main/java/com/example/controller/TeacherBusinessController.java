@@ -2,17 +2,21 @@ package com.example.controller;
 
 import com.example.dto.request.CreateGroupRequest;
 import com.example.dto.request.TeacherCreateClassRequest;
+import com.example.dto.request.UpdateClassRequest;
 import com.example.dto.response.*;
 import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
+import com.example.model.classes.GroupStudent;
 import com.example.model.course.CourseStandard;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
 import com.example.service.classes.ClassStudentService;
+import com.example.service.classes.GroupStudentService;
 import com.example.service.classes.impl.ClassGroupServiceImpl;
 import com.example.service.classes.impl.ClassServiceImpl;
 import com.example.service.classes.impl.ClassStudentServiceImpl;
+import com.example.service.classes.impl.GroupStudentServiceImpl;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.user.StudentService;
@@ -37,17 +41,20 @@ public class TeacherBusinessController {
     private final ClassGroupService classGroupService;
     private final ClassStudentService classStudentService;
     private final StudentService studentService;
+    private final GroupStudentService groupStudentService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
                                      ClassGroupServiceImpl classGroupService,
                                      ClassStudentServiceImpl classStudentService,
-                                     StudentServiceImpl studentService) {
+                                     StudentServiceImpl studentService,
+                                     GroupStudentServiceImpl groupStudentService) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
         this.classGroupService = classGroupService;
         this.classStudentService = classStudentService;
         this.studentService = studentService;
+        this.groupStudentService = groupStudentService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -165,4 +172,61 @@ public class TeacherBusinessController {
         }
     }
 
+    @DeleteMapping("/{teacherId}/disband-group")
+    public ResponseEntity<Message> disbandGroup(@PathVariable Long teacherId, @RequestParam Long groupId) {
+        Message response = new Message();
+
+        try {
+            ClassGroup group = classGroupService.getGroupById(groupId);
+            if (group == null) {
+                response.setMessage("小组解散失败, 找不到该小组");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            classGroupService.removeGroup(groupId);
+            response.setMessage("成功解散小组");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("小组解散失败" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    @GetMapping("/{teacherId}/groups-members")
+    public ResponseEntity<GroupMembersResponse> getGroupMembers(@PathVariable Long teacherId,
+                                                                @RequestParam Long groupId) {
+        GroupMembersResponse response = new GroupMembersResponse();
+        response.setStudents(new ArrayList<>());
+        try {
+            List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByGroupId(groupId);
+
+            for (GroupStudent groupStudent : groupStudents) {
+                GroupMembersResponse.memberInfo info = new GroupMembersResponse.memberInfo();
+                info.setStudentId(groupStudent.getStudentId());
+                info.setStudentName(studentService.getStudentById(groupStudent.getStudentId()).getName());
+                response.getStudents().add(info);
+            }
+
+            response.setMessage("小组成员构成获取成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("获取失败:" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+    }
+    @PutMapping("/{id}/update-class")
+    public ResponseEntity<Message> updateClass(@PathVariable Long id, @RequestBody UpdateClassRequest request) {
+        Long classId = request.getClassId();
+        Clazz clazz = classService.getClassById(classId);
+        if (clazz == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("更新失败，未找到班级"));
+        }
+        clazz.setName(request.getClassName());
+        clazz.setDescription(request.getClassDescription());
+        classService.updateClass(clazz);
+
+        return ResponseEntity.ok(new Message("更新成功"));
+    }
 }

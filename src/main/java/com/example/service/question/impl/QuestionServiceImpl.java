@@ -38,4 +38,9 @@ public class QuestionServiceImpl implements QuestionService {
     public List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId) {
         return questionMapper.getQuestionsByKnowledgePointId(knowledgePointId);
     }
+
+    @Override
+    public List<Question> getAllQuestions() {
+        return questionMapper.selectAll();
+    }
 }

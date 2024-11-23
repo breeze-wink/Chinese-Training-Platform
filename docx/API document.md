@@ -1156,6 +1156,7 @@
     ```
 
 - **响应说明**：
+  
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
@@ -1170,6 +1171,44 @@
     {
       "message": "班级创建失败",
       "classCode" : null
+    }
+    ```
+
+### Update Class `finished`
+
+- **接口路径**：`/api/teacher/{id}/update-class`
+
+- **请求方法**：PUT
+
+- **接口说明**：教师用户更改班级信息，传输班级名称和班级描述。
+
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 老师的唯一标识符
+  
+  - 请求体(`JSON` 格式)：
+
+    ```json
+    {
+      "classId" : 12345,
+      "className" : "string", // 班级名称
+      "classDescription" : "string" // 班级描述
+    }
+    ```
+  
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "更新成功"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+  
+    ```json
+    {
+      "message": "更新失败, ...",
     }
     ```
 
@@ -1536,14 +1575,14 @@
 
 ### Remove Student from Class 
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/students/{studentId}/remove`
+- **接口路径**：`/api/teacher/{teacherId}/classes/remove-student`
 - **请求方法**：DELETE
 - **接口说明**：教师用户将某个学生移出指定班级。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
-    - 路径参数（Path Variable）：`studentId` - 学生的唯一标识符
+    - 查询参数（Path Variable）：`classId` - 班级的唯一标识符
+    - 查询参数（Path Variable）：`studentId` - 学生的唯一标识符
   - 请求体：无
 
 - **响应说明**：
@@ -1561,16 +1600,19 @@
     }
     ```
 
-### Get Group Members 
+### Get Group Members `finished`
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/members`
+- **接口路径**：`/api/teacher/{teacherId}/groups-members`
+
 - **请求方法**：GET
+
 - **接口说明**：教师用户查看某个小组的成员构成。
+
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
-    - 路径参数（Path Variable）：`groupId` - 小组的唯一标识符
+    - 查询参数（Path Variable）：`groupId` - 小组的唯一标识符
   - 请求体：无
 
 - **响应说明**：
@@ -1579,7 +1621,7 @@
     ```json
     {
       "message": "小组成员构成获取成功",
-      "data": [
+      "students": [
         {
           "studentId": "12345",
           "studentName": "张三"
@@ -1636,18 +1678,23 @@
     }
     ```
 
-### Disband Group
+### Disband Group `finished`
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/disband`
+- **接口路径**：`/api/teacher/{teacherId}/disband-group`
+
 - **请求方法**：DELETE
+
 - **接口说明**：教师用户解散某个小组。
+
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
-    - 路径参数（Path Variable）：`groupId` - 小组的唯一标识符
+    
+      查询参数（Path Variable）：`groupId` - 小组的唯一标识符
+    
   - 请求体：无
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -2270,7 +2317,7 @@
   
 ###  Get All Questions
 
-- **接口路径**：`/api/system-admin/get-all-questions`
+- **接口路径**：`/api/system-admin/get-all-questions` `problem`
 - **请求方法**：GET
 - **接口说明**：系统管理员获取所有题目信息。
 
