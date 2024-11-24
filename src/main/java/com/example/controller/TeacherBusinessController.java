@@ -160,7 +160,7 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}/classes/disband")
+    @DeleteMapping("/{id}/classes/disband")
     public ResponseEntity<Message> disbandClass(@PathVariable Long id, @RequestParam Long classId) {
         Message response = new Message();
         if (classService.removeClass(classId) == 1) {

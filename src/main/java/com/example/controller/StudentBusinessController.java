@@ -144,6 +144,35 @@ public class StudentBusinessController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{id}/practice/generate-auto")//暂时
+    public ResponseEntity<GeneratePracticeDefineResponse> generatePracticeAuto(@PathVariable Long id) {
+        GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
+        List<Question> questions = questionService.getAllQuestions();
+        Practice practice = new Practice();
+        practice.setStudentId(id);
+        practiceService.createPractice(practice);
+        List<GeneratePracticeDefineResponse.InfoData> data = new ArrayList<>();
+        for(int i = 0; i < 5; i++){
+            int index = (int)(Math.random() * questions.size());
+            Question question = questions.get(index);
+            GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
+            PracticeQuestion practiceQuestion = new PracticeQuestion();
+            practiceQuestion.setPracticeId(practice.getId());
+            practiceQuestion.setQuestionId(question.getId());
+            practiceQuestion.setSequence(i + 1);
+            practiceQuestionService.addPracticeQuestion(practiceQuestion);
+            infoData.setPracticeQuestionId(practiceQuestion.getId());
+            infoData.setQuestionContent(question.getContent());
+            infoData.setType(question.getType());
+            infoData.setQuestionOptions(question.getOptions());
+            infoData.setSequence(i + 1);
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("练习生成成功");
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/{id}/practice/save")
     public ResponseEntity<Message> saveAnswer(@PathVariable Long id, @RequestBody SaveAnswerRequest request) {
         Message message = new Message();
