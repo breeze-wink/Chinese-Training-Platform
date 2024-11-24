@@ -160,8 +160,9 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}/classes/disband")
-    public ResponseEntity<Message> disbandClass(@PathVariable Long id, @RequestParam Long classId) {
+    @DeleteMapping("/{teacherId}/classes/disband")
+
+    public ResponseEntity<Message> disbandClass(@PathVariable Long teacherId, @RequestParam Long classId) {
         Message response = new Message();
         if (classService.removeClass(classId) == 1) {
             response.setMessage("班级解散成功");
