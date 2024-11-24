@@ -1163,6 +1163,7 @@
     {
       "message" : "班级创建成功",
       "classCode": "string",
+      "classId": 12345
     }
     ```
   - **失败响应** (`400 Bad Request`):
@@ -1170,7 +1171,8 @@
     ```json
     {
       "message": "班级创建失败",
-      "classCode" : null
+      "classCode" : null,
+      "classId" : null
     }
     ```
 
