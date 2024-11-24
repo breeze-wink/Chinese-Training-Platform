@@ -69,8 +69,10 @@ public class ClassServiceImpl implements ClassService {
     @Transactional
     public int removeClass(Long classId) {
         List<ClassGroup> classGroups = classGroupMapper.selectByClassId(classId);
-        for(ClassGroup classGroup : classGroups){
-            classGroupService.removeGroup(classGroup.getId());
+        if(!classGroups.isEmpty()){
+            for(ClassGroup classGroup : classGroups){
+                classGroupService.removeGroup(classGroup.getId());
+            }
         }
         classStudentMapper.removeClass(classId);
         return classMapper.delete(classId);
