@@ -85,6 +85,7 @@ public class TeacherBusinessController {
         }
         response.setMessage("班级创建成功");
         response.setClassCode(clazz.getInviteCode());
+        response.setClassId(clazz.getId());
         return ResponseEntity.ok(response);
     }
 
