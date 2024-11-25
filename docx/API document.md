@@ -416,6 +416,7 @@
     ```json
     {
       "message": "知识点获取成功",
+      "practiceId" : "long",
       "data": [
         {
           "id": "long",
@@ -475,6 +476,7 @@
   - **成功响应** (`200 OK`):
   ```json
     {
+      "practiceId" : "long",
       "message": "题目发送成功",
       "data": [
         {
@@ -672,7 +674,7 @@
     ```
 
 
-### Get Unfinished Practice List `finished`
+### Get Unfinished Practice List 
 
 - **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
 - **请求方法**：`GET`
@@ -708,7 +710,7 @@
         ```
 
 
-### Get Finished Practice List `finished`
+### Get Finished Practice List 
 
 - **接口路径**：`/api/student/{id}/get-finished-practice-list`
 - **请求方法**：`GET`
@@ -748,7 +750,7 @@
         ```
 
 
-### Continue Practice `修改了api文档` `finished`
+### Continue Practice 
 
 - **接口路径**：`/api/student/{id}/continue-practice`
 - **请求方法**：`POST`
