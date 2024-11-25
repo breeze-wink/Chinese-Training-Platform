@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.dto.request.*;
 import com.example.dto.response.*;
+import com.example.dto.response.StudentBusinessController.GetKnowledgePointsResponse;
+import com.example.model.course.KnowledgePoint;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.Teacher;
 import com.example.service.user.AuthorizationCodeService;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -149,6 +153,24 @@ public class TeacherManagementController {
 
         //开始执行
         teacher.setPhoneNumber(newNumber);
+        teacherService.updateTeacher(teacher);
+
+        response.setMessage("手机号修改成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/update-name")
+    public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody TeacherUpdateNameRequest request) {
+        Message response = new Message();
+        String newNumber = request.getName();
+        Teacher teacher = teacherService.getTeacherById(id);
+        if (teacher == null) {
+            response.setMessage("Id错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        //开始执行
+        teacher.setName(request.getName());
         teacherService.updateTeacher(teacher);
 
         response.setMessage("手机号修改成功");

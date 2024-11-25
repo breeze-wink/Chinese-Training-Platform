@@ -59,4 +59,9 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
     public List<KnowledgePoint> getAllKnowledgePoints() {
         return knowledgePointMapper.selectAll();
     }
+
+    @Override
+    public List<KnowledgePoint> getAllKnowledgePointsOrderByType() {
+        return knowledgePointMapper.selectAllOrderByType();
+    }
 }

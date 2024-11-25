@@ -1088,6 +1088,43 @@
     }
     ```
 
+### Update Name`finished`
+
+- **接口路径**：`/api/teacher/{id}/update-name`
+
+- **请求方法**：PUT
+
+- **接口说明**：教师用户修改自己的姓名。
+
+- **请求说明**：
+  
+  - 请求参数：
+    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name": "name"
+    }
+    ```
+    - `phoneNumber`：教师希望修改的新手机号。
+  
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    
+    ```json
+    {
+      "message": "姓名修改成功",
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    
+    ```json
+    {
+      "message": "姓名修改失败，...",
+    }
+    ```
+
 ### View Curriculum Standard  `finished`
 
 - **接口路径**：`/api/teacher/{id}/view-curriculum-standard`
@@ -1113,13 +1150,13 @@
     响应体为空
     ```
 
-### View Knowledge Point  
+### View Knowledge Point `finished`
 
 - **接口路径**：`/api/teacher/{id}/view-knowledge-point`
 
 - **请求方法**：`GET`
 
-- **接口说明**：教师用户查看知识点，以 PDF 文件形式返回。
+- **接口说明**：教师用户查看知识点。
 
 - **请求说明**：
 
@@ -1129,14 +1166,49 @@
 
 - 响应说明：
 
+  - 相应格式: `JSON`
+  
   - 成功响应 (`200 OK`)
-    - 响应类型为 `application/pdf`，返回 PDF 文件内容，附带 `Content-Disposition` 头以 inline 方式显示。
-
-  - **失败响应** (`404 Not Found`):
-
+  
     ```json
-    响应体为空
+    {
+        "message": "获取成功",
+        "knowledgePoints": {
+            "Math": [
+                {
+                    "name": "Algebra",
+                    "type": "Math",
+                    "description": "Basic Algebra"
+                },
+                {
+                    "name": "Geometry",
+                    "type": "Math",
+                    "description": "Basic Geometry"
+                }
+            ],
+            "Science": [
+                {
+                    "name": "Physics",
+                    "type": "Science",
+                    "description": "Basic Physics"
+                }
+            ]
+        }
+    }
+    
     ```
+  
+    
+  
+  - **失败响应** (`400 Bad Request`):
+  
+    ```json
+    {
+        "message" : "获取失败,  ..."
+        "knowledgePoints": null
+    }
+    ```
+  
 
 ### Create Class `finished`
 
