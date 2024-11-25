@@ -186,26 +186,59 @@ public class StudentBusinessController {
     public ResponseEntity<GeneratePracticeDefineResponse> generatePracticeAuto(@PathVariable Long id) {
         GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
         List<Question> questions = questionService.getAllQuestions();
+
+        // 创建练习
         Practice practice = new Practice();
         practice.setStudentId(id);
+        practice.setName("auto");
         practiceService.createPractice(practice);
+        response.setPracticeId(practice.getId());
+
+        // 初始化练习题目列表
+        List<PracticeQuestion> practiceQuestions = new ArrayList<>();
         List<GeneratePracticeDefineResponse.InfoData> data = new ArrayList<>();
-        for(int i = 0; i < 5; i++){
-            int index = (int)(Math.random() * questions.size());
+
+        // 随机选择题目并存储
+        for (int i = 0; i < 10; i++) {
+            int index = (int) (Math.random() * questions.size());
             Question question = questions.get(index);
-            GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
+
             PracticeQuestion practiceQuestion = new PracticeQuestion();
             practiceQuestion.setPracticeId(practice.getId());
             practiceQuestion.setQuestionId(question.getId());
-            practiceQuestion.setSequence(i + 1);
+
+            // 设置初始的类型优先级
+            if (Objects.equals(question.getType(), "CHOICE")) {
+                practiceQuestion.setSequence(1);
+            } else if (Objects.equals(question.getType(), "FILL_IN_BLANK")) {
+                practiceQuestion.setSequence(2);
+            } else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
+                practiceQuestion.setSequence(3);
+            }
+            practiceQuestions.add(practiceQuestion);
+        }
+
+        // 按题目类型排序
+        practiceQuestions.sort(Comparator.comparingInt(PracticeQuestion::getSequence));
+
+        // 设置最终的序列值并保存
+        int finalSequence = 1;
+        for (PracticeQuestion practiceQuestion : practiceQuestions) {
+            practiceQuestion.setSequence(finalSequence++);
             practiceQuestionService.addPracticeQuestion(practiceQuestion);
+
+            // 构建返回数据
+            Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+            GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
             infoData.setPracticeQuestionId(practiceQuestion.getId());
             infoData.setQuestionContent(question.getContent());
             infoData.setType(question.getType());
             infoData.setQuestionOptions(question.getOptions());
-            infoData.setSequence(i + 1);
+            infoData.setSequence(practiceQuestion.getSequence());
             data.add(infoData);
         }
+
+        // 返回响应
         response.setData(data);
         response.setMessage("练习生成成功");
         return ResponseEntity.ok(response);

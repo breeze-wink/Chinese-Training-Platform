@@ -269,4 +269,38 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    @GetMapping("/{id}/list-knowledge-point")
+    public ResponseEntity<ListKnowledgeResponse> getKnowledgePoint(@PathVariable Long id) {
+        ListKnowledgeResponse response = new ListKnowledgeResponse();
+        try {
+            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePointsOrderByType();
+
+            // 按 type 分组
+            Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> groupedPoints =
+                    knowledgePoints.stream()
+                            .collect(Collectors.groupingBy(KnowledgePoint::getType))  // 先按 KnowledgePoint 的 type 进行分组
+                            .entrySet().stream()  // 获取分组后的 EntrySet
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,  // 使用 type 作为键
+                                    entry -> entry.getValue().stream()
+                                            .map(kp -> {
+                                                ListKnowledgeResponse.KnowledgePointInfo info = new ListKnowledgeResponse.KnowledgePointInfo();
+                                                info.setName(kp.getName());
+                                                info.setId(kp.getId());
+                                                return info;
+                                            })
+                                            .collect(Collectors.toList())  // 转换为 List<KnowledgePointInfo>
+                            ));
+
+            response.setMessage("获取成功");
+            response.setKnowledgePoints(groupedPoints);
+
+            return ResponseEntity.ok(response);
+        }  catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("获取失败" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 }
