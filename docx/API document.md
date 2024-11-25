@@ -2335,9 +2335,13 @@
       "data": {
         "questions": [
           {
-            "id": "number",
-            "title": "string",
-            "description": "string"
+            "id": "number", // 对应数据库中的 id 字段
+        "content": "string", // 对应数据库中的 content 字段
+        "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+        "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
+        "answer": "string", // 对应数据库中的 answer 字段
+        "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
+        "creatorId": "number" // 对应数据库中的 creatorId 字段
           }
         ]
       }
