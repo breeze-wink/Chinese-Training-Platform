@@ -1446,40 +1446,46 @@
     }
     ```
 
-### Get Class Members Information `Waiting`
+### Get KnowledgePoint List `finished`
 
-- **接口路径**：`/api/teacher/{id}/list-knowledge`
+- **接口路径**：`/api/teacher/{id}/list-knowledge-point`
 - **请求方法**：GET
 - **接口说明**：获取教师的知识点分类和知识点名称。
 - **请求说明**：
+  
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 教师的唯一标识符
   - 请求体：无
-
+  
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
-    "message": "获取成功",
-    "data": [
-        {
-            "category": "Math",
-            "pointName": "Algebra"
-        },
-        {
-            "category": "Math",
-            "pointName": "Geometry"
-        },
-        {
-            "category": "Science",
-            "pointName": "Physics"
+        "message": "获取成功",
+        "knowledgePoints": {
+            "Math": [
+                {
+                    "id" : 12345,
+                    "name": "Algebra",
+                },
+                {
+                    "id" : 12345
+                    "name": "Geometry",
+                }
+            ],
+            "Science": [
+                {
+                    "id" : 12345
+                    "name": "Physics",
+                }
+            ]
         }
-    ]
-}
-
+    }
+    
     ```
   - **失败响应** (`400 Bad Request`):
+    
     ```json
     {
       "message": "获取知识点信息失败",
@@ -2449,12 +2455,12 @@
         "questions": [
           {
             "id": "number", // 对应数据库中的 id 字段
-        "content": "string", // 对应数据库中的 content 字段
-        "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-        "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
-        "answer": "string", // 对应数据库中的 answer 字段
-        "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-        "creatorId": "number" // 对应数据库中的 creatorId 字段
+            "content": "string", // 对应数据库中的 content 字段
+            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+            "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
+            "answer": "string", // 对应数据库中的 answer 字段
+            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
+            "creatorId": "number" // 对应数据库中的 creatorId 字段
           }
         ]
       }
