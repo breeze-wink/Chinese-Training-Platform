@@ -1445,6 +1445,46 @@
     }
     ```
 
+### Get Class Members Information `Waiting`
+
+- **接口路径**：`/api/teacher/{id}/list-knowledge`
+- **请求方法**：GET
+- **接口说明**：获取教师的知识点分类和知识点名称。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+    "message": "获取成功",
+    "conent": [
+        {
+            "category": "Math",
+            "pointName": "Algebra"
+        },
+        {
+            "category": "Math",
+            "pointName": "Geometry"
+        },
+        {
+            "category": "Science",
+            "pointName": "Physics"
+        }
+    ]
+}
+
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "获取知识点信息失败",
+      "content": null
+    }
+    ```
 
 ### Get Student's Average Homework Score and Class Rank 
 
