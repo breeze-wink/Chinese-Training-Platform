@@ -457,6 +457,7 @@
 - 请求体(`JSON` 格式)：
   ```json
   {
+    "practiceId" : "long",
     "num" : "int",
     "name" : "string",
     "data": [
