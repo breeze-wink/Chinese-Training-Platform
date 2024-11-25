@@ -24,4 +24,6 @@ public interface KnowledgePointMapper {
     @Select("SELECT * FROM knowledge_point")
     List<KnowledgePoint> selectAll();
 
+    @Select("SELECT * FROM knowledge_point order by type")
+    List<KnowledgePoint> selectAllOrderByType();
 }

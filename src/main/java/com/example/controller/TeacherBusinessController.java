@@ -9,6 +9,7 @@ import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.GroupStudent;
 import com.example.model.course.CourseStandard;
+import com.example.model.course.KnowledgePoint;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
 import com.example.service.classes.ClassStudentService;
@@ -18,7 +19,9 @@ import com.example.service.classes.impl.ClassServiceImpl;
 import com.example.service.classes.impl.ClassStudentServiceImpl;
 import com.example.service.classes.impl.GroupStudentServiceImpl;
 import com.example.service.course.CourseStandardService;
+import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
+import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -42,19 +48,22 @@ public class TeacherBusinessController {
     private final ClassStudentService classStudentService;
     private final StudentService studentService;
     private final GroupStudentService groupStudentService;
+    private final KnowledgePointService knowledgePointService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
                                      ClassGroupServiceImpl classGroupService,
                                      ClassStudentServiceImpl classStudentService,
                                      StudentServiceImpl studentService,
-                                     GroupStudentServiceImpl groupStudentService) {
+                                     GroupStudentServiceImpl groupStudentService,
+                                     KnowledgePointServiceImpl knowledgePointService) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
         this.classGroupService = classGroupService;
         this.classStudentService = classStudentService;
         this.studentService = studentService;
         this.groupStudentService = groupStudentService;
+        this.knowledgePointService = knowledgePointService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -127,8 +136,8 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/{id}/create-group")
-    public ResponseEntity<Message> createGroup(@RequestBody CreateGroupRequest request ) {
-        Message response = new Message();
+    public ResponseEntity<CreateGroupResponse> createGroup(@RequestBody CreateGroupRequest request ) {
+        CreateGroupResponse response = new CreateGroupResponse();
 
         try {
             ClassGroup group = classGroupService.createGroup(request.getClassId(), request.getGroupName(), request.getGroupDescription());
@@ -137,6 +146,7 @@ public class TeacherBusinessController {
                 classGroupService.addStudentToGroup(groupId, studentId);
             }
 
+            response.setGroupId(groupId);
             response.setMessage("小组创建成功");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -230,5 +240,33 @@ public class TeacherBusinessController {
         classService.updateClass(clazz);
 
         return ResponseEntity.ok(new Message("更新成功"));
+    }
+    @GetMapping("/{id}/view-knowledge-point")
+    public ResponseEntity<KnowledgePointsResponse> viewKnowledgePoints(@PathVariable Long id) {
+        KnowledgePointsResponse response = new KnowledgePointsResponse();
+
+        try {
+            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePointsOrderByType();
+
+            // 按 type 分组
+            Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> groupedPoints =
+                    knowledgePoints.stream()
+                            .map(kp -> {
+                                KnowledgePointsResponse.KnowledgePointInfo info = new KnowledgePointsResponse.KnowledgePointInfo();
+                                info.setName(kp.getName());
+                                info.setType(kp.getType());
+                                info.setDescription(kp.getDescription());
+                                return info;
+                            })
+                            .collect(Collectors.groupingBy(KnowledgePointsResponse.KnowledgePointInfo::getType));
+            response.setMessage("获取成功");
+            response.setKnowledgePoints(groupedPoints);
+
+            return ResponseEntity.ok(response);
+        }  catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("获取失败" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

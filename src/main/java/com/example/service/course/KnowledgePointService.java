@@ -10,4 +10,6 @@ public interface KnowledgePointService {
     int updateKnowledgePoint(KnowledgePoint point);
     KnowledgePoint getKnowledgePointById(Long id);
     List<KnowledgePoint> getAllKnowledgePoints();
+
+    List<KnowledgePoint> getAllKnowledgePointsOrderByType();
 }
