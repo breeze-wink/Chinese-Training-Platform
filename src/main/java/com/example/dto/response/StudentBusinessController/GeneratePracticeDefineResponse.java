@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class GeneratePracticeDefineResponse {
+    private Long practiceId;
     private String message;
     private List<InfoData> data;
 
