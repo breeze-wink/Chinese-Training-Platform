@@ -1461,7 +1461,7 @@
     ```json
     {
     "message": "获取成功",
-    "conent": [
+    "data": [
         {
             "category": "Math",
             "pointName": "Algebra"
