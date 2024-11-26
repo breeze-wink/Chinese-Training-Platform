@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.request.CreateKnowledgePointRequest;
+import com.example.dto.request.SystemAdminController.SystemAdminChangePasswordRequest;
 import com.example.dto.request.SystemAdminLoginRequest;
 import com.example.dto.response.*;
 import com.example.model.course.CourseStandard;
@@ -193,6 +194,7 @@ public class SystemAdminController {
         KnowledgePoint knowledgePoint = new KnowledgePoint();
         knowledgePoint.setName(request.getName());
         knowledgePoint.setDescription(request.getDescription());
+        knowledgePoint.setType(request.getType());
         try {
             knowledgePointService.addKnowledgePoint(knowledgePoint);
             response.setKnowledgePointId(knowledgePoint.getId());
@@ -234,6 +236,7 @@ public class SystemAdminController {
         try {
             knowledgePoint.setName(request.getName());
             knowledgePoint.setDescription(request.getDescription());
+            knowledgePoint.setType(request.getType());
 
             knowledgePointService.updateKnowledgePoint(knowledgePoint);
 
@@ -274,6 +277,7 @@ public class SystemAdminController {
                 info.setId(knowledgePoint.getId());
                 info.setName(knowledgePoint.getName());
                 info.setDescription(knowledgePoint.getDescription());
+                info.setType(knowledgePoint.getType());
                 response.getKnowledgePointInfos().add(info);
             }
             response.setMessage("知识点获取成功");
@@ -283,5 +287,23 @@ public class SystemAdminController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
+    }
+
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<Message> changePassword(@PathVariable Long id, @RequestBody SystemAdminChangePasswordRequest request) {
+        Message response = new Message();
+        SystemAdmin systemAdmin = systemAdminService.getSystemAdminById(id);
+        if (systemAdmin == null) {
+            response.setMessage("用户不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if (!systemAdmin.getPassword().equals(request.getPassword())) {
+            response.setMessage("旧密码错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        systemAdmin.setPassword(request.getNewPassword());
+        systemAdminService.updateSystemAdmin(systemAdmin);
+        response.setMessage("密码修改成功");
+        return ResponseEntity.ok(response);
     }
 }
