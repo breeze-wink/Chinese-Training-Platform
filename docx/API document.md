@@ -1494,7 +1494,8 @@
       "content": null
     }
     ```
-### Upload Question
+
+### Upload Question `finished`
 
 - **接口路径**：`/api/teacher/{id}/upload-question`
 - **请求方法**：POST
@@ -1505,10 +1506,10 @@
     ```json
     {
       "questionType": "string", // '单题', '文言文阅读', '记叙文阅读', '非连续性文本阅读', '古诗词曲鉴赏', '名著阅读'
+      "body": "string", // 题目内容
       "questions": [
         {
-          "body": "string", // 题目内容
-          "type": "CHOICE", // 题目类型，CHOICE, FILL_IN_THE_BLANK, SHORT_ANSWER, ESSAY
+          "type": "CHOICE", // 题目类型，CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY
           "problem": "string", // 问题描述
           "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
           "answer": "string", // 题目答案
