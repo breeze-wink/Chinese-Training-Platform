@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.dto.request.SchoolAdminLoginRequest;
+import com.example.dto.request.SchoolAdminManagementController.SchoolAdminChangePasswordRequest;
+import com.example.dto.response.Message;
 import com.example.dto.response.SchoolAdminInfoResponse;
 import com.example.dto.response.SchoolAdminLoginResponse;
 import com.example.model.user.AuthorizationCode;
@@ -78,5 +80,23 @@ public class SchoolAdminManagementController {
             response.setData(null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+    }
+
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<Message> changePassword(@PathVariable Long id, @RequestBody SchoolAdminChangePasswordRequest request) {
+        Message response = new Message();
+        SchoolAdmin admin = schoolAdminService.getSchoolAdminById(id);
+        if(admin == null) {
+            response.setMessage("用户未找到");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if(!admin.getPassword().equals(request.getPassword())){
+            response.setMessage("旧密码错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        admin.setPassword(request.getNewPassword());
+        schoolAdminService.updateSchoolAdmin(admin);
+        response.setMessage("密码修改成功");
+        return ResponseEntity.ok(response);
     }
 }
