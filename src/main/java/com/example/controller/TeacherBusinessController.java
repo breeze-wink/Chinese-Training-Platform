@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.dto.request.CreateGroupRequest;
 import com.example.dto.request.TeacherCreateClassRequest;
 import com.example.dto.request.UpdateClassRequest;
+import com.example.dto.request.UploadQuestionRequest;
 import com.example.dto.response.*;
 import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
@@ -302,5 +303,10 @@ public class TeacherBusinessController {
             response.setMessage("获取失败" + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+    }
+
+    @PostMapping("/{id}/upload-question")
+    public ResponseEntity<Message>  uploadQuestion(@PathVariable Long id, @RequestBody UploadQuestionRequest request) {
+        return ResponseEntity.ok(new Message("上传成功"));
     }
 }

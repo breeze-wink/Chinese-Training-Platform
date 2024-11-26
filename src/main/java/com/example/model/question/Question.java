@@ -13,5 +13,5 @@ public class Question {
     private String answer;
     private Long knowledgePointId; // 外键，关联KnowledgePoint表的id
     private Long creatorId; // 外键，关联Teacher表的id
-
+    private Long bodyId;
 }
