@@ -3041,6 +3041,37 @@
     ```
 
 
+### Change Password
+
+- **接口路径**：`/api/school-admin/{id}/change-password`
+- **请求方法**：POST
+- **接口说明**：学校管理员账号修改密码。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "password" : "string", // 旧密码
+      "newPassword" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`401 Unauthorized`):
+    ```json
+    {
+      "message" : "修改密码失败"
+    }
+    ```
+
 
 
 ## Image
@@ -3097,37 +3128,6 @@
     ```json
     {
       "message": "Image not found."
-    }
-    ```
-
-### Change Password
-
-- **接口路径**：`/api/school-admin/{id}/change-password`
-- **请求方法**：POST
-- **接口说明**：学校管理员账号修改密码。
-- **请求说明**
-  - 请求头: `Content-Type` : `application/json`
-  - 请求参数:
-    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
-    - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "password" : "string", // 旧密码
-      "newPassword" : "string"
-    }
-    ```
-- **响应说明**
-  - 响应格式: `JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message" : "success"
-    }
-    ```
-  - **失败响应** (`401 Unauthorized`):
-    ```json
-    {
-      "message" : "修改密码失败"
     }
     ```
 
