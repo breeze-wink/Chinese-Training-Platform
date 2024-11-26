@@ -607,6 +607,7 @@
     ```json
     {
       "message" : "success",
+      "score" : "double",
       "data" : 
       [
         {
