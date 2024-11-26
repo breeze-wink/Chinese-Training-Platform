@@ -193,6 +193,7 @@ public class SystemAdminController {
         KnowledgePoint knowledgePoint = new KnowledgePoint();
         knowledgePoint.setName(request.getName());
         knowledgePoint.setDescription(request.getDescription());
+        knowledgePoint.setType(request.getType());
         try {
             knowledgePointService.addKnowledgePoint(knowledgePoint);
             response.setKnowledgePointId(knowledgePoint.getId());
@@ -234,6 +235,7 @@ public class SystemAdminController {
         try {
             knowledgePoint.setName(request.getName());
             knowledgePoint.setDescription(request.getDescription());
+            knowledgePoint.setType(request.getType());
 
             knowledgePointService.updateKnowledgePoint(knowledgePoint);
 
@@ -274,6 +276,7 @@ public class SystemAdminController {
                 info.setId(knowledgePoint.getId());
                 info.setName(knowledgePoint.getName());
                 info.setDescription(knowledgePoint.getDescription());
+                info.setType(knowledgePoint.getType());
                 response.getKnowledgePointInfos().add(info);
             }
             response.setMessage("知识点获取成功");
