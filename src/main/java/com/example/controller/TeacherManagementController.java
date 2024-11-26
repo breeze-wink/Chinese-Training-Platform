@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.request.*;
+import com.example.dto.request.TeacherManagementController.TeacherChangePasswordRequest;
 import com.example.dto.response.*;
 import com.example.dto.response.StudentBusinessController.GetKnowledgePointsResponse;
 import com.example.model.course.KnowledgePoint;
@@ -174,6 +175,24 @@ public class TeacherManagementController {
         teacherService.updateTeacher(teacher);
 
         response.setMessage("手机号修改成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<Message> changePassword(@PathVariable Long id, @RequestBody TeacherChangePasswordRequest request) {
+        Message response = new Message();
+        Teacher teacher = teacherService.getTeacherById(id);
+        if (teacher == null) {
+            response.setMessage("用户不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if (!teacher.getPassword().equals(request.getPassword())) {
+            response.setMessage("旧密码错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        teacher.setPassword(request.getNewPassword());
+        teacherService.updateTeacher(teacher);
+        response.setMessage("密码修改成功");
         return ResponseEntity.ok(response);
     }
 
