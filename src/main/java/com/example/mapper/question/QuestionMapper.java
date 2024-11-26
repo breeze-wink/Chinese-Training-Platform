@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface QuestionMapper {
 
-    @Insert("INSERT INTO question(content, type, options, answer, knowledgePointId, creatorId) VALUES(#{content}, #{type}, #{options}, #{answer}, #{knowledgePointId}, #{creatorId})")
+    @Insert("INSERT INTO question(content, type, options, answer, knowledgePointId, creatorId, bodyId) VALUES(#{content}, #{type}, #{options}, #{answer}, #{knowledgePointId}, #{creatorId}, #{bodyId})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Question question);
 
     @Delete("DELETE FROM question WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE question SET content = #{content}, type = #{type}, options = #{options}, answer = #{answer}, knowledgePointId = #{knowledgePointId}, creatorId = #{creatorId} WHERE id = #{id}")
+    @Update("UPDATE question SET content = #{content}, type = #{type}, options = #{options}, answer = #{answer}, knowledgePointId = #{knowledgePointId}, creatorId = #{creatorId}, bodyId = #{bodyId} WHERE id = #{id}")
     int update(Question question);
 
     @Select("SELECT * FROM question WHERE id = #{id}")
