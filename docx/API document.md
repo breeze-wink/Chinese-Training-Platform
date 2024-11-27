@@ -421,13 +421,13 @@
           "id": "long",
           "name": "string",
           "description": "string",
-          "type": ["积累与运用", "阅读理解"]
+          "type": "string"
         },
         {
           "id": "long",
           "name": "string",
           "description": "string",
-          "type": ["积累与运用", "阅读理解"]
+          "type": "string"
         },
         ...
       ]
@@ -457,7 +457,6 @@
 - 请求体(`JSON` 格式)：
   ```json
   {
-    "practiceId" : "long",
     "num" : "int",
     "name" : "string",
     "data": [
@@ -476,21 +475,24 @@
   - **成功响应** (`200 OK`):
   ```json
     {
-      "message": "题目发送成功",
+      "message": "题目已生成",
+      "practiceId": "long",
       "data": [
         {
           "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
           "questionOptions": "string",
-          "sequence": "int"
+          "sequence": "string"
         },
         {
           "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
           "questionOptions": "string",
-          "sequence": "int"
+          "sequence": "string"
         },
         ...
       ]
@@ -499,7 +501,8 @@
   - **失败响应** (`400 Bad Request`):
   ```json
   {
-    "message": "考点和题目发送失败",
+    "message": "题目发送失败",
+    "practiceId": null,
     "data": null
   }
   ```
@@ -514,31 +517,39 @@
 - 请求头: `Content-Type` : `application/json`
 - 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
 - 请求体(`JSON` 格式)：
-  无
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "name" : "string"
+  }
+  ```
 - **响应说明**
   - 响应格式: `JSON`
   - **成功响应** (`200 OK`):
   ```json
     {
-      "message": "题目发送成功",
+      "message": "题目已生成",
+      "practiceId": "long",
       "data": [
-      {
-        "practiceQuestionId" : "long",
-        "questionContent": "string",
-        "type": "string",
-        "questionOptions": "string",
-        "sequence": "int"
-      },
-      {
-        "practiceQuestionId" : "long",
-        "questionContent": "string",
-        "type": "string",
-        "questionOptions": "string",
-        "sequence": "int"
-      },
-      ...
-    ]
-  }
+        {
+          "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
+          "questionContent": "string",
+          "type": "string",
+          "questionOptions": "string",
+          "sequence": "string"
+        },
+        {
+          "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
+          "questionContent": "string",
+          "type": "string",
+          "questionOptions": "string",
+          "sequence": "string"
+        },
+        ...
+      ]
+    }
   ```
   - **失败响应** (`400 Bad Request`):
   ```json
@@ -774,7 +785,7 @@
         "data" : [
             {
               "practiceQuestionId" : "long",
-              "sequence" : "int",
+              "sequence" : "string",
               "questionContent" : "string",
               "questionType" : "string",
               "questionOptions" : "string",
@@ -782,7 +793,7 @@
             },
             {
               "practiceQuestionId" : "long",
-              "sequence" : "int",
+              "sequence" : "string",
               "questionContent" : "string",
               "questionType" : "string",
               "questionOptions" : "string",
