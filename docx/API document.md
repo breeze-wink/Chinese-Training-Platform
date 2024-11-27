@@ -422,13 +422,13 @@
           "id": "long",
           "name": "string",
           "description": "string",
-          "type": ["积累与运用", "阅读理解"]
+          "type": "string"
         },
         {
           "id": "long",
           "name": "string",
           "description": "string",
-          "type": ["积累与运用", "阅读理解"]
+          "type": "string"
         },
         ...
       ]
@@ -476,22 +476,24 @@
   - **成功响应** (`200 OK`):
   ```json
     {
-      "practiceId" : "long",
-      "message": "题目发送成功",
+      "message": "题目已生成",
+      "practiceId": "long",
       "data": [
         {
           "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
-          "questionOptions": "string",
-          "sequence": "int"
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+          "sequence": "string"
         },
         {
           "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
-          "questionOptions": "string",
-          "sequence": "int"
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+          "sequence": "string"
         },
         ...
       ]
@@ -500,7 +502,8 @@
   - **失败响应** (`400 Bad Request`):
   ```json
   {
-    "message": "考点和题目发送失败",
+    "message": "题目发送失败",
+    "practiceId": null,
     "data": null
   }
   ```
@@ -515,31 +518,39 @@
 - 请求头: `Content-Type` : `application/json`
 - 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
 - 请求体(`JSON` 格式)：
-  无
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "name" : "string"
+  }
+  ```
 - **响应说明**
   - 响应格式: `JSON`
   - **成功响应** (`200 OK`):
   ```json
     {
-      "message": "题目发送成功",
+      "message": "题目已生成",
+      "practiceId": "long",
       "data": [
-      {
-        "practiceQuestionId" : "long",
-        "questionContent": "string",
-        "type": "string",
-        "questionOptions": "string",
-        "sequence": "int"
-      },
-      {
-        "practiceQuestionId" : "long",
-        "questionContent": "string",
-        "type": "string",
-        "questionOptions": "string",
-        "sequence": "int"
-      },
-      ...
-    ]
-  }
+        {
+          "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
+          "questionContent": "string",
+          "type": "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+          "sequence": "string"
+        },
+        {
+          "practiceQuestionId" : "long",
+          "questionBody": "string",//该题是组合题的第一题时才有，否则为空
+          "questionContent": "string",
+          "type": "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+          "sequence": "string"
+        },
+        ...
+      ]
+    }
   ```
   - **失败响应** (`400 Bad Request`):
   ```json
@@ -613,14 +624,14 @@
         {
           "questionContent" : "string",
           "questionType" : "string",
-          "questionOptions" : "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "answer" : "string",
           "studentAnswer" : "string"
         },
         {
           "questionContent" : "string",
           "questionType" : "string",
-          "questionOptions" : "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "answer" : "string",
           "studentAnswer" : "string"
         }
@@ -750,7 +761,7 @@
         ```
 
 
-### Continue Practice 
+### Continue Practice `finished`
 
 - **接口路径**：`/api/student/{id}/continue-practice`
 - **请求方法**：`POST`
@@ -774,18 +785,20 @@
         "data" : [
             {
               "practiceQuestionId" : "long",
-              "sequence" : "int",
+              "sequence" : "string",
+              "questionBody": "string",//该题是组合题的第一题时才有，否则为空
               "questionContent" : "string",
               "questionType" : "string",
-              "questionOptions" : "string",
+              "questionOptions": ["string","string","string","string"],//若不是选择题则为空
               "answerContent" : "string"
             },
             {
               "practiceQuestionId" : "long",
-              "sequence" : "int",
+              "sequence" : "string",
+              "questionBody": "string",//该题是组合题的第一题时才有，否则为空
               "questionContent" : "string",
               "questionType" : "string",
-              "questionOptions" : "string",
+              "questionOptions": ["string","string","string","string"],//若不是选择题则为空
               "answerContent" : "string"
             },
         ]
@@ -798,6 +811,7 @@
         "data" : null
       }
       ```
+
 
 
 ### Get Unfinished Assignment List
@@ -882,6 +896,7 @@
           "data" : null
         }
         ```
+
 
 
 
@@ -1206,7 +1221,7 @@
   
     ```json
     {
-        "message" : "获取失败,  ..."
+        "message" : "获取失败,  ...",
         "knowledgePoints": null
     }
     ```
@@ -1447,6 +1462,91 @@
     }
     ```
 
+### Get KnowledgePoint List `finished`
+
+- **接口路径**：`/api/teacher/{id}/list-knowledge-point`
+- **请求方法**：GET
+- **接口说明**：获取教师的知识点分类和知识点名称。
+- **请求说明**：
+  
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+  - 请求体：无
+  
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+        "message": "获取成功",
+        "knowledgePoints": {
+            "Math": [
+                {
+                    "id" : 12345,
+                    "name": "Algebra",
+                },
+                {
+                    "id" : 12345
+                    "name": "Geometry",
+                }
+            ],
+            "Science": [
+                {
+                    "id" : 12345
+                    "name": "Physics",
+                }
+            ]
+        }
+    }
+    
+    ```
+  - **失败响应** (`400 Bad Request`):
+    
+    ```json
+    {
+      "message": "获取知识点信息失败",
+      "content": null
+    }
+    ```
+
+### Upload Question `finished`
+
+- **接口路径**：`/api/teacher/{id}/upload-question`
+- **请求方法**：POST
+- **接口说明**：上传题目信息，包含题目类型、题目内容、选项（若有）等信息。
+- **请求说明**：
+  - 请求参数：路径参数 ：`id`  老师唯一标识。
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "questionType": "string", // '单题', '文言文阅读', '记叙文阅读', '非连续性文本阅读', '古诗词曲鉴赏', '名著阅读'
+      "body": "string", // 题目内容
+      "questions": [
+        {
+          "type": "CHOICE", // 题目类型，CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY
+          "problem": "string", // 问题描述
+          "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
+          "answer": "string", // 题目答案
+          "analysis": "string", // 题目解析
+          "knowledgePointId": 12345 // 知识点ID
+        }
+      ]
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "上传成功"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "请求参数错误"
+    }
+    ```
 
 ### Get Student's Average Homework Score and Class Rank 
 
@@ -1944,6 +2044,38 @@
     ```
 
 
+### Change Password `finished`
+
+- **接口路径**：`/api/teacher/{id}/change-password`
+- **请求方法**：POST
+- **接口说明**：教师账号修改密码。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "password" : "string", // 旧密码
+      "newPassword" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`401 Unauthorized`):
+    ```json
+    {
+      "message" : "修改密码失败"
+    }
+    ```
+
+
 
 
 
@@ -2203,7 +2335,8 @@
     ```json
     {
       "name": "string", // 知识点标题
-      "description": "string" // 知识点描述
+      "description": "string", // 知识点描述
+      "type": "string"
     }
     ```
 - **响应说明**：
@@ -2265,6 +2398,7 @@
     {
       "name": "string", // 更新后的知识点标题
       "description": "string", // 更新后的知识点描述
+      "type": "string"
     }
     ```
 - **响应说明**：
@@ -2302,12 +2436,14 @@
         {
           "id": 12345,
           "name": "string",
-          "description": "string"
+          "description": "string",
+          "type" : "string"
         },
         {
           "id": 12345,
           "name": "string",
-          "description": "string"
+          "description": "string",
+          "type" : "string"
         },
         ...
       ]
@@ -2410,12 +2546,12 @@
         "questions": [
           {
             "id": "number", // 对应数据库中的 id 字段
-        "content": "string", // 对应数据库中的 content 字段
-        "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-        "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
-        "answer": "string", // 对应数据库中的 answer 字段
-        "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-        "creatorId": "number" // 对应数据库中的 creatorId 字段
+            "content": "string", // 对应数据库中的 content 字段
+            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+            "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
+            "answer": "string", // 对应数据库中的 answer 字段
+            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
+            "creatorId": "number" // 对应数据库中的 creatorId 字段
           }
         ]
       }
@@ -2451,6 +2587,38 @@
     ```json
     {
       "message": "删除失败"
+    }
+    ```
+
+
+### Change Password `finished`
+
+- **接口路径**：`/api/system-admin/{id}/change-password`
+- **请求方法**：POST
+- **接口说明**：系统管理员账号修改密码。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 系统管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "password" : "string", // 旧密码
+      "newPassword" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`401 Unauthorized`):
+    ```json
+    {
+      "message" : "修改密码失败"
     }
     ```
 
@@ -2886,3 +3054,95 @@
       "data": null
     }
     ```
+
+
+### Change Password
+
+- **接口路径**：`/api/school-admin/{id}/change-password`
+- **请求方法**：POST
+- **接口说明**：学校管理员账号修改密码。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "password" : "string", // 旧密码
+      "newPassword" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`401 Unauthorized`):
+    ```json
+    {
+      "message" : "修改密码失败"
+    }
+    ```
+
+
+
+## Image
+
+### 图片上传接口
+
+- **接口路径**：`/uploads/image`
+- **请求方法**：POST
+- **接口说明**：上传图片，支持头像和内容两种类型的图片上传。
+- **请求说明**：
+  - 请求参数：无路径参数。
+  - 请求体(`multipart/form-data` 格式)：
+    ```bash
+    {
+      "image": <file>,   // 上传的图片文件
+      "type": "string"   // 图片类型，取值："avatar"（头像）或 "content"（内容）
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "imageUrl": "/uploads/avatar/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "Invalid image type. Must be 'avatar' or 'content'."
+    }
+    ```
+
+---
+
+### 获取图片接口
+
+- **接口路径**：`/uploads/images/{type}/{imageName}`
+- **请求方法**：GET
+- **接口说明**：根据类型和图片名获取已上传的图片。
+- **请求说明**：
+  - 请求参数：路径参数
+    - `type`：图片类型，取值：`avatar` 或 `content`
+    - `imageName`：图片文件名
+  - 请求示例：
+    ```bash
+    GET /uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    ```
+- **响应说明**：
+  - 响应格式：图片文件
+  - **成功响应** (`200 OK`):
+    - 返回图片文件，具体类型由图片扩展名决定（如 JPEG、PNG）。
+  - **失败响应** (`404 Not Found`):
+    ```json
+    {
+      "message": "Image not found."
+    }
+    ```
+

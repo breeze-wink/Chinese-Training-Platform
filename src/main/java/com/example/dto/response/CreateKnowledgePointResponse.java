@@ -8,4 +8,5 @@ import lombok.Setter;
 public class CreateKnowledgePointResponse {
     private String message;
     private Long knowledgePointId;
+    private String type;
 }

@@ -4,19 +4,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
-public class GetAllKnowledgePointsResponse {
+public class ListKnowledgeResponse {
     private String message;
-    private List<KnowledgePointInfo> knowledgePointInfos;
+    private Map<String, List<KnowledgePointInfo>> knowledgePoints;
 
-    @Getter
     @Setter
+    @Getter
     public static class KnowledgePointInfo {
         private Long id;
         private String name;
-        private String description;
-        private String type;
     }
 }

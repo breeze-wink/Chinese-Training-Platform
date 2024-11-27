@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.dto.request.CreateGroupRequest;
 import com.example.dto.request.TeacherCreateClassRequest;
 import com.example.dto.request.UpdateClassRequest;
+import com.example.dto.request.UploadQuestionRequest;
 import com.example.dto.response.*;
 import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
@@ -10,6 +11,8 @@ import com.example.model.classes.Clazz;
 import com.example.model.classes.GroupStudent;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
+import com.example.model.question.Question;
+import com.example.model.question.QuestionBody;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
 import com.example.service.classes.ClassStudentService;
@@ -22,6 +25,10 @@ import com.example.service.course.CourseStandardService;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
+import com.example.service.question.QuestionBodyService;
+import com.example.service.question.QuestionService;
+import com.example.service.question.impl.QuestionBodyServiceImpl;
+import com.example.service.question.impl.QuestionServiceImpl;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +56,10 @@ public class TeacherBusinessController {
     private final StudentService studentService;
     private final GroupStudentService groupStudentService;
     private final KnowledgePointService knowledgePointService;
+
+    private final QuestionService questionService;
+
+    private final QuestionBodyService questionBodyService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -56,7 +67,9 @@ public class TeacherBusinessController {
                                      ClassStudentServiceImpl classStudentService,
                                      StudentServiceImpl studentService,
                                      GroupStudentServiceImpl groupStudentService,
-                                     KnowledgePointServiceImpl knowledgePointService) {
+                                     KnowledgePointServiceImpl knowledgePointService,
+                                     QuestionServiceImpl questionService,
+                                     QuestionBodyServiceImpl questionBodyService) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
         this.classGroupService = classGroupService;
@@ -64,6 +77,8 @@ public class TeacherBusinessController {
         this.studentService = studentService;
         this.groupStudentService = groupStudentService;
         this.knowledgePointService = knowledgePointService;
+        this.questionService = questionService;
+        this.questionBodyService = questionBodyService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -268,5 +283,88 @@ public class TeacherBusinessController {
             response.setMessage("获取失败" + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+    }
+
+    @GetMapping("/{id}/list-knowledge-point")
+    public ResponseEntity<ListKnowledgeResponse> getKnowledgePoint(@PathVariable Long id) {
+        ListKnowledgeResponse response = new ListKnowledgeResponse();
+        try {
+            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePointsOrderByType();
+
+            // 按 type 分组
+            Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> groupedPoints =
+                    knowledgePoints.stream()
+                            .collect(Collectors.groupingBy(KnowledgePoint::getType))  // 先按 KnowledgePoint 的 type 进行分组
+                            .entrySet().stream()  // 获取分组后的 EntrySet
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,  // 使用 type 作为键
+                                    entry -> entry.getValue().stream()
+                                            .map(kp -> {
+                                                ListKnowledgeResponse.KnowledgePointInfo info = new ListKnowledgeResponse.KnowledgePointInfo();
+                                                info.setName(kp.getName());
+                                                info.setId(kp.getId());
+                                                return info;
+                                            })
+                                            .collect(Collectors.toList())  // 转换为 List<KnowledgePointInfo>
+                            ));
+
+            response.setMessage("获取成功");
+            response.setKnowledgePoints(groupedPoints);
+
+            return ResponseEntity.ok(response);
+        }  catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("获取失败" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("/{id}/upload-question")
+    public ResponseEntity<Message>  uploadQuestion(@PathVariable Long id, @RequestBody UploadQuestionRequest request) {
+        Message response = new Message();
+
+        try {
+            QuestionBody questionBody = new QuestionBody();
+            questionBody.setType(request.getQuestionType());
+            questionBody.setBody(request.getBody());
+
+            questionBodyService.createQuestionBody(questionBody);
+
+            List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
+
+            for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
+                Question question = getQuestion(id, questionInfo, questionBody);
+
+                questionService.creatQuestion(question);
+            }
+
+            return ResponseEntity.ok(new Message("上传成功"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    private static Question getQuestion(Long id, UploadQuestionRequest.QuestionInfo questionInfo, QuestionBody questionBody) {
+        Question question = new Question();
+        question.setBodyId(questionBody.getId());
+        question.setType(questionInfo.getType());
+        question.setContent(questionInfo.getProblem());
+        question.setAnswer(questionInfo.getAnswer() + "$$" + questionInfo.getAnalysis());
+        question.setKnowledgePointId(questionInfo.getKnowledgePointId());
+        question.setCreatorId(id);
+
+        if (questionInfo.getType().equals("CHOICE")) {
+            StringBuilder choices = new StringBuilder();
+
+            for (int i = 0; i < questionInfo.getChoices().size(); i ++) {
+                choices.append(questionInfo.getChoices().get(i));
+                if (i != questionInfo.getChoices().size() - 1) {
+                    choices.append("$$");
+                }
+            }
+            question.setOptions(choices.toString());
+        }
+        return question;
     }
 }
