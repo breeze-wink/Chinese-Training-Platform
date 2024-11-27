@@ -400,12 +400,14 @@ public class StudentBusinessController {
     @GetMapping("/{id}/practice/get-answer")
     public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) {
         GetAnswerResponse response = new GetAnswerResponse();
+        response.setTotalScore(practiceService.getPracticeById(practiceId).getTotalScore().doubleValue());
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
         List<GetAnswerResponse.InfoData> data = new ArrayList<>();
         for(PracticeQuestion practiceQuestion : practiceQuestions){
             GetAnswerResponse.InfoData infoData = new GetAnswerResponse.InfoData();
             infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
+            infoData.setSequence(practiceQuestion.getSequence());
             infoData.setScore(null);
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){

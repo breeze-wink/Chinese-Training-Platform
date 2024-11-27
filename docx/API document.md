@@ -467,6 +467,34 @@
         ```
 
 
+
+### Delete Practice
+
+- **接口路径**：`/api/student/{id}/delete-practice`
+- **请求方法**：`DELETE`
+- **接口说明**：学生用户删除指定练习。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+         - 查询参数（Query Parameter）：`practiceId` - 练习的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+        {
+          "message" : "删除成功"
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "删除失败"
+        }
+        ```
+
+
+
 ### Get Finished Practice List `finished`
 
 - **接口路径**：`/api/student/{id}/get-finished-practice-list`
@@ -734,9 +762,11 @@
     ```json
     {
       "message" : "success",
+      "totalScore" : "double",
       "data" : 
       [
         {
+          "sequence" : "string",
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent" : "string",
           "questionType" : "string",
@@ -747,6 +777,7 @@
           "score" : "double"
         },
         {
+          "sequence" : "string",
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent" : "string",
           "questionType" : "string",
