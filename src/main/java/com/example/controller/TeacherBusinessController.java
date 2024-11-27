@@ -5,22 +5,14 @@ import com.example.dto.request.TeacherCreateClassRequest;
 import com.example.dto.request.UpdateClassRequest;
 import com.example.dto.request.UploadQuestionRequest;
 import com.example.dto.response.*;
-import com.example.model.classes.ClassGroup;
-import com.example.model.classes.ClassStudent;
-import com.example.model.classes.Clazz;
-import com.example.model.classes.GroupStudent;
+import com.example.dto.response.TeacherBusinessController.GetApplicationsResponse;
+import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
-import com.example.service.classes.ClassGroupService;
-import com.example.service.classes.ClassService;
-import com.example.service.classes.ClassStudentService;
-import com.example.service.classes.GroupStudentService;
-import com.example.service.classes.impl.ClassGroupServiceImpl;
-import com.example.service.classes.impl.ClassServiceImpl;
-import com.example.service.classes.impl.ClassStudentServiceImpl;
-import com.example.service.classes.impl.GroupStudentServiceImpl;
+import com.example.service.classes.*;
+import com.example.service.classes.impl.*;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
@@ -40,10 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -60,6 +49,7 @@ public class TeacherBusinessController {
     private final QuestionService questionService;
 
     private final QuestionBodyService questionBodyService;
+    private final JoinClassService joinClassService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -69,7 +59,9 @@ public class TeacherBusinessController {
                                      GroupStudentServiceImpl groupStudentService,
                                      KnowledgePointServiceImpl knowledgePointService,
                                      QuestionServiceImpl questionService,
-                                     QuestionBodyServiceImpl questionBodyService) {
+                                     QuestionBodyServiceImpl questionBodyService,
+                                     JoinClassServiceImpl joinClassService
+                                     ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
         this.classGroupService = classGroupService;
@@ -79,6 +71,7 @@ public class TeacherBusinessController {
         this.knowledgePointService = knowledgePointService;
         this.questionService = questionService;
         this.questionBodyService = questionBodyService;
+        this.joinClassService = joinClassService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -366,5 +359,58 @@ public class TeacherBusinessController {
             question.setOptions(choices.toString());
         }
         return question;
+    }
+
+
+    @GetMapping("/{id}/get-applications")
+    public ResponseEntity<GetApplicationsResponse> getApplications(@PathVariable Long id, @RequestParam Long classId) {
+        GetApplicationsResponse response = new GetApplicationsResponse();
+        if(classService.getClassById(classId) == null){
+            response.setMessage("班级不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if(!Objects.equals(classService.getClassById(classId).getCreatorId(), id)){
+            response.setMessage("无权限");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<GetApplicationsResponse.infoData> data = new ArrayList<>();
+        List<JoinClass> joinClasses = joinClassService.selectJoinClassByClassId(classId);
+        for (JoinClass joinClass : joinClasses) {
+            GetApplicationsResponse.infoData infoData = new GetApplicationsResponse.infoData();
+            infoData.setJoinClassId(joinClass.getId());
+            infoData.setStudentId(joinClass.getStudentId());
+            infoData.setUserName(studentService.getStudentById(joinClass.getStudentId()).getUsername());
+            infoData.setName(studentService.getStudentById(joinClass.getStudentId()).getName());
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("获取申请列表成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("/{id}/allow-application")
+    public ResponseEntity<Message> allowApplication(@PathVariable Long id, @RequestParam Long joinClassId) {
+        Message response = new Message();
+        JoinClass joinClass = joinClassService.selectJoinClassById(joinClassId);
+        if(joinClass == null){
+            response.setMessage("申请不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        else if(!Objects.equals(classService.getClassById(joinClass.getClassId()).getCreatorId(), id)){
+            response.setMessage("无权限");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        else{
+            ClassStudent classStudent = new ClassStudent();
+            classStudent.setClassId(joinClass.getClassId());
+            classStudent.setStudentId(joinClass.getStudentId());
+            classStudent.setJoinDate(new Date());
+            classStudentService.addClassStudent(classStudent);
+            joinClassService.removeJoinClassByStudentId(joinClass.getStudentId());
+        }
+        response.setMessage("操作成功");
+        return ResponseEntity.ok(response);
     }
 }
