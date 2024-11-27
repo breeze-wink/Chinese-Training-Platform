@@ -2192,6 +2192,103 @@
     }
     ```
 
+###  Get All Questions
+
+- **接口路径**：`/api/teacher/{id}/get-all-questions`
+- **请求方法**：GET
+- **接口说明**：教师获取所有题目。
+
+- **请求说明**：
+  - 无需额外请求参数。
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+    ```json
+    {
+      "message": "获取题目成功",
+      "data": {
+        "questions": [
+          {
+            "id": "number", // 对应数据库中的 id 字段
+            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
+          }
+        ]
+      }
+    }
+    ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "题目获取失败",
+      "data": null
+    }
+    ```
+###  Get  Question
+
+- **接口路径**：`/api/teacher/{id}/get-questions` `problem`
+- **请求方法**：GET
+- **接口说明**：教师获取题目信息。
+
+- **请求说明**：
+  - 无需额外请求参数。
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+    ```json
+    {
+      "message": "获取题目成功",
+      "data": {
+        "questions": [
+          {
+            "id": "number", // 对应数据库中的 id 字段
+            "content": "string", // 对应数据库中的 content 字段
+            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+            "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
+            "answer": "string", // 对应数据库中的 answer 字段
+            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
+            "creatorId": "number" // 对应数据库中的 creatorId 字段
+          }
+        ]
+      }
+    }
+    ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "题目获取失败",
+      "data": null
+    }
+    ```
+
+### Delete Question
+
+- **接口路径**：`/api/teacher/delete-question/{id}`
+- **请求方法**：DELETE
+- **接口说明**：教师删除指定ID的题目。
+
+- **请求说明**：
+  - **路径参数**：
+    - `id`：题目的唯一标识符。
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+    ```json
+    {
+      "message": "删除成功"
+    }
+    ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "删除失败"
+    }
+    ```
+
+
 
 
 
@@ -2701,71 +2798,6 @@
     }
     ```
   - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "删除失败"
-    }
-    ```
-
-
-  
-###  Get All Questions
-
-- **接口路径**：`/api/system-admin/get-all-questions` `problem`
-- **请求方法**：GET
-- **接口说明**：系统管理员获取所有题目信息。
-
-- **请求说明**：
-  - 无需额外请求参数。
-
-- **响应说明**：
-  - **响应格式**：JSON
-  - **成功响应**（200 OK）：
-    ```json
-    {
-      "message": "获取题目成功",
-      "data": {
-        "questions": [
-          {
-            "id": "number", // 对应数据库中的 id 字段
-            "content": "string", // 对应数据库中的 content 字段
-            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-            "options": "string", // 对应数据库中的 options 字段，可能需要根据实际情况进行解析或转换
-            "answer": "string", // 对应数据库中的 answer 字段
-            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-            "creatorId": "number" // 对应数据库中的 creatorId 字段
-          }
-        ]
-      }
-    }
-    ```
-  - **失败响应**（400 Bad Request）：
-    ```json
-    {
-      "message": "题目获取失败",
-      "data": null
-    }
-    ```
-
-### Delete Question
-
-- **接口路径**：`/api/system-admin/delete-question/{id}`
-- **请求方法**：DELETE
-- **接口说明**：系统管理员删除指定ID的题目。
-
-- **请求说明**：
-  - **路径参数**：
-    - `id`：题目的唯一标识符。
-
-- **响应说明**：
-  - **响应格式**：JSON
-  - **成功响应**（200 OK）：
-    ```json
-    {
-      "message": "删除成功"
-    }
-    ```
-  - **失败响应**（400 Bad Request）：
     ```json
     {
       "message": "删除失败"
