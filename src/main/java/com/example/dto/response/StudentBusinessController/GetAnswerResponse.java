@@ -9,11 +9,13 @@ import java.util.List;
 @Setter
 public class GetAnswerResponse {
     private String message;
+    private Double totalScore;
     private List<InfoData> data;
 
     @Getter
     @Setter
     public static class InfoData {
+        private String sequence;
         private String questionBody;
         private String questionContent;
         private String questionType;
