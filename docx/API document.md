@@ -785,6 +785,7 @@
             {
               "practiceQuestionId" : "long",
               "sequence" : "string",
+              "questionBody": "string",//该题是组合题的第一题时才有，否则为空
               "questionContent" : "string",
               "questionType" : "string",
               "questionOptions": ["string","string","string","string"],//若不是选择题则为空
@@ -793,6 +794,7 @@
             {
               "practiceQuestionId" : "long",
               "sequence" : "string",
+              "questionBody": "string",//该题是组合题的第一题时才有，否则为空
               "questionContent" : "string",
               "questionType" : "string",
               "questionOptions": ["string","string","string","string"],//若不是选择题则为空
