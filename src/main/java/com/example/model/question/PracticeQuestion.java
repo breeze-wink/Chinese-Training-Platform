@@ -7,5 +7,5 @@ public class PracticeQuestion {
     private Long id;
     private Long practiceId;
     private Long questionId;
-    private Integer sequence;
+    private String sequence;
 }

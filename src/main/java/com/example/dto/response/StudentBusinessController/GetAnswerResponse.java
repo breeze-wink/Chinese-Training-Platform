@@ -14,10 +14,13 @@ public class GetAnswerResponse {
     @Getter
     @Setter
     public static class InfoData {
+        private String questionBody;
         private String questionContent;
         private String questionType;
-        private String questionOptions;
+        private List<String> questionOptions;
         private String answer;
+        private String analysis;
         private String studentAnswer;
+        private Double score;
     }
 }

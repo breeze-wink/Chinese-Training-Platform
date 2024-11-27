@@ -27,4 +27,6 @@ public interface QuestionMapper {
     @Select("SELECT * FROM question WHERE knowledgePointId = #{knowledgePointId}")
     List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId);
 
+    @Select("SELECT * FROM question WHERE bodyId = #{questionBodyId}")
+    List<Question> getQuestionsByQuestionBodyId(Long questionBodyId);
 }

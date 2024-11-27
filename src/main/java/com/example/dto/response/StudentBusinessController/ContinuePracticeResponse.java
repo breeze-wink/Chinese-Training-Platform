@@ -15,10 +15,11 @@ public class ContinuePracticeResponse {
     @Setter
     public static class InfoData {
         private Long practiceQuestionId;
-        private Integer sequence;
+        private String sequence;
+        private String questionBody;
         private String questionContent;
         private String questionType;
-        private String questionOptions;
+        private List<String> questionOptions;
         private String answerContent;
     }
 }
