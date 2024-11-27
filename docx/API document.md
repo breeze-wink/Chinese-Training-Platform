@@ -416,6 +416,7 @@
     ```json
     {
       "message": "知识点获取成功",
+      "practiceId" : "long",
       "data": [
         {
           "id": "long",
@@ -684,7 +685,7 @@
     ```
 
 
-### Get Unfinished Practice List `finished`
+### Get Unfinished Practice List 
 
 - **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
 - **请求方法**：`GET`
@@ -720,7 +721,7 @@
         ```
 
 
-### Get Finished Practice List `finished`
+### Get Finished Practice List 
 
 - **接口路径**：`/api/student/{id}/get-finished-practice-list`
 - **请求方法**：`GET`
