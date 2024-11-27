@@ -315,10 +315,17 @@ public class TeacherBusinessController {
     @PostMapping("/{id}/upload-question")
     public ResponseEntity<Message>  uploadQuestion(@PathVariable Long id, @RequestBody UploadQuestionRequest request) {
         Message response = new Message();
-
+        if(request.getQuestionType().isEmpty()){
+            response.setMessage("题型不能为空");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
         try {
             QuestionBody questionBody = new QuestionBody();
             questionBody.setType(request.getQuestionType());
+            if(questionBody.getType().isEmpty()){
+                response.setMessage("题型不能为空");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             questionBody.setBody(request.getBody());
 
             questionBodyService.createQuestionBody(questionBody);
