@@ -322,6 +322,9 @@
   }
   ```
 
+
+
+
 ### Get Essay Info `finished`
 
 - **接口路径**：`/api/student/{id}/essay/get-info/{essayId}`
@@ -345,6 +348,10 @@
     ```json
       响应体为空
     ```
+    
+
+
+
     
 ### View Essays `finished`
 
@@ -391,7 +398,86 @@
       "data": null
     }
     ```
-    
+
+
+
+### Get Unfinished Practice List `finished`
+
+- **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
+- **请求方法**：`GET`
+- **接口说明**：学生用户获取未完成练习列表。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+        {
+          "message" : "获取成功",
+          "data" : [
+              {
+                "practiceId" : "long",
+                "practiceName" : "string"
+              },
+              {
+                "practiceId" : "long",
+                "practiceName" : "string"
+              },
+          ]
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "获取失败",
+          "data" : null
+        }
+        ```
+
+
+### Get Finished Practice List `finished`
+
+- **接口路径**：`/api/student/{id}/get-finished-practice-list`
+- **请求方法**：`GET`
+- **接口说明**：学生用户获取已完成练习列表。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：空
+  - **响应说明**
+    - 响应格式: `JSON`
+      - **成功响应** (`200 OK`):
+        ```json
+        {
+          "message" : "获取成功",
+          "data" : [
+              {
+                "practiceId" : "long",
+                "practiceName" : "string",
+                "practiceTime" : "string",
+                "totalScore" : "double"
+              },
+              {
+                "practiceId" : "long",
+                "practiceName" : "string",
+                "practiceTime" : "string",
+                "totalScore" : "double"
+              },
+          ]
+        }
+        ```
+      - **失败响应** (`400 Bad Request`):
+        ```json
+        {
+          "message": "获取失败",
+          "data" : null
+        }
+        ```
+
+
+  
 
 ### Get Knowledge Points `finished`
 
@@ -483,7 +569,7 @@
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
-          "questionOptions": "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "sequence": "string"
         },
         {
@@ -491,7 +577,7 @@
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
-          "questionOptions": "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "sequence": "string"
         },
         ...
@@ -536,7 +622,7 @@
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
-          "questionOptions": "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "sequence": "string"
         },
         {
@@ -544,7 +630,7 @@
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
           "questionContent": "string",
           "type": "string",
-          "questionOptions": "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "sequence": "string"
         },
         ...
@@ -618,21 +704,22 @@
     ```json
     {
       "message" : "success",
-      "score" : "double",
       "data" : 
       [
         {
           "questionContent" : "string",
           "questionType" : "string",
-          "questionOptions" : "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "answer" : "string",
+          "analysis" : "string",
           "studentAnswer" : "string"
         },
         {
           "questionContent" : "string",
           "questionType" : "string",
-          "questionOptions" : "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "answer" : "string",
+          "analysis" : "string",
           "studentAnswer" : "string"
         }
       ]
@@ -685,81 +772,6 @@
     ```
 
 
-### Get Unfinished Practice List `finished`
-
-- **接口路径**：`/api/student/{id}/get-unfinished-practice-list`
-- **请求方法**：`GET`
-- **接口说明**：学生用户获取未完成练习列表。
-- **请求说明**
-- 请求头: `Content-Type` : `application/json`
-- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
-- 请求体(`JSON` 格式)：空
-  - **响应说明**
-    - 响应格式: `JSON`
-      - **成功响应** (`200 OK`):
-        ```json
-        {
-          "message" : "获取成功",
-          "data" : [
-              {
-                "practiceId" : "long",
-                "practiceName" : "string"
-              },
-              {
-                "practiceId" : "long",
-                "practiceName" : "string"
-              },
-          ]
-        }
-        ```
-      - **失败响应** (`400 Bad Request`):
-        ```json
-        {
-          "message": "获取失败",
-          "data" : null
-        }
-        ```
-
-
-### Get Finished Practice List `finished`
-
-- **接口路径**：`/api/student/{id}/get-finished-practice-list`
-- **请求方法**：`GET`
-- **接口说明**：学生用户获取已完成练习列表。
-- **请求说明**
-- 请求头: `Content-Type` : `application/json`
-- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
-- 请求体(`JSON` 格式)：空
-  - **响应说明**
-    - 响应格式: `JSON`
-      - **成功响应** (`200 OK`):
-        ```json
-        {
-          "message" : "获取成功",
-          "data" : [
-              {
-                "practiceId" : "long",
-                "practiceName" : "string",
-                "practiceTime" : "string",
-                "totalScore" : "double"
-              },
-              {
-                "practiceId" : "long",
-                "practiceName" : "string",
-                "practiceTime" : "string",
-                "totalScore" : "double"
-              },
-          ]
-        }
-        ```
-      - **失败响应** (`400 Bad Request`):
-        ```json
-        {
-          "message": "获取失败",
-          "data" : null
-        }
-        ```
-
 
 ### Continue Practice `finished`
 
@@ -786,17 +798,19 @@
             {
               "practiceQuestionId" : "long",
               "sequence" : "string",
+              "questionBody": "string",//该题是组合题的第一题时才有，否则为空
               "questionContent" : "string",
               "questionType" : "string",
-              "questionOptions" : "string",
+              "questionOptions": ["string","string","string","string"],//若不是选择题则为空
               "answerContent" : "string"
             },
             {
               "practiceQuestionId" : "long",
               "sequence" : "string",
+              "questionBody": "string",//该题是组合题的第一题时才有，否则为空
               "questionContent" : "string",
               "questionType" : "string",
-              "questionOptions" : "string",
+              "questionOptions": ["string","string","string","string"],//若不是选择题则为空
               "answerContent" : "string"
             },
         ]
