@@ -2502,6 +2502,45 @@
       "data": null
     }
     ```
+
+
+
+### Get School Administrator Accounts
+
+- **接口路径**：`/api/system-admin/get-school-admin-accounts`
+- **请求方法**：GET
+- **接口说明**：系统管理员获取所有学校管理员账号信息。
+- **请求说明**：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学校管理员账号信息查询成功",
+      "data": [
+        {
+          "schoolAdminId": 12345,
+          "userName": "string",
+          "email": "string",
+          "schoolName": "string"
+        },
+        {
+          "schoolAdminId": 12345,
+          "userName": "string",
+          "email": "string",
+          "schoolName": "string"
+        }
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "查询失败",
+      "data": null
+    }
+    ```
+    
     
 
 ### Creating School Administrator Account `finished`
@@ -2541,7 +2580,33 @@
       "message": "账号生成失败",
     }
     ```
-  
+
+
+
+### Delete School Administrator Account
+
+- **接口路径**：`/api/system-admin/delete-school-admin-account/{id}`
+- **请求方法**：DELETE
+- **接口说明**：系统管理员删除指定学校管理员账号。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学校管理员唯一标识符
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "删除成功"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "删除失败"
+    }
+    ```
+
+
   
 ###  Get All Questions
 
