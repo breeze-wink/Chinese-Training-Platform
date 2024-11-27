@@ -95,7 +95,7 @@ public class TeacherManagementController {
         teacher.setEmail(request.getEmail());
         teacher.setPassword(request.getPassword());
         teacher.setSchoolId(request.getSchoolId());
-
+        teacher.setPermission(0);
         teacherService.addTeacher(teacher);
         response.setId(teacher.getId());
         response.setMessage("注册成功");
@@ -174,7 +174,7 @@ public class TeacherManagementController {
         teacher.setName(request.getName());
         teacherService.updateTeacher(teacher);
 
-        response.setMessage("手机号修改成功");
+        response.setMessage("姓名修改成功");
         return ResponseEntity.ok(response);
     }
 
