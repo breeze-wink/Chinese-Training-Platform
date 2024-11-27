@@ -436,4 +436,30 @@ public class StudentBusinessController {
         return ResponseEntity.ok(response);
     }
 
+
+    @DeleteMapping("/{id}/delete-practice")
+    public ResponseEntity<Message> deletePractice(@PathVariable Long id, @RequestParam Long practiceId) {
+        Message response = new Message();
+        Practice practice = practiceService.getPracticeById(practiceId);
+        if(practice == null){
+            response.setMessage("练习不存在");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        else if(!Objects.equals(practice.getStudentId(), id)){
+            response.setMessage("id不匹配，练习删除失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
+        for(PracticeQuestion practiceQuestion : practiceQuestions){
+            PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
+            if(practiceAnswer != null){
+                practiceAnswerService.deletePracticeAnswer(practiceAnswer.getId());
+            }
+            practiceQuestionService.deletePracticeQuestion(practiceQuestion.getId());
+        }
+        practiceService.deletePractice(practiceId);
+        response.setMessage("练习删除成功");
+        return ResponseEntity.ok(response);
+    }
+
 }
