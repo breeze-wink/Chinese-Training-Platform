@@ -289,7 +289,7 @@
   }
   ```
 
-### Join Class `finished`
+### Join Class `old` `finished`
 - **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
@@ -319,6 +319,36 @@
   {
      "message": "加入班级失败",
   	 "data": null
+  }
+  ```
+
+
+
+### Join Class `new`
+- **接口路径**：`/api/student/{id}/join-class`
+- **请求方法**：`POST`
+- **接口说明**：学生加入一个班级。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "inviteCode": "string"
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+  ```json
+  {
+    "message": "成功发送入班申请"
+  }
+  ```
+  - **失败响应** (`400 Bad Request`):
+  ```json
+  {
+     "message": "发送入班申请失败"
   }
   ```
 
@@ -2084,10 +2114,81 @@
       "message" : "success"
     }
     ```
-  - **失败响应** (`401 Unauthorized`):
+  - **失败响应** (`400 Bad Request`):
     ```json
     {
       "message" : "修改密码失败"
+    }
+    ```
+
+
+
+### Get Applications
+
+- **接口路径**：`/api/teacher/{id}/get-applications`
+- **请求方法**：GET
+- **接口说明**：教师获取加入班级申请。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Query Parameter）`classId` - 班级唯一标识符
+    - 请求体：无
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success",
+      "data" : [
+        {
+           "joinClassId": "long",
+           "studentId": "long",
+           "userName": "string",
+           "name": "string"
+        },
+        {
+           "joinClassId": "long",
+           "studentId": "long",
+           "userName": "string",
+           "name": "string"
+        }
+    ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "读取失败",
+      "data": null
+    }
+    ```
+
+
+
+### Allow Application
+
+- **接口路径**：`/api/teacher/{id}/allow-application`
+- **请求方法**：GET
+- **接口说明**：教师允许加入班级申请。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Query Parameter）`joinClassId` - 学生加入班级行为的唯一标识符
+    - 请求体：无
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success",
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "错误"
     }
     ```
 
