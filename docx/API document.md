@@ -734,6 +734,7 @@
     ```json
     {
       "message" : "success",
+      "score" : "double",
       "data" : 
       [
         {
@@ -744,7 +745,6 @@
           "answer" : "string",
           "analysis" : "string",
           "studentAnswer" : "string",
-          "score" : "double"
         },
         {
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
@@ -754,7 +754,6 @@
           "answer" : "string",
           "analysis" : "string",
           "studentAnswer" : "string",
-          "score" : "double"
         }
       ]
     }
