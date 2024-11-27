@@ -5,9 +5,11 @@ import com.example.dto.request.*;
 import com.example.dto.response.*;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
+import com.example.model.classes.JoinClass;
 import com.example.model.user.Student;
 import com.example.service.classes.ClassService;
 import com.example.service.classes.ClassStudentService;
+import com.example.service.classes.JoinClassService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
@@ -29,18 +31,22 @@ public class StudentInfoController {
     private final ClassStudentService classStudentService;
     private final ClassService classService;
     private final SchoolService schoolService;
+    private final JoinClassService joinClassService;
 
     @Autowired
     public StudentInfoController(StudentService studentService,
                                  EmailService emailService,
                                  ClassStudentService classStudentService,
                                  ClassService classService,
-                                 SchoolService schoolService) {
+                                 SchoolService schoolService,
+                                 JoinClassService joinClassService
+                                 ) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.classStudentService = classStudentService;
         this.classService = classService;
         this.schoolService = schoolService;
+        this.joinClassService = joinClassService;
     }
     @PostMapping("/{id}/editInformation")
     public ResponseEntity<StudentEditInformationResponse> studentEditInformation(@PathVariable Long id, @RequestBody StudentEditInformationRequest request) {
@@ -126,29 +132,27 @@ public class StudentInfoController {
     }
 
     @PostMapping("/{id}/join-class")
-    public ResponseEntity<StudentJoinClassResponse> studentJoinClass(@PathVariable Long id, @RequestBody StudentJoinClassRequest request) {
-        StudentJoinClassResponse response = new StudentJoinClassResponse();
-        StudentJoinClassResponse.InfoData data = new StudentJoinClassResponse.InfoData();
+    public ResponseEntity<Message> studentJoinClass(@PathVariable Long id, @RequestBody StudentJoinClassRequest request) {
+        Message response = new Message();
         String inviteCode = request.getInviteCode();
         Clazz clazz = classService.getClassByInviteCode(inviteCode);
-        if (clazz == null) {
-            response.setMessage("班级码无效");
+        JoinClass joinClass = joinClassService.selectJoinClassByStudentIdAndClassId(id, clazz.getId());
+        List<ClassStudent> classStudent = classStudentService.getClassStudentByStudentId(id);
+        if(!classStudent.isEmpty()){
+            response.setMessage("请勿重复加入班级");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        ClassStudent classStudent = classStudentService.selectByClassIdAndStudentId(clazz.getId(), id);
-        if(classStudent != null){
-            response.setMessage("不允许重复加入班级");
+        if(joinClass != null){
+            response.setMessage("请勿重复发送申请");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        int result = classService.joinClass(inviteCode, id);
-        if (result == 0) {
-            response.setMessage("加入班级失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        else{
+            joinClass = new JoinClass();
+            joinClass.setClassId(clazz.getId());
+            joinClass.setStudentId(id);
+            int result = joinClassService.addJoinClass(joinClass);
         }
-        data.setClassName(clazz.getName());
-        data.setSchoolName(schoolService.getSchoolById(clazz.getSchoolId()).getName());
-        response.setData(data);
-        response.setMessage("加入班级成功");
+        response.setMessage("申请已发送");
         return ResponseEntity.ok(response);
     }
 }

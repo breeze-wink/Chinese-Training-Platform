@@ -6,6 +6,7 @@ import com.example.dto.request.StudentBusinessController.GeneratePracticeDefineR
 import com.example.dto.request.StudentBusinessController.SaveAnswerRequest;
 import com.example.dto.response.Message;
 import com.example.dto.response.StudentBusinessController.*;
+import com.example.dto.response.StudentJoinClassResponse;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Practice;
 import com.example.model.question.PracticeQuestion;
