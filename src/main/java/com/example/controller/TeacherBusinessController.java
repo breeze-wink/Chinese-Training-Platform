@@ -329,6 +329,10 @@ public class TeacherBusinessController {
             questionBody.setBody(request.getBody());
 
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
+            if (questions.isEmpty()) {
+                response.setMessage("题目内容不能为空");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             for(UploadQuestionRequest.QuestionInfo questionInfo : questions){
                 if(questionInfo.getProblem().isEmpty()){
                     response.setMessage("题目不能为空");
