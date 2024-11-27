@@ -6,6 +6,7 @@ import com.example.dto.response.Message;
 import com.example.dto.response.QuestionsResponse;
 import com.example.dto.response.SystemAdminBusinessController.GetSchoolAdminAccountsResponse;
 import com.example.model.question.Question;
+import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
 import com.example.service.question.QuestionService;
 import com.example.service.question.impl.QuestionServiceImpl;
@@ -60,7 +61,7 @@ public class SystemAdminBusinessController {
     public ResponseEntity<Message> createSchoolAdmin(@RequestBody  CreateSchoolAdminRequest request) {
         String name = request.getName();
         String password = request.getPassword();
-        Long schoolId = request.getSchoolId();
+        String schoolName = request.getSchoolName();
         Message response = new Message();
         if (schoolAdminService.checkExistSchool(name)) {
             response.setMessage("用户名已存在");
@@ -68,6 +69,15 @@ public class SystemAdminBusinessController {
         }
 
         try {
+            School school = schoolService.getSchoolByName(schoolName);
+
+            if (school == null) {
+                school = new School();
+                school.setName(schoolName);
+                schoolService.addSchool(school);
+            }
+
+            Long schoolId = school.getId();
             SchoolAdmin schoolAdmin = new SchoolAdmin();
             schoolAdmin.setUsername(name);
             schoolAdmin.setPassword(password);
