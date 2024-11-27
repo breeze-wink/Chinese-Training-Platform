@@ -40,7 +40,14 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
     public List<Question> getAllQuestions() {
         return questionMapper.selectAll();
+    }
+
+    @Override
+    @Transactional
+    public List<Question> getQuestionsByQuestionBodyId(Long questionBodyId) {
+        return questionMapper.getQuestionsByQuestionBodyId(questionBodyId);
     }
 }

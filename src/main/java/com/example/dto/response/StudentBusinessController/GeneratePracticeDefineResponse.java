@@ -16,9 +16,10 @@ public class GeneratePracticeDefineResponse {
     @Setter
     public static class InfoData {
         private Long practiceQuestionId;
+        private String questionBody;
         private String questionContent;
         private String type;
-        private String questionOptions;
-        private Integer sequence;
+        private List<String> questionOptions;
+        private String sequence;
     }
 }
