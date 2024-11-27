@@ -344,14 +344,15 @@ public class StudentBusinessController {
             practiceAnswer.setAnswerContent(infoData.getAnswerContent());
             Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
             if(Objects.equals(question.getType(), "CHOICE")){
-                if(question.getAnswer().equals(practiceAnswer.getAnswerContent())){
-                    practiceAnswer.setScore(BigDecimal.valueOf(1.0));
-                    score += 1.0;
-                    totalScore += 1.0;
+                String [] answerArray = question.getAnswer().split("\\$\\$");
+                if(answerArray[0].equals(practiceAnswer.getAnswerContent())){
+                    practiceAnswer.setScore(BigDecimal.valueOf(5.0));
+                    score += 5.0;
+                    totalScore += 5.0;
                 }
                 else{
                     practiceAnswer.setScore(BigDecimal.valueOf(0.0));
-                    totalScore += 1.0;
+                    totalScore += 5.0;
                 }
             }
             PracticeAnswer testPracticeAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(infoData.getPracticeQuestionId());
@@ -388,11 +389,25 @@ public class StudentBusinessController {
             GetAnswerResponse.InfoData infoData = new GetAnswerResponse.InfoData();
             infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
+            infoData.setScore(null);
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
-                infoData.setQuestionOptions(questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions());
+                String [] answerArray = questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$");
+                infoData.setQuestionOptions(List.of(answerArray));
+                if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
+                    infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
+                }
             }
-            infoData.setAnswer(questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer());
+            String [] answerAndAnalysis = questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer().split("\\$\\$");
+            infoData.setAnswer(answerAndAnalysis[0]);
             infoData.setStudentAnswer(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
+            infoData.setAnalysis("");
+            if(answerAndAnalysis.length > 1){
+                infoData.setAnalysis(answerAndAnalysis[1]);
+            }
+            String [] sequenceArray = practiceQuestion.getSequence().split("\\.");
+            if(sequenceArray.length > 1 && Objects.equals(sequenceArray[1], "1")){
+                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+            }
             data.add(infoData);
         }
         response.setData(data);

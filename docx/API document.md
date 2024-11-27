@@ -713,7 +713,8 @@
           "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "answer" : "string",
           "analysis" : "string",
-          "studentAnswer" : "string"
+          "studentAnswer" : "string",
+          "score" : "double"
         },
         {
           "questionBody": "string",//该题是组合题的第一题时才有，否则为空
@@ -722,7 +723,8 @@
           "questionOptions": ["string","string","string","string"],//若不是选择题则为空
           "answer" : "string",
           "analysis" : "string",
-          "studentAnswer" : "string"
+          "studentAnswer" : "string",
+          "score" : "double"
         }
       ]
     }
