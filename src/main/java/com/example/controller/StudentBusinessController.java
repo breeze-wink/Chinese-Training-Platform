@@ -301,10 +301,17 @@ public class StudentBusinessController {
     public ResponseEntity<Message> saveAnswer(@PathVariable Long id, @RequestBody SaveAnswerRequest request) {
         Message message = new Message();
         for(SaveAnswerRequest.InfoData infoData : request.getData()){
-            PracticeAnswer practiceAnswer = new PracticeAnswer();
-            practiceAnswer.setPracticeQuestionId(infoData.getPracticeQuestionId());
-            practiceAnswer.setAnswerContent(infoData.getAnswerContent());
-            practiceAnswerService.addPracticeAnswer(practiceAnswer);
+            PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(infoData.getPracticeQuestionId());
+            if(practiceAnswer != null){
+                practiceAnswer.setAnswerContent(infoData.getAnswerContent());
+                practiceAnswerService.updatePracticeAnswer(practiceAnswer);
+            }
+            else{
+                practiceAnswer = new PracticeAnswer();
+                practiceAnswer.setAnswerContent(infoData.getAnswerContent());
+                practiceAnswer.setPracticeQuestionId(infoData.getPracticeQuestionId());
+                practiceAnswerService.addPracticeAnswer(practiceAnswer);
+            }
         }
         message.setMessage("答案保存成功");
         return ResponseEntity.ok(message);
@@ -318,11 +325,20 @@ public class StudentBusinessController {
         for(PracticeQuestion practiceQuestion : practiceQuestions){
             ContinuePracticeResponse.InfoData infoData = new ContinuePracticeResponse.InfoData();
             infoData.setPracticeQuestionId(practiceQuestion.getId());
-            infoData.setSequence(Integer.valueOf(practiceQuestion.getSequence()));
+            infoData.setSequence(practiceQuestion.getSequence());
             infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
-            infoData.setQuestionOptions(questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions());
+            infoData.setQuestionOptions(new ArrayList<>());
+            if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
+                List<String> choices = List.of(questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$"));
+                infoData.getQuestionOptions().addAll(choices);
+            }
             infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
+            String [] sequences = infoData.getSequence().split("\\.");
+            infoData.setQuestionBody("");
+            if(sequences.length > 1 && sequences[1].equals("1")){
+                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+            }
             data.add(infoData);
         }
         response.setData(data);
@@ -390,6 +406,7 @@ public class StudentBusinessController {
             infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setScore(null);
+            infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
                 String [] answerArray = questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$");
                 infoData.setQuestionOptions(List.of(answerArray));
@@ -404,6 +421,7 @@ public class StudentBusinessController {
             if(answerAndAnalysis.length > 1){
                 infoData.setAnalysis(answerAndAnalysis[1]);
             }
+            infoData.setQuestionBody("");
             String [] sequenceArray = practiceQuestion.getSequence().split("\\.");
             if(sequenceArray.length > 1 && Objects.equals(sequenceArray[1], "1")){
                 infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
