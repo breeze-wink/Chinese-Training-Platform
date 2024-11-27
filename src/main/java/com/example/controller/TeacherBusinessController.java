@@ -315,32 +315,43 @@ public class TeacherBusinessController {
     @PostMapping("/{id}/upload-question")
     public ResponseEntity<Message>  uploadQuestion(@PathVariable Long id, @RequestBody UploadQuestionRequest request) {
         Message response = new Message();
-        if(request.getQuestionType().isEmpty()){
-            response.setMessage("题型不能为空");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
         try {
             QuestionBody questionBody = new QuestionBody();
             questionBody.setType(request.getQuestionType());
-            if(questionBody.getType().isEmpty()){
+            if(questionBody.getType().isEmpty() || request.getQuestionType().isEmpty()){
                 response.setMessage("题型不能为空");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            else if(request.getBody().isEmpty()){
+                response.setMessage("题干不能为空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             questionBody.setBody(request.getBody());
 
-            questionBodyService.createQuestionBody(questionBody);
-
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
-
+            for(UploadQuestionRequest.QuestionInfo questionInfo : questions){
+                if(questionInfo.getProblem().isEmpty()){
+                    response.setMessage("题目不能为空");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                }
+                else if(questionInfo.getAnswer().isEmpty()){
+                    response.setMessage("答案不能为空");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                }
+                else if(questionInfo.getKnowledgePointId() == null){
+                    response.setMessage("知识点不能为空");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                }
+            }
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
-
                 questionService.creatQuestion(question);
             }
-
+            questionBodyService.createQuestionBody(questionBody);
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {
             e.printStackTrace();
+            response.setMessage("上传失败" + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
