@@ -8,5 +8,5 @@ import lombok.Setter;
 public class CreateSchoolAdminRequest {
     private String name;
     private String password;
-    private Long schoolId;
+    private String schoolName;
 }
