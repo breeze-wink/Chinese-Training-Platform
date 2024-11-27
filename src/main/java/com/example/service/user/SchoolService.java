@@ -10,4 +10,6 @@ public interface SchoolService {
     int updateSchool(School school);
     School getSchoolById(Long id);
     List<School> getAllSchools();
+
+    School getSchoolByName(String schoolName);
 }
