@@ -317,31 +317,29 @@ public class TeacherBusinessController {
         Message response = new Message();
         try {
             QuestionBody questionBody = new QuestionBody();
-            if(request.getQuestionType().isEmpty()){
+            if(request.getQuestionType() == null || request.getQuestionType().isEmpty()){
                 response.setMessage("题型不能为空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            if(request.getBody() == null || request.getBody().isEmpty()){
-                request.setBody("");
-            }
+           
             questionBody.setBody(request.getBody());
             questionBody.setType(request.getQuestionType());
 
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
-            if (questions.isEmpty()) {
+            if (questions == null || questions.isEmpty()) {
                 response.setMessage("题目数量不能为零");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            else if(questions.size() > 1 && request.getBody().isEmpty()){
+            else if(questions.size() > 1 && (request.getBody() == null || request.getBody().isEmpty())){
                 response.setMessage("组合题题干不能为空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             for(UploadQuestionRequest.QuestionInfo questionInfo : questions){
-                if(questionInfo.getProblem().isEmpty()){
+                if(questionInfo.getProblem() == null || questionInfo.getProblem().isEmpty()){
                     response.setMessage("题目不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
-                else if(questionInfo.getType().isEmpty()){
+                else if(questionInfo.getType() == null || questionInfo.getType().isEmpty()){
                     response.setMessage("题目类型不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
@@ -349,7 +347,7 @@ public class TeacherBusinessController {
                     response.setMessage("知识点不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
-                else if(questionInfo.getType().equals("CHOICE") && questionInfo.getChoices().isEmpty()){
+                else if(questionInfo.getType().equals("CHOICE") && (questionInfo.getChoices() == null || questionInfo.getChoices().isEmpty())){
                     response.setMessage("选择题选项不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
@@ -372,15 +370,20 @@ public class TeacherBusinessController {
         question.setBodyId(questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
-        if(questionInfo.getAnswer().isEmpty()){
-            questionInfo.setAnswer("无");
-        }
-        if(questionInfo.getAnalysis().isEmpty()){
-            questionInfo.setAnalysis("无");
-        }
+
         question.setAnswer(questionInfo.getAnswer() + "$$" + questionInfo.getAnalysis());
+
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
         question.setCreatorId(id);
+
+        StringBuilder resAnswer = new StringBuilder();
+        for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
+            resAnswer.append(questionInfo.getAnswer().get(i));
+            if (i != questionInfo.getAnswer().size() - 1) {
+                resAnswer.append("##");
+            }
+        }
+        question.setAnswer(resAnswer + "$$" + questionInfo.getAnalysis());
 
         if (questionInfo.getType().equals("CHOICE")) {
             StringBuilder choices = new StringBuilder();

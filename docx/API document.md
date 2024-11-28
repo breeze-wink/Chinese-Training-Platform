@@ -1572,8 +1572,8 @@
           "type": "CHOICE", // 题目类型，CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY
           "problem": "string", // 问题描述
           "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
-          "answer": "string", // 题目答案
-          "analysis": "string", // 题目解析
+          "answer": ["string", "string", "string"], // 题目答案
+          "analysis":"string", // 题目解析
           "knowledgePointId": 12345 // 知识点ID
         }
       ]
@@ -3266,6 +3266,65 @@
     }
     ```
 
+
+### Update Username 
+
+- **接口路径**：`/api/school-admin/{id}/update-username`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改用户名。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```
+### Update Name
+
+- **接口路径**：`/api/school-admin/{id}/update-name`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改负责人名字。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```    
 
 ### Change Password
 
