@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class TeacherUpdateNameRequest {
+public class UpdateNameRequest {
     private String name;
 }
