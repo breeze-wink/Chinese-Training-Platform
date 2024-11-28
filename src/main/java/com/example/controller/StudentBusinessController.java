@@ -469,7 +469,8 @@ public class StudentBusinessController {
                 }
             }
             String [] answerAndAnalysis = questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer().split("\\$\\$");
-            infoData.setAnswer(answerAndAnalysis[0]);
+            String replace = answerAndAnalysis[0].replace("##", ";");
+            infoData.setAnswer(replace);
             infoData.setStudentAnswer(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
             infoData.setAnalysis("");
             if(answerAndAnalysis.length > 1){
