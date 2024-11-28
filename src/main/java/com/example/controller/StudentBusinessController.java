@@ -190,7 +190,7 @@ public class StudentBusinessController {
                     infoData.setQuestionOptions(new ArrayList<>());
                     infoData.setSequence(littlePracticeQuestion.getSequence());
                     if(Objects.equals(question.getType(), "CHOICE")){
-                        List<String> choices = List.of(question.getOptions().split("\\$\\$"));
+                        List<String> choices = getStrings(question);
                         infoData.getQuestionOptions().addAll(choices);
                     }
                     if(i == 1){
@@ -213,7 +213,7 @@ public class StudentBusinessController {
                 infoData.setQuestionOptions(new ArrayList<>());
                 infoData.setSequence(finalSequence + "");
                 if(Objects.equals(question.getType(), "CHOICE")){
-                    List<String> choices = List.of(question.getOptions().split("\\$\\$"));
+                    List<String> choices = getStrings(question);
                     infoData.getQuestionOptions().addAll(choices);
                 }
                 data.add(infoData);
@@ -296,7 +296,7 @@ public class StudentBusinessController {
                     infoData.setQuestionOptions(new ArrayList<>());
                     infoData.setSequence(littlePracticeQuestion.getSequence());
                     if(Objects.equals(question.getType(), "CHOICE")){
-                        List<String> choices = List.of(question.getOptions().split("\\$\\$"));
+                        List<String> choices = getStrings(question);
                         infoData.getQuestionOptions().addAll(choices);
                     }
                     if(i == 1){
@@ -319,7 +319,7 @@ public class StudentBusinessController {
                 infoData.setQuestionOptions(new ArrayList<>());
                 infoData.setSequence(finalSequence + "");
                 if(Objects.equals(question.getType(), "CHOICE")){
-                    List<String> choices = List.of(question.getOptions().split("\\$\\$"));
+                    List<String> choices = getStrings(question);
                     infoData.getQuestionOptions().addAll(choices);
                 }
                 data.add(infoData);
@@ -333,8 +333,18 @@ public class StudentBusinessController {
         return ResponseEntity.ok(response);
     }
 
-
-
+    private static List<String> getStrings(Question question) {
+        List<String> choices = new ArrayList<>(List.of(question.getOptions().split("\\$\\$")));
+        char choiceOption = 'A';
+        for(int j = 0; j < choices.size(); j++){
+            String [] test = choices.get(j).split("\\.");
+            if(choiceOption != test[0].charAt(0)){
+                choices.set(j, choiceOption + "." + choices.get(j));
+            }
+            choiceOption++;
+        }
+        return choices;
+    }
 
 
     @PostMapping("/{id}/practice/save")
@@ -370,7 +380,8 @@ public class StudentBusinessController {
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
-                List<String> choices = List.of(questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$"));
+                Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+                List<String> choices = getStrings(question);
                 infoData.getQuestionOptions().addAll(choices);
             }
             infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
@@ -450,8 +461,9 @@ public class StudentBusinessController {
             infoData.setScore(null);
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
-                String [] answerArray = questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$");
-                infoData.setQuestionOptions(List.of(answerArray));
+                Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+                List<String> answerArray = getStrings(question);
+                infoData.setQuestionOptions(answerArray);
                 if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
                     infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
                 }
