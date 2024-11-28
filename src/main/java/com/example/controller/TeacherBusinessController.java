@@ -456,18 +456,17 @@ public class TeacherBusinessController {
     }
 
 
-    @DeleteMapping("/{teacherId}/classes/{classId}/groups/{groupId}/students/{studentId}/remove")
-    public ResponseEntity<Message> removeStudentFromGroup(@PathVariable Long teacherId,
-                                                          @PathVariable Long classId,
-                                                          @PathVariable Long groupId,
-                                                          @PathVariable Long studentId) {
+    @DeleteMapping("/{id}/group/remove-student")
+    public ResponseEntity<Message> removeStudentFromGroup(@PathVariable Long id,
+                                                          @RequestParam Long groupId,
+                                                          @RequestParam Long studentId) {
         Message response = new Message();
         GroupStudent groupStudent = groupStudentService.getGroupStudentByIds(groupId, studentId);
         if(groupStudent == null){
             response.setMessage("小组或学生不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        if(!Objects.equals(classService.getClassById(classGroupService.getGroupById(groupId).getClassId()).getCreatorId(), teacherId)){
+        if(!Objects.equals(classService.getClassById(classGroupService.getGroupById(groupId).getClassId()).getCreatorId(), id)){
             response.setMessage("无权限");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
