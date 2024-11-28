@@ -1795,7 +1795,7 @@
     ```
 
 
-### Remove Student from Class 
+### Remove Student from Class `finished`
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/remove-student`
 - **请求方法**：DELETE
@@ -1803,7 +1803,6 @@
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 查询参数（Path Variable）：`classId` - 班级的唯一标识符
     - 查询参数（Path Variable）：`studentId` - 学生的唯一标识符
   - 请求体：无
 
@@ -2123,7 +2122,7 @@
 
 
 
-### Get Applications
+### Get Applications `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-applications`
 - **请求方法**：GET
@@ -2166,7 +2165,7 @@
 
 
 
-### Allow Application
+### Allow Application `finished`
 
 - **接口路径**：`/api/teacher/{id}/allow-application`
 - **请求方法**：GET
