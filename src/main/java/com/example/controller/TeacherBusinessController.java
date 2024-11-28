@@ -317,7 +317,7 @@ public class TeacherBusinessController {
         Message response = new Message();
         try {
             QuestionBody questionBody = new QuestionBody();
-            if(request.getQuestionType().isEmpty()){
+            if(request.getBody() == null || request.getQuestionType().isEmpty()){
                 response.setMessage("题型不能为空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
