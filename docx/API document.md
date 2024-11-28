@@ -1572,8 +1572,8 @@
           "type": "CHOICE", // 题目类型，CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY
           "problem": "string", // 问题描述
           "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
-          "answer": "string", // 题目答案
-          "analysis": "string", // 题目解析
+          "answer": ["string", "string", "string"], // 题目答案
+          "analysis":"string", // 题目解析
           "knowledgePointId": 12345 // 知识点ID
         }
       ]

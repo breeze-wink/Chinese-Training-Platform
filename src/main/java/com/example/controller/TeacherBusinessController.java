@@ -365,9 +365,17 @@ public class TeacherBusinessController {
         question.setBodyId(questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
-        question.setAnswer(questionInfo.getAnswer() + "$$" + questionInfo.getAnalysis());
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
         question.setCreatorId(id);
+
+        StringBuilder resAnswer = new StringBuilder();
+        for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
+            resAnswer.append(questionInfo.getAnswer().get(i));
+            if (i != questionInfo.getAnswer().size() - 1) {
+                resAnswer.append("##");
+            }
+        }
+        question.setAnswer(resAnswer + "$$" + questionInfo.getAnalysis());
 
         if (questionInfo.getType().equals("CHOICE")) {
             StringBuilder choices = new StringBuilder();

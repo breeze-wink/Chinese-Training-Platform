@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.request.SchoolAdminLoginRequest;
 import com.example.dto.request.SchoolAdminManagementController.SchoolAdminChangePasswordRequest;
+import com.example.dto.request.UpdateNameRequest;
 import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.response.Message;
 import com.example.dto.response.SchoolAdminInfoResponse;
@@ -98,7 +99,37 @@ public class SchoolAdminManagementController {
         response.setMessage("密码修改成功");
         return ResponseEntity.ok(response);
     }
-    @PutMapping("/{id}/update-name")
-    public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody UpdateUsernameRequest)
+    @PutMapping("/{id}/update-username")
+    public ResponseEntity<Message> updateUserName(@PathVariable Long id, @RequestBody UpdateUsernameRequest request) {
+        String username = request.getUsername();
 
+        try {
+            if (schoolAdminService.checkExistUsername(username)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("用户名已存在"));
+            }
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            schoolAdmin.setUsername(username);
+            schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            return ResponseEntity.ok(new Message("修改成功"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误" + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/update-name")
+    public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody UpdateNameRequest request) {
+        String name = request.getName();
+
+        try {
+
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            schoolAdmin.setName(name);
+            schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            return ResponseEntity.ok(new Message("修改成功"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误" + e.getMessage()));
+        }
+    }
 }
