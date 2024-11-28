@@ -1931,7 +1931,7 @@
     }
     ```
 
-### Remove Student from Group 
+### Remove Student from Group `finished`
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/students/{studentId}/remove`
 - **请求方法**：DELETE
@@ -2262,7 +2262,7 @@
     }
     ```
 
-### Delete Question
+### Delete Question `finished`
 
 - **接口路径**：`/api/teacher/delete-question/{id}`
 - **请求方法**：DELETE
@@ -2270,7 +2270,7 @@
 
 - **请求说明**：
   - **路径参数**：
-    - `id`：题目的唯一标识符。
+    - `id`：题目的唯一标识符(bodyId)。
 
 - **响应说明**：
   - **响应格式**：JSON

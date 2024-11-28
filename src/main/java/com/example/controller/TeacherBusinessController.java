@@ -481,4 +481,26 @@ public class TeacherBusinessController {
         }
     }
 
+    @DeleteMapping("/delete-question/{id}")
+    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id) {
+        Message response = new Message();
+        QuestionBody questionBody = questionBodyService.getQuestionBodyById(id);
+        if(questionBody == null){
+            response.setMessage("问题不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        else{
+            int result = questionBodyService.deleteQuestionBody(id);
+            if(result == 0){
+                response.setMessage("删除失败");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            else{
+                response.setMessage("删除成功");
+                return ResponseEntity.ok(response);
+            }
+        }
+    }
+
+
 }
