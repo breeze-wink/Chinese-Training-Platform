@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/uploads")
+@RequestMapping("/api/uploads")
 public class ImageController {
 
     private final String uploadDir = "uploads";  // 上传目录

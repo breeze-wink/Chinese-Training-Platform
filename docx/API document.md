@@ -3275,7 +3275,7 @@
 
 ### 图片上传接口
 
-- **接口路径**：`/uploads/image`
+- **接口路径**：`/api/uploads/image`
 - **请求方法**：POST
 - **接口说明**：上传图片，支持头像和内容两种类型的图片上传。
 - **请求说明**：
@@ -3306,7 +3306,7 @@
 
 ### 获取图片接口
 
-- **接口路径**：`/uploads/images/{type}/{imageName}`
+- **接口路径**：`/api/uploads/images/{type}/{imageName}`
 - **请求方法**：GET
 - **接口说明**：根据类型和图片名获取已上传的图片。
 - **请求说明**：
@@ -3315,7 +3315,7 @@
     - `imageName`：图片文件名
   - 请求示例：
     ```bash
-    GET /uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    GET /api/uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
     ```
 - **响应说明**：
   - 响应格式：图片文件
