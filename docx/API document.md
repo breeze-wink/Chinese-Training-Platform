@@ -1795,7 +1795,7 @@
     ```
 
 
-### Remove Student from Class 
+### Remove Student from Class `finished`
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/remove-student`
 - **请求方法**：DELETE
@@ -1803,7 +1803,6 @@
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 查询参数（Path Variable）：`classId` - 班级的唯一标识符
     - 查询参数（Path Variable）：`studentId` - 学生的唯一标识符
   - 请求体：无
 
@@ -2123,7 +2122,7 @@
 
 
 
-### Get Applications
+### Get Applications `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-applications`
 - **请求方法**：GET
@@ -2166,7 +2165,7 @@
 
 
 
-### Allow Application
+### Allow Application `finished`
 
 - **接口路径**：`/api/teacher/{id}/allow-application`
 - **请求方法**：GET
@@ -3306,7 +3305,7 @@
 
 ### 图片上传接口
 
-- **接口路径**：`/uploads/image`
+- **接口路径**：`/api/uploads/image`
 - **请求方法**：POST
 - **接口说明**：上传图片，支持头像和内容两种类型的图片上传。
 - **请求说明**：
@@ -3337,7 +3336,7 @@
 
 ### 获取图片接口
 
-- **接口路径**：`/uploads/images/{type}/{imageName}`
+- **接口路径**：`/api/uploads/images/{type}/{imageName}`
 - **请求方法**：GET
 - **接口说明**：根据类型和图片名获取已上传的图片。
 - **请求说明**：
@@ -3346,7 +3345,7 @@
     - `imageName`：图片文件名
   - 请求示例：
     ```bash
-    GET /uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    GET /api/uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
     ```
 - **响应说明**：
   - 响应格式：图片文件

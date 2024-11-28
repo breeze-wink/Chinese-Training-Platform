@@ -435,4 +435,50 @@ public class TeacherBusinessController {
         response.setMessage("操作成功");
         return ResponseEntity.ok(response);
     }
+
+
+    @DeleteMapping("/{teacherId}/classes/remove-student")
+    public ResponseEntity<Message> removeStudentFromClass(@PathVariable Long teacherId, @RequestParam Long studentId) {
+        Message response = new Message();
+        List<ClassStudent> classStudents = classStudentService.getClassStudentByStudentId(studentId);
+        if(classStudents.isEmpty()){
+            response.setMessage("学生不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        ClassStudent classStudent = classStudents.get(0);
+        if(!Objects.equals(classService.getClassById(classStudent.getClassId()).getCreatorId(), teacherId)){
+            response.setMessage("无权限");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        classService.removeStudentFromClass(classStudent.getClassId(), studentId);
+        response.setMessage("删除学生成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/{teacherId}/classes/{classId}/groups/{groupId}/students/{studentId}/remove")
+    public ResponseEntity<Message> removeStudentFromGroup(@PathVariable Long teacherId,
+                                                          @PathVariable Long classId,
+                                                          @PathVariable Long groupId,
+                                                          @PathVariable Long studentId) {
+        Message response = new Message();
+        GroupStudent groupStudent = groupStudentService.getGroupStudentByIds(groupId, studentId);
+        if(groupStudent == null){
+            response.setMessage("小组或学生不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if(!Objects.equals(classService.getClassById(classGroupService.getGroupById(groupId).getClassId()).getCreatorId(), teacherId)){
+            response.setMessage("无权限");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if(groupStudentService.removeGroupStudent(groupId, studentId) == 1){
+            response.setMessage("删除学生成功");
+            return ResponseEntity.ok(response);
+        }
+        else{
+            response.setMessage("未知错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 }
