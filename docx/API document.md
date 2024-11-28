@@ -324,7 +324,7 @@
 
 
 
-### Join Class `new`
+### Join Class `new` `finished
 - **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
@@ -1931,17 +1931,16 @@
     }
     ```
 
-### Remove Student from Group 
+### Remove Student from Group `finished`
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/students/{studentId}/remove`
+- **接口路径**：`/api/teacher/{id}/group/remove-student`
 - **请求方法**：DELETE
 - **接口说明**：教师用户将某个学生移出指定小组。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
-    - 路径参数（Path Variable）：`groupId` - 小组的唯一标识符
-    - 路径参数（Path Variable）：`studentId` - 学生的唯一标识符
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Path Variable）：`groupId` - 小组的唯一标识符
+    - 查询参数（Path Variable）：`studentId` - 学生的唯一标识符
   - 请求体：无
 
 - **响应说明**：
@@ -2262,7 +2261,7 @@
     }
     ```
 
-### Delete Question
+### Delete Question `finished`
 
 - **接口路径**：`/api/teacher/delete-question/{id}`
 - **请求方法**：DELETE
@@ -2270,7 +2269,7 @@
 
 - **请求说明**：
   - **路径参数**：
-    - `id`：题目的唯一标识符。
+    - `id`：题目的唯一标识符(bodyId)。
 
 - **响应说明**：
   - **响应格式**：JSON
