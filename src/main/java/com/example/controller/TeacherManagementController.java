@@ -3,8 +3,6 @@ package com.example.controller;
 import com.example.dto.request.*;
 import com.example.dto.request.TeacherManagementController.TeacherChangePasswordRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.StudentBusinessController.GetKnowledgePointsResponse;
-import com.example.model.course.KnowledgePoint;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.Teacher;
 import com.example.service.user.AuthorizationCodeService;
@@ -18,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -122,7 +118,7 @@ public class TeacherManagementController {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/{id}/update-username")
-    public ResponseEntity<Message> updateUsername(@PathVariable Long id, @RequestBody TeacherUpdateUsernameRequest request) {
+    public ResponseEntity<Message> updateUsername(@PathVariable Long id, @RequestBody UpdateUsernameRequest request) {
         Message response = new Message();
         String newName = request.getUsername();
         Teacher teacher = teacherService.getTeacherById(id);
@@ -161,7 +157,7 @@ public class TeacherManagementController {
     }
 
     @PutMapping("/{id}/update-name")
-    public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody TeacherUpdateNameRequest request) {
+    public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody UpdateNameRequest request) {
         Message response = new Message();
         String newNumber = request.getName();
         Teacher teacher = teacherService.getTeacherById(id);
