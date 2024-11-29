@@ -502,12 +502,14 @@ public class StudentBusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
-        for(PracticeQuestion practiceQuestion : practiceQuestions){
-            PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
-            if(practiceAnswer != null){
-                practiceAnswerService.deletePracticeAnswer(practiceAnswer.getId());
+        if(practiceQuestions != null){
+            for(PracticeQuestion practiceQuestion : practiceQuestions){
+                PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
+                if(practiceAnswer != null){
+                    practiceAnswerService.deletePracticeAnswer(practiceAnswer.getId());
+                }
+                practiceQuestionService.deletePracticeQuestion(practiceQuestion.getId());
             }
-            practiceQuestionService.deletePracticeQuestion(practiceQuestion.getId());
         }
         practiceService.deletePractice(practiceId);
         response.setMessage("练习删除成功");
