@@ -185,7 +185,7 @@ public class StudentBusinessController {
                     GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                     infoData.setPracticeQuestionId(littlePracticeQuestion.getId());
                     infoData.setQuestionBody(null);
-                    infoData.setQuestionContent(question.getContent());
+                    infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
                     infoData.setType(question.getType());
                     infoData.setQuestionOptions(new ArrayList<>());
                     infoData.setSequence(littlePracticeQuestion.getSequence());
@@ -194,7 +194,7 @@ public class StudentBusinessController {
                         infoData.getQuestionOptions().addAll(choices);
                     }
                     if(i == 1){
-                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
                     }
                     data.add(infoData);
                     i++;
@@ -208,7 +208,7 @@ public class StudentBusinessController {
                 GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                 infoData.setPracticeQuestionId(practiceQuestion.getId());
                 infoData.setQuestionBody(null);
-                infoData.setQuestionContent(question.getContent());
+                infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
                 infoData.setType(question.getType());
                 infoData.setQuestionOptions(new ArrayList<>());
                 infoData.setSequence(finalSequence + "");
@@ -291,7 +291,7 @@ public class StudentBusinessController {
                     GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                     infoData.setPracticeQuestionId(littlePracticeQuestion.getId());
                     infoData.setQuestionBody(null);
-                    infoData.setQuestionContent(question.getContent());
+                    infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
                     infoData.setType(question.getType());
                     infoData.setQuestionOptions(new ArrayList<>());
                     infoData.setSequence(littlePracticeQuestion.getSequence());
@@ -300,7 +300,7 @@ public class StudentBusinessController {
                         infoData.getQuestionOptions().addAll(choices);
                     }
                     if(i == 1){
-                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
                     }
                     data.add(infoData);
                     i++;
@@ -314,7 +314,7 @@ public class StudentBusinessController {
                 GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                 infoData.setPracticeQuestionId(practiceQuestion.getId());
                 infoData.setQuestionBody(null);
-                infoData.setQuestionContent(question.getContent());
+                infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
                 infoData.setType(question.getType());
                 infoData.setQuestionOptions(new ArrayList<>());
                 infoData.setSequence(finalSequence + "");
@@ -376,7 +376,7 @@ public class StudentBusinessController {
             ContinuePracticeResponse.InfoData infoData = new ContinuePracticeResponse.InfoData();
             infoData.setPracticeQuestionId(practiceQuestion.getId());
             infoData.setSequence(practiceQuestion.getSequence());
-            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent().replace("<p>", "").replace("</p>", ""));
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
@@ -388,7 +388,7 @@ public class StudentBusinessController {
             String [] sequences = infoData.getSequence().split("\\.");
             infoData.setQuestionBody("");
             if(sequences.length > 1 && sequences[1].equals("1")){
-                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
             }
             data.add(infoData);
         }
@@ -455,7 +455,7 @@ public class StudentBusinessController {
         List<GetAnswerResponse.InfoData> data = new ArrayList<>();
         for(PracticeQuestion practiceQuestion : practiceQuestions){
             GetAnswerResponse.InfoData infoData = new GetAnswerResponse.InfoData();
-            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent().replace("<p>", "").replace("</p>", ""));
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setSequence(practiceQuestion.getSequence());
             infoData.setScore(null);
@@ -479,7 +479,7 @@ public class StudentBusinessController {
             infoData.setQuestionBody("");
             String [] sequenceArray = practiceQuestion.getSequence().split("\\.");
             if(sequenceArray.length > 1 && Objects.equals(sequenceArray[1], "1")){
-                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
             }
             data.add(infoData);
         }
