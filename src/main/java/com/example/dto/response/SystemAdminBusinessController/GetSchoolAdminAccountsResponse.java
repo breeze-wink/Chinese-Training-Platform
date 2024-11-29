@@ -16,6 +16,7 @@ public class GetSchoolAdminAccountsResponse {
     public static class InfoData {
         private Long schoolAdminId;
         private String userName;
+        private String name;
         private String email;
         private String schoolName;
     }

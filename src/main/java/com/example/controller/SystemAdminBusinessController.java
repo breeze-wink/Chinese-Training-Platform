@@ -48,6 +48,7 @@ public class SystemAdminBusinessController {
             GetSchoolAdminAccountsResponse.InfoData infoData = new GetSchoolAdminAccountsResponse.InfoData();
             infoData.setSchoolAdminId(schoolAdmin.getId());
             infoData.setUserName(schoolAdmin.getUsername());
+            infoData.setName(schoolAdmin.getName());
             infoData.setEmail(schoolAdmin.getEmail());
             infoData.setSchoolName(schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName());
             data.add(infoData);
