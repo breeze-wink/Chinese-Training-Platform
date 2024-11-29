@@ -160,7 +160,7 @@ public class StudentBusinessController {
             else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
                 practiceQuestion.setSequence("3");
             }
-            else if (Objects.equals(question.getType(), "Essay")) {
+            else if (Objects.equals(question.getType(), "ESSAY")) {
                 practiceQuestion.setSequence("9");
             }
             practiceQuestions.add(practiceQuestion);
@@ -266,7 +266,7 @@ public class StudentBusinessController {
             else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
                 practiceQuestion.setSequence("3");
             }
-            else if (Objects.equals(question.getType(), "Essay")) {
+            else if (Objects.equals(question.getType(), "ESSAY")) {
                 practiceQuestion.setSequence("9");
             }
             practiceQuestions.add(practiceQuestion);
