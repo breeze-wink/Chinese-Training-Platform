@@ -377,11 +377,17 @@ public class TeacherBusinessController {
         question.setCreatorId(id);
 
         StringBuilder resAnswer = new StringBuilder();
-        for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
-            resAnswer.append(questionInfo.getAnswer().get(i));
-            if (i != questionInfo.getAnswer().size() - 1) {
-                resAnswer.append("##");
+        if(questionInfo.getAnswer() != null && (!questionInfo.getAnswer().isEmpty())){
+            for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
+                resAnswer.append(questionInfo.getAnswer().get(i));
+                if (i != questionInfo.getAnswer().size() - 1) {
+                    resAnswer.append("##");
+                }
             }
+
+        }
+        else{
+            resAnswer.append("无");
         }
         question.setAnswer(resAnswer + "$$" + questionInfo.getAnalysis());
 
