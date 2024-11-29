@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,37 +55,46 @@ public class SchoolAdminBusinessController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         Random random = new Random();
-        String [] charsToCode= {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        String code = charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)];
-        while(authorizationCodeService.codeIsExist(code)){
-            code = charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)] + charsToCode[random.nextInt(36)];
+        String[] charsToCode = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        StringBuilder code = new StringBuilder();
+        extracted(code, charsToCode, random);
+        while(authorizationCodeService.codeIsExist(code.toString())){
+            extracted(code, charsToCode, random);
         }
         if(authorizationCodeService.schoolIsExist(schoolAdmin.getSchoolId())){
             AuthorizationCode authorizationCode = new AuthorizationCode();
-            authorizationCode.setCode(code);
+            authorizationCode.setCode(code.toString());
             authorizationCode.setSchoolId(schoolAdmin.getSchoolId());
+            authorizationCode.setCreateDate(LocalDate.now());
             int result = authorizationCodeService.updateAuthorizationCode(authorizationCode);
             if(result != 0){
                 response.setMessage("授权码更新成功");
-                response.setCode(code);
+                response.setCode(code.toString());
+                response.setCreateDate(LocalDate.now().toString());
                 return ResponseEntity.ok(response);
             }
             response.setMessage("授权码更新失败");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }else{
             AuthorizationCode authorizationCode = new AuthorizationCode();
-            authorizationCode.setCode(code);
+            authorizationCode.setCode(code.toString());
             authorizationCode.setSchoolId(schoolAdmin.getSchoolId());
             int result = authorizationCodeService.addAuthorizationCode(authorizationCode);
             if(result != 0){
                 response.setMessage("授权码创建成功");
-                response.setCode(code);
+                response.setCode(code.toString());
                 return ResponseEntity.ok(response);
             }
             response.setMessage("授权码创建失败");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
+    }
+
+    private static void extracted(StringBuilder code, String[] charsToCode, Random random) {
+        for (int i = 0; i < 8; ++ i) {
+            code.append(charsToCode[random.nextInt(36)]);
+        }
     }
 
     @DeleteMapping("{id}/delete-teacher/{teacherid}")
@@ -157,6 +168,7 @@ public class SchoolAdminBusinessController {
             SchoolAdminQueryTeachers.InfoData infoData = new SchoolAdminQueryTeachers.InfoData();
             infoData.setId(teacher.getId());
             infoData.setName(teacher.getName());
+            infoData.setUsername(teacher.getUsername());
             infoData.setEmail(teacher.getEmail());
             infoData.setPhoneNumber(teacher.getPhoneNumber());
             infoData.setSchoolId(teacher.getSchoolId());

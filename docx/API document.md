@@ -3266,6 +3266,129 @@
     }
     ```
 
+### Send Verification Code `finished`
+
+- **接口路径**：`/api/school-admin/{id}/send-verification-code`
+- **请求方法**：POST
+- **接口说明**：学校管理员用户通过邮箱发送验证码。
+- **请求说明**
+  
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "email" : "string" // 学校管理员的邮箱地址
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "验证码已发送",
+      "verificationCode" : "string",
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "String", 
+      "verificationCode" : null
+    }
+    ```
+
+### Bind Email `finished`
+
+- **接口路径**：`/api/school-admin/{id}/bind-email`
+- **请求方法**：POST
+- **接口说明**：学校管理员用户绑定邮箱。
+- **请求说明**
+  
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数：`id`  学校管理员的id
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "email" : "string" // 教师的邮箱地址
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "成功",
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    
+    ```json
+    {
+      "message" : "String", // 授权码不可用 or 邮箱已注册 
+    }
+    ```
+
+### Update Username  `finished`
+
+- **接口路径**：`/api/school-admin/{id}/update-username`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改用户名。
+- **请求说明**
+  
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```
+### Update Name
+
+- **接口路径**：`/api/school-admin/{id}/update-name`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改负责人名字。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```
 
 ### Update Username 
 

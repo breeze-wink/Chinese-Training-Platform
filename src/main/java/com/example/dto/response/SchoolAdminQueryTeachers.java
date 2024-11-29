@@ -14,6 +14,7 @@ public class SchoolAdminQueryTeachers {
     @Getter
     @Setter
     public static class InfoData {
+        private String username;
         private Long id;
         private String name;
         private String email;

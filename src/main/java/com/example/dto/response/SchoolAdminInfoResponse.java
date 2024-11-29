@@ -3,6 +3,8 @@ package com.example.dto.response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class SchoolAdminInfoResponse {
@@ -17,5 +19,6 @@ public class SchoolAdminInfoResponse {
         private String name;
         private String schoolName;
         private String authorizationCode;
+        private String createDate;
     }
 }
