@@ -63,7 +63,7 @@ public class SystemAdminBusinessController {
         String password = request.getPassword();
         String schoolName = request.getSchoolName();
         Message response = new Message();
-        if (schoolAdminService.checkExistSchool(name)) {
+        if (schoolAdminService.checkExistUsername(name)) {
             response.setMessage("用户名已存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }

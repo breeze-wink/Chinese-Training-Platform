@@ -20,7 +20,7 @@ public class UploadQuestionRequest {
         private String type; // CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY
         private String problem;
         private List<String> choices; //若不是选择题则为空
-        private String answer;
+        private List<String> answer;
         private String analysis;
         private Long knowledgePointId;
     }

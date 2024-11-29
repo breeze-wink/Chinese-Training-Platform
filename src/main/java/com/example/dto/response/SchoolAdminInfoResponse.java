@@ -14,6 +14,7 @@ public class SchoolAdminInfoResponse {
     public static class InfoData {
         private String username;
         private String email;
+        private String name;
         private String schoolName;
         private String authorizationCode;
     }
