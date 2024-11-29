@@ -3,6 +3,8 @@ package com.example.controller;
 import com.example.dto.response.SchoolEmailVerifyResponse;
 import com.example.dto.request.*;
 import com.example.dto.request.SchoolAdminManagementController.SchoolAdminChangePasswordRequest;
+import com.example.dto.request.UpdateNameRequest;
+import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.response.Message;
 import com.example.dto.response.SchoolAdminInfoResponse;
 import com.example.dto.response.SchoolAdminLoginResponse;
@@ -12,8 +14,10 @@ import com.example.model.user.SchoolAdmin;
 import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
+
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -165,4 +169,5 @@ public class SchoolAdminManagementController {
         }
 
     }
+
 }
