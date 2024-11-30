@@ -109,22 +109,43 @@ public class SchoolAdminBusinessController {
         }
     }
 
-    @DeleteMapping ("/{id}/delete-student/{studentid}")
+    @DeleteMapping("/{id}/delete-student/{studentid}")
     public ResponseEntity<Message> deleteStudent(@PathVariable Long id, @PathVariable Long studentid) {
         Message response = new Message();
+
+        // 校验学校管理员是否与学生所属学校一致
         SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
         Student student = studentService.getStudentById(studentid);
-        if(!Objects.equals(schoolAdmin.getSchoolId(), student.getSchoolId())){
+
+        if (schoolAdmin == null || student == null) {
+            response.setMessage("学校管理员或学生不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        if (!Objects.equals(schoolAdmin.getSchoolId(), student.getSchoolId())) {
             response.setMessage("该学生不是该学校学生");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+
+        // 删除学生相关的班级记录
         List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentid);
         for (ClassStudent classStudent : classStudents) {
-            classService.removeStudentFromClass(classStudent.getClassId(), studentid);
+            classService.removeStudentFromClass(classStudent.getClassId(), studentid);  // 删除学生与班级的关联
         }
-        response.setMessage("学生账号删除成功");
-        return ResponseEntity.ok(response);
+
+        // 从数据库删除学生记录
+        int result = studentService.removeStudent(studentid);  // 假设 studentService.removeStudent 返回删除记录数
+
+        // 判断删除结果
+        if (result > 0) {
+            response.setMessage("学生账号删除成功");
+            return ResponseEntity.ok(response);
+        } else {
+            response.setMessage("学生账号删除失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
+
 
     @GetMapping("/{id}/query-all-students")
     public ResponseEntity<SchoolAdminQueryStudents> queryAllStudents(@PathVariable Long id) {
