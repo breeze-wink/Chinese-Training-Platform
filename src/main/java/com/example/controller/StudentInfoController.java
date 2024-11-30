@@ -1,8 +1,11 @@
 package com.example.controller;
 
 
-import com.example.dto.request.*;
+import com.example.dto.request.StudentController.*;
 import com.example.dto.response.*;
+import com.example.dto.response.StudentController.StudentChangeEmailResponse;
+import com.example.dto.response.StudentController.StudentChangeEmailVerificationResponse;
+import com.example.dto.response.StudentController.StudentEditInformationResponse;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.JoinClass;
@@ -12,7 +15,6 @@ import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.JoinClassService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
-import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +58,16 @@ public class StudentInfoController {
             response.setMessage("用户未找到");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        if (studentService.existStudentUsername(request.getUsername()) && !student.getUsername().equals(request.getUsername())) {
-            response.setMessage("用户名已存在");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        if(!request.getUsername().isEmpty()){
+            if (studentService.existStudentUsername(request.getUsername()) && !student.getUsername().equals(request.getUsername())) {
+                response.setMessage("用户名已存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            student.setUsername(request.getUsername());
         }
-        student.setUsername(request.getUsername());
-        student.setName(request.getName());
+        if(!request.getName().isEmpty()){
+            student.setName(request.getName());
+        }
         student.setGrade(request.getGrade());
         studentService.updateStudent(student);
         response.setMessage("个人信息修改成功");
@@ -136,6 +142,10 @@ public class StudentInfoController {
         Message response = new Message();
         String inviteCode = request.getInviteCode();
         Clazz clazz = classService.getClassByInviteCode(inviteCode);
+        if(clazz == null){
+            response.setMessage("邀请码错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
         JoinClass joinClass = joinClassService.selectJoinClassByStudentIdAndClassId(id, clazz.getId());
         List<ClassStudent> classStudent = classStudentService.getClassStudentByStudentId(id);
         if(!classStudent.isEmpty()){

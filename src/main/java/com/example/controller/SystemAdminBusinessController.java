@@ -1,11 +1,12 @@
 package com.example.controller;
 
 
-import com.example.dto.request.CreateSchoolAdminRequest;
+import com.example.dto.request.SystemAdminController.CreateSchoolAdminRequest;
 import com.example.dto.response.Message;
-import com.example.dto.response.QuestionsResponse;
-import com.example.dto.response.SystemAdminBusinessController.GetSchoolAdminAccountsResponse;
+import com.example.dto.response.SystemAdminController.QuestionsResponse;
+import com.example.dto.response.SystemAdminController.GetSchoolAdminAccountsResponse;
 import com.example.model.question.Question;
+import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
 import com.example.service.question.QuestionService;
 import com.example.service.question.impl.QuestionServiceImpl;
@@ -47,6 +48,7 @@ public class SystemAdminBusinessController {
             GetSchoolAdminAccountsResponse.InfoData infoData = new GetSchoolAdminAccountsResponse.InfoData();
             infoData.setSchoolAdminId(schoolAdmin.getId());
             infoData.setUserName(schoolAdmin.getUsername());
+            infoData.setName(schoolAdmin.getName());
             infoData.setEmail(schoolAdmin.getEmail());
             infoData.setSchoolName(schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName());
             data.add(infoData);
@@ -60,14 +62,23 @@ public class SystemAdminBusinessController {
     public ResponseEntity<Message> createSchoolAdmin(@RequestBody  CreateSchoolAdminRequest request) {
         String name = request.getName();
         String password = request.getPassword();
-        Long schoolId = request.getSchoolId();
+        String schoolName = request.getSchoolName();
         Message response = new Message();
-        if (schoolAdminService.checkExistSchool(name)) {
+        if (schoolAdminService.checkExistUsername(name)) {
             response.setMessage("用户名已存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         try {
+            School school = schoolService.getSchoolByName(schoolName);
+
+            if (school == null) {
+                school = new School();
+                school.setName(schoolName);
+                schoolService.addSchool(school);
+            }
+
+            Long schoolId = school.getId();
             SchoolAdmin schoolAdmin = new SchoolAdmin();
             schoolAdmin.setUsername(name);
             schoolAdmin.setPassword(password);

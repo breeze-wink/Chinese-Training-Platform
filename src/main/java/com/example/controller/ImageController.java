@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/uploads")
+@RequestMapping("/api/uploads")
 public class ImageController {
 
     private final String uploadDir = "uploads";  // 上传目录
@@ -44,7 +44,7 @@ public class ImageController {
             }
 
             // 生成图片文件名，并拼接路径
-            String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
             Path directoryPath = Paths.get(uploadDir, type);  // 根据类型选择文件夹
             Files.createDirectories(directoryPath);  // 创建分类目录
             Path path = directoryPath.resolve(fileName).normalize();

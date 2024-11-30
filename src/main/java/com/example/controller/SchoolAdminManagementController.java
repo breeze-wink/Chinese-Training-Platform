@@ -1,19 +1,24 @@
 package com.example.controller;
 
-import com.example.dto.request.SchoolAdminLoginRequest;
-import com.example.dto.request.SchoolAdminManagementController.SchoolAdminChangePasswordRequest;
+import com.example.dto.request.SchoolAdminController.SchoolAdminBindEmailRequest;
+import com.example.dto.request.SchoolAdminController.SchoolAdminLoginRequest;
+import com.example.dto.response.SchoolAdminController.SchoolEmailVerifyResponse;
+import com.example.dto.request.SchoolAdminController.SchoolAdminChangePasswordRequest;
+import com.example.dto.request.UpdateNameRequest;
+import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.response.Message;
-import com.example.dto.response.SchoolAdminInfoResponse;
-import com.example.dto.response.SchoolAdminLoginResponse;
+import com.example.dto.response.SchoolAdminController.SchoolAdminInfoResponse;
+import com.example.dto.response.SchoolAdminController.SchoolAdminLoginResponse;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
 import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
-import com.example.service.user.impl.AuthorizationCodeServiceImpl;
-import com.example.service.user.impl.SchoolAdminServiceImpl;
-import com.example.service.user.impl.SchoolServiceImpl;
+
+import com.example.service.utils.EmailService;
+import jakarta.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +31,17 @@ public class SchoolAdminManagementController {
     private final SchoolService schoolService;
     private final AuthorizationCodeService authorizationCodeService;
 
+    private final EmailService emailService;
+
     @Autowired
     public SchoolAdminManagementController(SchoolAdminService schoolAdminService,
                                            SchoolService schoolService,
-                                           AuthorizationCodeService authorizationCodeService) {
+                                           AuthorizationCodeService authorizationCodeService,
+                                           EmailService emailService) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
         this.authorizationCodeService = authorizationCodeService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -65,12 +74,14 @@ public class SchoolAdminManagementController {
             SchoolAdminInfoResponse.InfoData data = new SchoolAdminInfoResponse.InfoData();
             data.setUsername(admin.getUsername());
             data.setEmail(admin.getEmail());
+            data.setName(admin.getName());
             data.setSchoolName(school.getName());
             if(code == null){
                 data.setAuthorizationCode("无");
             }
             else{
                 data.setAuthorizationCode(code.getCode());
+                data.setCreateDate(code.getCreateDate().toString());
             }
             response.setData(data);
 
@@ -99,4 +110,65 @@ public class SchoolAdminManagementController {
         response.setMessage("密码修改成功");
         return ResponseEntity.ok(response);
     }
+    @PutMapping("/{id}/update-username")
+    public ResponseEntity<Message> updateUserName(@PathVariable Long id, @RequestBody UpdateUsernameRequest request) {
+        String username = request.getUsername();
+
+        try {
+            if (schoolAdminService.checkExistUsername(username)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("用户名已存在"));
+            }
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            schoolAdmin.setUsername(username);
+            schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            return ResponseEntity.ok(new Message("修改成功"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误" + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/update-name")
+    public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody UpdateNameRequest request) {
+        String name = request.getName();
+
+        try {
+
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            schoolAdmin.setName(name);
+            schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            return ResponseEntity.ok(new Message("修改成功"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误" + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/send-verification-code")
+    public ResponseEntity<SchoolEmailVerifyResponse> sendVerificationCode(@PathVariable Long id, @RequestBody SchoolAdminBindEmailRequest request) throws MessagingException {
+        String email = request.getEmail();
+
+        SchoolEmailVerifyResponse response = new SchoolEmailVerifyResponse();
+
+        String verificationCode = emailService.sendEmail(email);
+        response.setVerificationCode(verificationCode);
+        response.setMessage("验证码已发送");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/bind-email")
+    public ResponseEntity<Message> bindEmail(@PathVariable Long id, @RequestBody SchoolAdminBindEmailRequest request) {
+        String email = request.getEmail();
+
+        try {
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            schoolAdmin.setEmail(email);
+            schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            return ResponseEntity.ok(new Message("成功"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
+        }
+
+    }
+
 }

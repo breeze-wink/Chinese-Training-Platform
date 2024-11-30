@@ -1,7 +1,9 @@
 package com.example.controller;
 
-import com.example.dto.request.*;
-import com.example.dto.response.*;
+import com.example.dto.request.StudentController.StudentLoginRequest;
+import com.example.dto.request.StudentController.StudentRegisterRequest;
+import com.example.dto.request.StudentController.StudentVerifyRequest;
+import com.example.dto.response.StudentController.*;
 import com.example.model.classes.ClassStudent;
 import com.example.model.essay.Essay;
 import com.example.model.user.Student;

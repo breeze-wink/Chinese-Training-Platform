@@ -1,11 +1,11 @@
 package com.example.controller;
 
-import com.example.dto.request.CreateGroupRequest;
-import com.example.dto.request.TeacherCreateClassRequest;
-import com.example.dto.request.UpdateClassRequest;
-import com.example.dto.request.UploadQuestionRequest;
+import com.example.dto.request.TeacherController.CreateGroupRequest;
+import com.example.dto.request.TeacherController.TeacherCreateClassRequest;
+import com.example.dto.request.TeacherController.UpdateClassRequest;
+import com.example.dto.request.TeacherController.UploadQuestionRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.TeacherBusinessController.GetApplicationsResponse;
+import com.example.dto.response.TeacherController.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
@@ -317,41 +317,46 @@ public class TeacherBusinessController {
         Message response = new Message();
         try {
             QuestionBody questionBody = new QuestionBody();
-            questionBody.setType(request.getQuestionType());
-            if(questionBody.getType().isEmpty() || request.getQuestionType().isEmpty()){
+            if(request.getQuestionType() == null || request.getQuestionType().isEmpty()){
                 response.setMessage("题型不能为空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            else if(request.getBody().isEmpty()){
-                response.setMessage("题干不能为空");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
+           
             questionBody.setBody(request.getBody());
+            questionBody.setType(request.getQuestionType());
 
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
-            if (questions.isEmpty()) {
-                response.setMessage("题目内容不能为空");
+            if (questions == null || questions.isEmpty()) {
+                response.setMessage("题目数量不能为零");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            else if(questions.size() > 1 && (request.getBody() == null || request.getBody().isEmpty())){
+                response.setMessage("组合题题干不能为空");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             for(UploadQuestionRequest.QuestionInfo questionInfo : questions){
-                if(questionInfo.getProblem().isEmpty()){
+                if(questionInfo.getProblem() == null || questionInfo.getProblem().isEmpty()){
                     response.setMessage("题目不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
-                else if(questionInfo.getAnswer().isEmpty()){
-                    response.setMessage("答案不能为空");
+                else if(questionInfo.getType() == null || questionInfo.getType().isEmpty()){
+                    response.setMessage("题目类型不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
                 else if(questionInfo.getKnowledgePointId() == null){
                     response.setMessage("知识点不能为空");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
+                else if(questionInfo.getType().equals("CHOICE") && (questionInfo.getChoices() == null || questionInfo.getChoices().isEmpty())){
+                    response.setMessage("选择题选项不能为空");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                }
             }
+            questionBodyService.createQuestionBody(questionBody);
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
                 questionService.creatQuestion(question);
             }
-            questionBodyService.createQuestionBody(questionBody);
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -365,15 +370,37 @@ public class TeacherBusinessController {
         question.setBodyId(questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
-        question.setAnswer(questionInfo.getAnswer() + "$$" + questionInfo.getAnalysis());
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
         question.setCreatorId(id);
+
+        StringBuilder resAnswer = new StringBuilder();
+        if(questionInfo.getAnswer() != null && (!questionInfo.getAnswer().isEmpty())){
+            for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
+                if(questionInfo.getAnswer().get(i) == null || questionInfo.getAnswer().get(i).isEmpty()){
+                    resAnswer.append(" ");
+                }
+                else{
+                    resAnswer.append(questionInfo.getAnswer().get(i));
+                }
+                if (i != questionInfo.getAnswer().size() - 1) {
+                    resAnswer.append("##");
+                }
+            }
+
+        }
+        else{
+            resAnswer.append(" ");
+        }
+        question.setAnswer(resAnswer + "$$" + questionInfo.getAnalysis());
 
         if (questionInfo.getType().equals("CHOICE")) {
             StringBuilder choices = new StringBuilder();
 
             for (int i = 0; i < questionInfo.getChoices().size(); i ++) {
                 choices.append(questionInfo.getChoices().get(i));
+                if(questionInfo.getChoices().get(i) == null || questionInfo.getChoices().get(i).isEmpty()){
+                    choices.append(" ");
+                }
                 if (i != questionInfo.getChoices().size() - 1) {
                     choices.append("$$");
                 }
@@ -435,4 +462,71 @@ public class TeacherBusinessController {
         response.setMessage("操作成功");
         return ResponseEntity.ok(response);
     }
+
+
+    @DeleteMapping("/{teacherId}/classes/remove-student")
+    public ResponseEntity<Message> removeStudentFromClass(@PathVariable Long teacherId, @RequestParam Long studentId) {
+        Message response = new Message();
+        List<ClassStudent> classStudents = classStudentService.getClassStudentByStudentId(studentId);
+        if(classStudents.isEmpty()){
+            response.setMessage("学生不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        ClassStudent classStudent = classStudents.get(0);
+        if(!Objects.equals(classService.getClassById(classStudent.getClassId()).getCreatorId(), teacherId)){
+            response.setMessage("无权限");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        classService.removeStudentFromClass(classStudent.getClassId(), studentId);
+        response.setMessage("删除学生成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/{id}/group/remove-student")
+    public ResponseEntity<Message> removeStudentFromGroup(@PathVariable Long id,
+                                                          @RequestParam Long groupId,
+                                                          @RequestParam Long studentId) {
+        Message response = new Message();
+        GroupStudent groupStudent = groupStudentService.getGroupStudentByIds(groupId, studentId);
+        if(groupStudent == null){
+            response.setMessage("小组或学生不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if(!Objects.equals(classService.getClassById(classGroupService.getGroupById(groupId).getClassId()).getCreatorId(), id)){
+            response.setMessage("无权限");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if(groupStudentService.removeGroupStudent(groupId, studentId) == 1){
+            response.setMessage("删除学生成功");
+            return ResponseEntity.ok(response);
+        }
+        else{
+            response.setMessage("未知错误");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/delete-question/{id}")
+    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id) {
+        Message response = new Message();
+        QuestionBody questionBody = questionBodyService.getQuestionBodyById(id);
+        if(questionBody == null){
+            response.setMessage("问题不存在");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        else{
+            int result = questionBodyService.deleteQuestionBody(id);
+            if(result == 0){
+                response.setMessage("删除失败");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            else{
+                response.setMessage("删除成功");
+                return ResponseEntity.ok(response);
+            }
+        }
+    }
+
+
 }

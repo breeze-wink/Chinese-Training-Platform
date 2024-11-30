@@ -1,12 +1,8 @@
 package com.example.controller;
 
-import com.example.dto.request.StudentBusinessController.CompletePracticeRequest;
-import com.example.dto.request.StudentBusinessController.ContinuePracticeRequest;
-import com.example.dto.request.StudentBusinessController.GeneratePracticeDefineRequest;
-import com.example.dto.request.StudentBusinessController.SaveAnswerRequest;
+import com.example.dto.request.StudentController.*;
 import com.example.dto.response.Message;
-import com.example.dto.response.StudentBusinessController.*;
-import com.example.dto.response.StudentJoinClassResponse;
+import com.example.dto.response.StudentController.*;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Practice;
 import com.example.model.question.PracticeQuestion;
@@ -163,7 +159,7 @@ public class StudentBusinessController {
             else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
                 practiceQuestion.setSequence("3");
             }
-            else if (Objects.equals(question.getType(), "Essay")) {
+            else if (Objects.equals(question.getType(), "ESSAY")) {
                 practiceQuestion.setSequence("9");
             }
             practiceQuestions.add(practiceQuestion);
@@ -188,16 +184,16 @@ public class StudentBusinessController {
                     GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                     infoData.setPracticeQuestionId(littlePracticeQuestion.getId());
                     infoData.setQuestionBody(null);
-                    infoData.setQuestionContent(question.getContent());
+                    infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
                     infoData.setType(question.getType());
                     infoData.setQuestionOptions(new ArrayList<>());
                     infoData.setSequence(littlePracticeQuestion.getSequence());
                     if(Objects.equals(question.getType(), "CHOICE")){
-                        List<String> choices = List.of(question.getOptions().split("\\$\\$"));
+                        List<String> choices = getStrings(question);
                         infoData.getQuestionOptions().addAll(choices);
                     }
                     if(i == 1){
-                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
                     }
                     data.add(infoData);
                     i++;
@@ -211,12 +207,12 @@ public class StudentBusinessController {
                 GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                 infoData.setPracticeQuestionId(practiceQuestion.getId());
                 infoData.setQuestionBody(null);
-                infoData.setQuestionContent(question.getContent());
+                infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
                 infoData.setType(question.getType());
                 infoData.setQuestionOptions(new ArrayList<>());
                 infoData.setSequence(finalSequence + "");
                 if(Objects.equals(question.getType(), "CHOICE")){
-                    List<String> choices = List.of(question.getOptions().split("\\$\\$"));
+                    List<String> choices = getStrings(question);
                     infoData.getQuestionOptions().addAll(choices);
                 }
                 data.add(infoData);
@@ -231,16 +227,15 @@ public class StudentBusinessController {
     }
 
 
-    /*
+
     @PostMapping("/{id}/practice/generate-auto")//暂时
-    public ResponseEntity<GeneratePracticeDefineResponse> generatePracticeAuto(@PathVariable Long id) {
+    public ResponseEntity<GeneratePracticeDefineResponse> generatePracticeAuto(@PathVariable Long id, @RequestBody GeneratePracticeAutoRequest request) {
         GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
         List<Question> questions = questionService.getAllQuestions();
-
         // 创建练习
         Practice practice = new Practice();
         practice.setStudentId(id);
-        practice.setName("auto");
+        practice.setName(request.getName());
         practiceService.createPractice(practice);
         response.setPracticeId(practice.getId());
 
@@ -258,34 +253,77 @@ public class StudentBusinessController {
             practiceQuestion.setQuestionId(question.getId());
 
             // 设置初始的类型优先级
-            if (Objects.equals(question.getType(), "CHOICE")) {
-                practiceQuestion.setSequence(1);
-            } else if (Objects.equals(question.getType(), "FILL_IN_BLANK")) {
-                practiceQuestion.setSequence(2);
-            } else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
-                practiceQuestion.setSequence(3);
+            if(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody() != null && (! questionBodyService.getQuestionBodyById(question.getBodyId()).getBody().isEmpty())){
+                practiceQuestion.setSequence("8");
+            }
+            else if (Objects.equals(question.getType(), "CHOICE")) {
+                practiceQuestion.setSequence("1");
+            }
+            else if (Objects.equals(question.getType(), "FILL_IN_BLANK")) {
+                practiceQuestion.setSequence("2");
+            }
+            else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
+                practiceQuestion.setSequence("3");
+            }
+            else if (Objects.equals(question.getType(), "ESSAY")) {
+                practiceQuestion.setSequence("9");
             }
             practiceQuestions.add(practiceQuestion);
         }
 
         // 按题目类型排序
-        practiceQuestions.sort(Comparator.comparingInt(PracticeQuestion::getSequence));
+        practiceQuestions.sort(Comparator.comparingInt(pq -> Integer.parseInt(pq.getSequence())));
 
         // 设置最终的序列值并保存
         int finalSequence = 1;
         for (PracticeQuestion practiceQuestion : practiceQuestions) {
-            practiceQuestion.setSequence(finalSequence++);
-            practiceQuestionService.addPracticeQuestion(practiceQuestion);
-
-            // 构建返回数据
-            Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
-            GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
-            infoData.setPracticeQuestionId(practiceQuestion.getId());
-            infoData.setQuestionContent(question.getContent());
-            infoData.setType(question.getType());
-            infoData.setQuestionOptions(question.getOptions());
-            infoData.setSequence(practiceQuestion.getSequence());
-            data.add(infoData);
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId());
+            if(questionBody.getBody() != null && (! questionBody.getBody().isEmpty())){
+                int i = 1;
+                List<Question> questionsByBody = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
+                for (Question question : questionsByBody) {
+                    PracticeQuestion littlePracticeQuestion = new PracticeQuestion();
+                    littlePracticeQuestion.setPracticeId(practice.getId());
+                    littlePracticeQuestion.setQuestionId(question.getId());
+                    littlePracticeQuestion.setSequence(finalSequence + "." + i);
+                    practiceQuestionService.addPracticeQuestion(littlePracticeQuestion);
+                    GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
+                    infoData.setPracticeQuestionId(littlePracticeQuestion.getId());
+                    infoData.setQuestionBody(null);
+                    infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
+                    infoData.setType(question.getType());
+                    infoData.setQuestionOptions(new ArrayList<>());
+                    infoData.setSequence(littlePracticeQuestion.getSequence());
+                    if(Objects.equals(question.getType(), "CHOICE")){
+                        List<String> choices = getStrings(question);
+                        infoData.getQuestionOptions().addAll(choices);
+                    }
+                    if(i == 1){
+                        infoData.setQuestionBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
+                    }
+                    data.add(infoData);
+                    i++;
+                }
+                finalSequence++;
+            }
+            else{
+                Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+                practiceQuestion.setSequence(String.valueOf(finalSequence));
+                practiceQuestionService.addPracticeQuestion(practiceQuestion);
+                GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
+                infoData.setPracticeQuestionId(practiceQuestion.getId());
+                infoData.setQuestionBody(null);
+                infoData.setQuestionContent(question.getContent().replace("<p>", "").replace("</p>", ""));
+                infoData.setType(question.getType());
+                infoData.setQuestionOptions(new ArrayList<>());
+                infoData.setSequence(finalSequence + "");
+                if(Objects.equals(question.getType(), "CHOICE")){
+                    List<String> choices = getStrings(question);
+                    infoData.getQuestionOptions().addAll(choices);
+                }
+                data.add(infoData);
+                finalSequence++;
+            }
         }
 
         // 返回响应
@@ -293,9 +331,19 @@ public class StudentBusinessController {
         response.setMessage("练习生成成功");
         return ResponseEntity.ok(response);
     }
-    */
 
-
+    private static List<String> getStrings(Question question) {
+        List<String> choices = new ArrayList<>(List.of(question.getOptions().split("\\$\\$")));
+        char choiceOption = 'A';
+        for(int j = 0; j < choices.size(); j++){
+            String [] test = choices.get(j).split("\\.");
+            if(choiceOption != test[0].charAt(0)){
+                choices.set(j, choiceOption + "." + choices.get(j));
+            }
+            choiceOption++;
+        }
+        return choices;
+    }
 
 
     @PostMapping("/{id}/practice/save")
@@ -327,18 +375,19 @@ public class StudentBusinessController {
             ContinuePracticeResponse.InfoData infoData = new ContinuePracticeResponse.InfoData();
             infoData.setPracticeQuestionId(practiceQuestion.getId());
             infoData.setSequence(practiceQuestion.getSequence());
-            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent().replace("<p>", "").replace("</p>", ""));
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
-                List<String> choices = List.of(questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$"));
+                Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+                List<String> choices = getStrings(question);
                 infoData.getQuestionOptions().addAll(choices);
             }
             infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
             String [] sequences = infoData.getSequence().split("\\.");
             infoData.setQuestionBody("");
             if(sequences.length > 1 && sequences[1].equals("1")){
-                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
             }
             data.add(infoData);
         }
@@ -400,23 +449,27 @@ public class StudentBusinessController {
     @GetMapping("/{id}/practice/get-answer")
     public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) {
         GetAnswerResponse response = new GetAnswerResponse();
+        response.setTotalScore(practiceService.getPracticeById(practiceId).getTotalScore().doubleValue());
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
         List<GetAnswerResponse.InfoData> data = new ArrayList<>();
         for(PracticeQuestion practiceQuestion : practiceQuestions){
             GetAnswerResponse.InfoData infoData = new GetAnswerResponse.InfoData();
-            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent().replace("<p>", "").replace("</p>", ""));
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
+            infoData.setSequence(practiceQuestion.getSequence());
             infoData.setScore(null);
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
-                String [] answerArray = questionService.getQuestionById(practiceQuestion.getQuestionId()).getOptions().split("\\$\\$");
-                infoData.setQuestionOptions(List.of(answerArray));
+                Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+                List<String> answerArray = getStrings(question);
+                infoData.setQuestionOptions(answerArray);
                 if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
                     infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
                 }
             }
             String [] answerAndAnalysis = questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer().split("\\$\\$");
-            infoData.setAnswer(answerAndAnalysis[0]);
+            String replace = answerAndAnalysis[0].replace("##", ";");
+            infoData.setAnswer(replace);
             infoData.setStudentAnswer(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
             infoData.setAnalysis("");
             if(answerAndAnalysis.length > 1){
@@ -425,12 +478,40 @@ public class StudentBusinessController {
             infoData.setQuestionBody("");
             String [] sequenceArray = practiceQuestion.getSequence().split("\\.");
             if(sequenceArray.length > 1 && Objects.equals(sequenceArray[1], "1")){
-                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
             }
             data.add(infoData);
         }
         response.setData(data);
         response.setMessage("答案获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/{id}/delete-practice")
+    public ResponseEntity<Message> deletePractice(@PathVariable Long id, @RequestParam Long practiceId) {
+        Message response = new Message();
+        Practice practice = practiceService.getPracticeById(practiceId);
+        if(practice == null){
+            response.setMessage("练习不存在");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        else if(!Objects.equals(practice.getStudentId(), id)){
+            response.setMessage("id不匹配，练习删除失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
+        if(practiceQuestions != null){
+            for(PracticeQuestion practiceQuestion : practiceQuestions){
+                PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
+                if(practiceAnswer != null){
+                    practiceAnswerService.deletePracticeAnswer(practiceAnswer.getId());
+                }
+                practiceQuestionService.deletePracticeQuestion(practiceQuestion.getId());
+            }
+        }
+        practiceService.deletePractice(practiceId);
+        response.setMessage("练习删除成功");
         return ResponseEntity.ok(response);
     }
 

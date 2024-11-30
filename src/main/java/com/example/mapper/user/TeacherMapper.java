@@ -9,14 +9,14 @@ import java.util.List;
 @Mapper
 public interface TeacherMapper {
 
-    @Insert("INSERT INTO teacher(name, username, email, password, phoneNumber, schoolId) VALUES(#{name}, #{username}, #{email}, #{password}, #{phoneNumber}, #{schoolId})")
+    @Insert("INSERT INTO teacher(name, username, email, password, phoneNumber, schoolId, permission) VALUES(#{name}, #{username}, #{email}, #{password}, #{phoneNumber}, #{schoolId}, #{permission})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Teacher teacher);
 
     @Delete("DELETE FROM teacher WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE teacher SET name = #{name}, username = #{username}, email = #{email}, password = #{password}, phoneNumber = #{phoneNumber}, schoolId = #{schoolId} WHERE id = #{id}")
+    @Update("UPDATE teacher SET name = #{name}, username = #{username}, email = #{email}, password = #{password}, phoneNumber = #{phoneNumber}, schoolId = #{schoolId}, permission = #{permission} WHERE id = #{id}")
     int update(Teacher teacher);
 
     @Select("SELECT * FROM teacher WHERE id = #{id}")

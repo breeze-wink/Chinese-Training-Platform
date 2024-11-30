@@ -23,4 +23,7 @@ public interface SchoolMapper {
 
     @Select("SELECT * FROM school")
     List<School> selectAll();
+
+    @Select("SELECT * FROM school WHERE name = #{schoolName}")
+    School selectByName(String schoolName);
 }

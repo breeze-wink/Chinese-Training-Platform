@@ -324,7 +324,7 @@
 
 
 
-### Join Class `new`
+### Join Class `new` `finished
 - **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
@@ -382,7 +382,7 @@
 
 
 
-    
+
 ### View Essays `finished`
 
 - **接口路径**：`/api/student/{id}/view-essays`
@@ -507,7 +507,7 @@
         ```
 
 
-  
+
 
 ### Get Knowledge Points `finished`
 
@@ -1572,8 +1572,8 @@
           "type": "CHOICE", // 题目类型，CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY
           "problem": "string", // 问题描述
           "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
-          "answer": "string", // 题目答案
-          "analysis": "string", // 题目解析
+          "answer": ["string", "string", "string"], // 题目答案
+          "analysis":"string", // 题目解析
           "knowledgePointId": 12345 // 知识点ID
         }
       ]
@@ -1795,7 +1795,7 @@
     ```
 
 
-### Remove Student from Class 
+### Remove Student from Class `finished`
 
 - **接口路径**：`/api/teacher/{teacherId}/classes/remove-student`
 - **请求方法**：DELETE
@@ -1803,7 +1803,6 @@
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 查询参数（Path Variable）：`classId` - 班级的唯一标识符
     - 查询参数（Path Variable）：`studentId` - 学生的唯一标识符
   - 请求体：无
 
@@ -1932,17 +1931,16 @@
     }
     ```
 
-### Remove Student from Group 
+### Remove Student from Group `finished`
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/students/{studentId}/remove`
+- **接口路径**：`/api/teacher/{id}/group/remove-student`
 - **请求方法**：DELETE
 - **接口说明**：教师用户将某个学生移出指定小组。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
-    - 路径参数（Path Variable）：`groupId` - 小组的唯一标识符
-    - 路径参数（Path Variable）：`studentId` - 学生的唯一标识符
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Path Variable）：`groupId` - 小组的唯一标识符
+    - 查询参数（Path Variable）：`studentId` - 学生的唯一标识符
   - 请求体：无
 
 - **响应说明**：
@@ -2123,7 +2121,7 @@
 
 
 
-### Get Applications
+### Get Applications `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-applications`
 - **请求方法**：GET
@@ -2166,7 +2164,7 @@
 
 
 
-### Allow Application
+### Allow Application `finished`
 
 - **接口路径**：`/api/teacher/{id}/allow-application`
 - **请求方法**：GET
@@ -2263,7 +2261,7 @@
     }
     ```
 
-### Delete Question
+### Delete Question `finished`
 
 - **接口路径**：`/api/teacher/delete-question/{id}`
 - **请求方法**：DELETE
@@ -2271,7 +2269,7 @@
 
 - **请求说明**：
   - **路径参数**：
-    - `id`：题目的唯一标识符。
+    - `id`：题目的唯一标识符(bodyId)。
 
 - **响应说明**：
   - **响应格式**：JSON
@@ -2287,9 +2285,6 @@
       "message": "删除失败"
     }
     ```
-
-
-
 
 
 
@@ -2703,7 +2698,7 @@
 
 
 
-### Get School Administrator Accounts
+### Get School Administrator Accounts `finished`
 
 - **接口路径**：`/api/system-admin/get-school-admin-accounts`
 - **请求方法**：GET
@@ -2803,6 +2798,8 @@
       "message": "删除失败"
     }
     ```
+
+
 
 
 ### Change Password `finished`
@@ -2941,13 +2938,13 @@
 
 ### Delete Teacher `finished`
 
-- **接口路径**：`/api/school-admin/{id}/delete-teacher/{teacherid}`
+- **接口路径**：`/api/school-admin/{id}/delete-teacher/{teacherId}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的老师账号。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`teacherid` - 教师账号的唯一标识符
+    - 路径参数（Path Variable）：`teacherId` - 教师账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -3000,13 +2997,13 @@
 
 ### Query Teacher `finished`
 
-- **接口路径**：`/api/school-admin/{id}/query-teacher/{teacherid}`
+- **接口路径**：`/api/school-admin/{id}/query-teacher/{teacherId}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定老师账号信息。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`teacherid` - 老师账号的唯一标识符
+    - 路径参数（Path Variable）：`teacherId` - 老师账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -3069,13 +3066,13 @@
 
 ### Delete Student `finished`
 
-- **接口路径**：`/api/school-admin/{id}/delete-student/{studentid}`
+- **接口路径**：`/api/school-admin/{id}/delete-student/{studentId}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的学生账号。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`studentid` - 学生账号的唯一标识符
+    - 路径参数（Path Variable）：`studentId` - 学生账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -3129,13 +3126,13 @@
 
 ### Query Student `finished`
 
-- **接口路径**：`/api/school-admin/{id}/query-student/{studentid}`
+- **接口路径**：`/api/school-admin/{id}/query-student/{studentId}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定学生账号信息。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`studentid` - 学生账号的唯一标识符
+    - 路径参数（Path Variable）：`studentId` - 学生账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -3269,6 +3266,188 @@
     }
     ```
 
+### Send Verification Code `finished`
+
+- **接口路径**：`/api/school-admin/{id}/send-verification-code`
+- **请求方法**：POST
+- **接口说明**：学校管理员用户通过邮箱发送验证码。
+- **请求说明**
+  
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "email" : "string" // 学校管理员的邮箱地址
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "验证码已发送",
+      "verificationCode" : "string",
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "String", 
+      "verificationCode" : null
+    }
+    ```
+
+### Bind Email `finished`
+
+- **接口路径**：`/api/school-admin/{id}/bind-email`
+- **请求方法**：POST
+- **接口说明**：学校管理员用户绑定邮箱。
+- **请求说明**
+  
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数：`id`  学校管理员的id
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "email" : "string" // 教师的邮箱地址
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "成功",
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    
+    ```json
+    {
+      "message" : "String", // 授权码不可用 or 邮箱已注册 
+    }
+    ```
+
+### Update Username  `finished`
+
+- **接口路径**：`/api/school-admin/{id}/update-username`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改用户名。
+- **请求说明**
+  
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```
+### Update Name
+
+- **接口路径**：`/api/school-admin/{id}/update-name`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改负责人名字。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```
+
+### Update Username 
+
+- **接口路径**：`/api/school-admin/{id}/update-username`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改用户名。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "username" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```
+### Update Name
+
+- **接口路径**：`/api/school-admin/{id}/update-name`
+- **请求方法**：PUT
+- **接口说明**：学校管理员账号修改负责人名字。
+- **请求说明**
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
+    - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "name" : "string"
+    }
+    ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "string"
+    }
+    ```    
 
 ### Change Password
 
@@ -3307,7 +3486,7 @@
 
 ### 图片上传接口
 
-- **接口路径**：`/uploads/image`
+- **接口路径**：`/api/uploads/image`
 - **请求方法**：POST
 - **接口说明**：上传图片，支持头像和内容两种类型的图片上传。
 - **请求说明**：
@@ -3338,7 +3517,7 @@
 
 ### 获取图片接口
 
-- **接口路径**：`/uploads/images/{type}/{imageName}`
+- **接口路径**：`/api/uploads/images/{type}/{imageName}`
 - **请求方法**：GET
 - **接口说明**：根据类型和图片名获取已上传的图片。
 - **请求说明**：
@@ -3347,7 +3526,7 @@
     - `imageName`：图片文件名
   - 请求示例：
     ```bash
-    GET /uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    GET /api/uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
     ```
 - **响应说明**：
   - 响应格式：图片文件

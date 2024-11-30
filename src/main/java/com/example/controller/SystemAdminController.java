@@ -1,9 +1,10 @@
 package com.example.controller;
 
-import com.example.dto.request.CreateKnowledgePointRequest;
+import com.example.dto.request.SystemAdminController.CreateKnowledgePointRequest;
 import com.example.dto.request.SystemAdminController.SystemAdminChangePasswordRequest;
-import com.example.dto.request.SystemAdminLoginRequest;
+import com.example.dto.request.SystemAdminController.SystemAdminLoginRequest;
 import com.example.dto.response.*;
+import com.example.dto.response.SystemAdminController.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.user.SystemAdmin;
@@ -13,7 +14,6 @@ import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SystemAdminServiceImpl;
-import org.springframework.beans.StandardBeanInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
