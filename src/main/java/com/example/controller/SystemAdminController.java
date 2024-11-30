@@ -1,10 +1,10 @@
 package com.example.controller;
 
-import com.example.dto.request.SystemAdminController.CreateKnowledgePointRequest;
-import com.example.dto.request.SystemAdminController.SystemAdminChangePasswordRequest;
-import com.example.dto.request.SystemAdminController.SystemAdminLoginRequest;
+import com.example.dto.request.system.CreateKnowledgePointRequest;
+import com.example.dto.request.system.SystemAdminChangePasswordRequest;
+import com.example.dto.request.system.SystemAdminLoginRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.SystemAdminController.*;
+import com.example.dto.response.system.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.user.SystemAdmin;
