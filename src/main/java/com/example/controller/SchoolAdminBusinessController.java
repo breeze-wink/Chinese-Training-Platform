@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.response.*;
+import com.example.dto.response.SchoolAdminController.*;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.user.AuthorizationCode;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -97,20 +97,20 @@ public class SchoolAdminBusinessController {
         }
     }
 
-    @DeleteMapping("{id}/delete-teacher/{teacherid}")
-    public ResponseEntity<Message> deleteTeacher(@PathVariable Long id, @PathVariable Long teacherid) {
+    @DeleteMapping("{id}/delete-teacher/{teacherId}")
+    public ResponseEntity<Message> deleteTeacher(@PathVariable Long id, @PathVariable Long teacherId) {
         Message response = new Message();
         SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        Teacher teacher = teacherService.getTeacherById(teacherid);
+        Teacher teacher = teacherService.getTeacherById(teacherId);
         if(!Objects.equals(schoolAdmin.getSchoolId(), teacher.getSchoolId())){
             response.setMessage("该教师不是该学校教师");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        List<Clazz> classes = classService.getClassesByTeacherId(teacherid);
+        List<Clazz> classes = classService.getClassesByTeacherId(teacherId);
         for (Clazz clazz : classes) {
             classService.removeClass(clazz.getId());
         }
-        int result = teacherService.removeTeacher(teacherid);
+        int result = teacherService.removeTeacher(teacherId);
         if(result != 0){
             response.setMessage("教师账号删除成功");
             return ResponseEntity.ok(response);
@@ -120,18 +120,18 @@ public class SchoolAdminBusinessController {
         }
     }
 
-    @DeleteMapping ("/{id}/delete-student/{studentid}")
-    public ResponseEntity<Message> deleteStudent(@PathVariable Long id, @PathVariable Long studentid) {
+    @DeleteMapping ("/{id}/delete-student/{studentId}")
+    public ResponseEntity<Message> deleteStudent(@PathVariable Long id, @PathVariable Long studentId) {
         Message response = new Message();
         SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        Student student = studentService.getStudentById(studentid);
+        Student student = studentService.getStudentById(studentId);
         if(!Objects.equals(schoolAdmin.getSchoolId(), student.getSchoolId())){
             response.setMessage("该学生不是该学校学生");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentid);
+        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
         for (ClassStudent classStudent : classStudents) {
-            classService.removeStudentFromClass(classStudent.getClassId(), studentid);
+            classService.removeStudentFromClass(classStudent.getClassId(), studentId);
         }
         response.setMessage("学生账号删除成功");
         return ResponseEntity.ok(response);
@@ -179,11 +179,11 @@ public class SchoolAdminBusinessController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}/query-student/{studentid}")
-    public ResponseEntity<SchoolAdminQueryStudent> queryStudent(@PathVariable Long id, @PathVariable Long studentid) {
+    @GetMapping("/{id}/query-student/{studentId}")
+    public ResponseEntity<SchoolAdminQueryStudent> queryStudent(@PathVariable Long id, @PathVariable Long studentId) {
         SchoolAdminQueryStudent response = new SchoolAdminQueryStudent();
         SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        Student student = studentService.getStudentById(studentid);
+        Student student = studentService.getStudentById(studentId);
         if(!Objects.equals(schoolAdmin.getSchoolId(), student.getSchoolId())){
             response.setMessage("该学生不是该学校学生");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -200,11 +200,11 @@ public class SchoolAdminBusinessController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}/query-teacher/{teacherid}")
-    public ResponseEntity<SchoolAdminQueryTeacher> queryTeacher(@PathVariable Long id, @PathVariable Long teacherid) {
+    @GetMapping("/{id}/query-teacher/{teacherId}")
+    public ResponseEntity<SchoolAdminQueryTeacher> queryTeacher(@PathVariable Long id, @PathVariable Long teacherId) {
         SchoolAdminQueryTeacher response = new SchoolAdminQueryTeacher();
         SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        Teacher teacher = teacherService.getTeacherById(teacherid);
+        Teacher teacher = teacherService.getTeacherById(teacherId);
         if(!Objects.equals(schoolAdmin.getSchoolId(), teacher.getSchoolId())){
             response.setMessage("该教师不是该学校教师");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

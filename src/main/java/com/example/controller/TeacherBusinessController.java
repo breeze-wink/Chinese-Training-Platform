@@ -1,11 +1,11 @@
 package com.example.controller;
 
-import com.example.dto.request.CreateGroupRequest;
-import com.example.dto.request.TeacherCreateClassRequest;
-import com.example.dto.request.UpdateClassRequest;
-import com.example.dto.request.UploadQuestionRequest;
+import com.example.dto.request.TeacherController.CreateGroupRequest;
+import com.example.dto.request.TeacherController.TeacherCreateClassRequest;
+import com.example.dto.request.TeacherController.UpdateClassRequest;
+import com.example.dto.request.TeacherController.UploadQuestionRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.TeacherBusinessController.GetApplicationsResponse;
+import com.example.dto.response.TeacherController.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
@@ -370,16 +370,18 @@ public class TeacherBusinessController {
         question.setBodyId(questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
-
-        question.setAnswer(questionInfo.getAnswer() + "$$" + questionInfo.getAnalysis());
-
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
         question.setCreatorId(id);
 
         StringBuilder resAnswer = new StringBuilder();
         if(questionInfo.getAnswer() != null && (!questionInfo.getAnswer().isEmpty())){
             for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
-                resAnswer.append(questionInfo.getAnswer().get(i));
+                if(questionInfo.getAnswer().get(i) == null || questionInfo.getAnswer().get(i).isEmpty()){
+                    resAnswer.append(" ");
+                }
+                else{
+                    resAnswer.append(questionInfo.getAnswer().get(i));
+                }
                 if (i != questionInfo.getAnswer().size() - 1) {
                     resAnswer.append("##");
                 }
@@ -387,7 +389,7 @@ public class TeacherBusinessController {
 
         }
         else{
-            resAnswer.append("无");
+            resAnswer.append(" ");
         }
         question.setAnswer(resAnswer + "$$" + questionInfo.getAnalysis());
 
@@ -396,6 +398,9 @@ public class TeacherBusinessController {
 
             for (int i = 0; i < questionInfo.getChoices().size(); i ++) {
                 choices.append(questionInfo.getChoices().get(i));
+                if(questionInfo.getChoices().get(i) == null || questionInfo.getChoices().get(i).isEmpty()){
+                    choices.append(" ");
+                }
                 if (i != questionInfo.getChoices().size() - 1) {
                     choices.append("$$");
                 }

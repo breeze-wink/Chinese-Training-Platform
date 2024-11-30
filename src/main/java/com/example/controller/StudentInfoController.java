@@ -1,8 +1,11 @@
 package com.example.controller;
 
 
-import com.example.dto.request.*;
+import com.example.dto.request.StudentController.*;
 import com.example.dto.response.*;
+import com.example.dto.response.StudentController.StudentChangeEmailResponse;
+import com.example.dto.response.StudentController.StudentChangeEmailVerificationResponse;
+import com.example.dto.response.StudentController.StudentEditInformationResponse;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.JoinClass;
@@ -12,7 +15,6 @@ import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.JoinClassService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
-import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
