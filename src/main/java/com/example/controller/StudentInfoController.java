@@ -1,11 +1,11 @@
 package com.example.controller;
 
 
-import com.example.dto.request.StudentController.*;
+import com.example.dto.request.student.*;
 import com.example.dto.response.*;
-import com.example.dto.response.StudentController.StudentChangeEmailResponse;
-import com.example.dto.response.StudentController.StudentChangeEmailVerificationResponse;
-import com.example.dto.response.StudentController.StudentEditInformationResponse;
+import com.example.dto.response.student.StudentChangeEmailResponse;
+import com.example.dto.response.student.StudentChangeEmailVerificationResponse;
+import com.example.dto.response.student.StudentEditInformationResponse;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.JoinClass;

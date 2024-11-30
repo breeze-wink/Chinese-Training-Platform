@@ -1,8 +1,8 @@
 package com.example.controller;
 
-import com.example.dto.request.StudentController.*;
+import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
-import com.example.dto.response.StudentController.*;
+import com.example.dto.response.student.*;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Practice;
 import com.example.model.question.PracticeQuestion;

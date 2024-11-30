@@ -1,12 +1,12 @@
 package com.example.controller;
 
 import com.example.dto.request.*;
-import com.example.dto.request.TeacherController.*;
+import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
-import com.example.dto.response.TeacherController.TeacherInfoResponse;
-import com.example.dto.response.TeacherController.TeacherLoginResponse;
-import com.example.dto.response.TeacherController.TeacherRegisterResponse;
-import com.example.dto.response.TeacherController.TeacherVerifyResponse;
+import com.example.dto.response.teacher.TeacherInfoResponse;
+import com.example.dto.response.teacher.TeacherLoginResponse;
+import com.example.dto.response.teacher.TeacherRegisterResponse;
+import com.example.dto.response.teacher.TeacherVerifyResponse;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.Teacher;
 import com.example.service.user.AuthorizationCodeService;

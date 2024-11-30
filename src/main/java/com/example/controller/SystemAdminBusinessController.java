@@ -1,10 +1,10 @@
 package com.example.controller;
 
 
-import com.example.dto.request.SystemAdminController.CreateSchoolAdminRequest;
+import com.example.dto.request.system.CreateSchoolAdminRequest;
 import com.example.dto.response.Message;
-import com.example.dto.response.SystemAdminController.QuestionsResponse;
-import com.example.dto.response.SystemAdminController.GetSchoolAdminAccountsResponse;
+import com.example.dto.response.system.QuestionsResponse;
+import com.example.dto.response.system.GetSchoolAdminAccountsResponse;
 import com.example.model.question.Question;
 import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
