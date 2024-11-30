@@ -1,13 +1,14 @@
 package com.example.controller;
 
-import com.example.dto.response.SchoolEmailVerifyResponse;
-import com.example.dto.request.*;
-import com.example.dto.request.SchoolAdminManagementController.SchoolAdminChangePasswordRequest;
+import com.example.dto.request.SchoolAdminController.SchoolAdminBindEmailRequest;
+import com.example.dto.request.SchoolAdminController.SchoolAdminLoginRequest;
+import com.example.dto.response.SchoolAdminController.SchoolEmailVerifyResponse;
+import com.example.dto.request.SchoolAdminController.SchoolAdminChangePasswordRequest;
 import com.example.dto.request.UpdateNameRequest;
 import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.response.Message;
-import com.example.dto.response.SchoolAdminInfoResponse;
-import com.example.dto.response.SchoolAdminLoginResponse;
+import com.example.dto.response.SchoolAdminController.SchoolAdminInfoResponse;
+import com.example.dto.response.SchoolAdminController.SchoolAdminLoginResponse;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;

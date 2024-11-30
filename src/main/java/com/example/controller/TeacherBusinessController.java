@@ -1,11 +1,11 @@
 package com.example.controller;
 
-import com.example.dto.request.CreateGroupRequest;
-import com.example.dto.request.TeacherCreateClassRequest;
-import com.example.dto.request.UpdateClassRequest;
-import com.example.dto.request.UploadQuestionRequest;
+import com.example.dto.request.TeacherController.CreateGroupRequest;
+import com.example.dto.request.TeacherController.TeacherCreateClassRequest;
+import com.example.dto.request.TeacherController.UpdateClassRequest;
+import com.example.dto.request.TeacherController.UploadQuestionRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.TeacherBusinessController.GetApplicationsResponse;
+import com.example.dto.response.TeacherController.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;

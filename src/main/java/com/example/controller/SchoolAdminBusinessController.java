@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.response.*;
+import com.example.dto.response.SchoolAdminController.*;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.user.AuthorizationCode;
