@@ -2938,13 +2938,13 @@
 
 ### Delete Teacher `finished`
 
-- **接口路径**：`/api/school-admin/{id}/delete-teacher/{teacherid}`
+- **接口路径**：`/api/school-admin/{id}/delete-teacher/{teacherId}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的老师账号。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`teacherid` - 教师账号的唯一标识符
+    - 路径参数（Path Variable）：`teacherId` - 教师账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -2997,13 +2997,13 @@
 
 ### Query Teacher `finished`
 
-- **接口路径**：`/api/school-admin/{id}/query-teacher/{teacherid}`
+- **接口路径**：`/api/school-admin/{id}/query-teacher/{teacherId}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定老师账号信息。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`teacherid` - 老师账号的唯一标识符
+    - 路径参数（Path Variable）：`teacherId` - 老师账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -3066,13 +3066,13 @@
 
 ### Delete Student `finished`
 
-- **接口路径**：`/api/school-admin/{id}/delete-student/{studentid}`
+- **接口路径**：`/api/school-admin/{id}/delete-student/{studentId}`
 - **请求方法**：DELETE
 - **接口说明**：学校管理员删除指定的学生账号。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`studentid` - 学生账号的唯一标识符
+    - 路径参数（Path Variable）：`studentId` - 学生账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -3126,13 +3126,13 @@
 
 ### Query Student `finished`
 
-- **接口路径**：`/api/school-admin/{id}/query-student/{studentid}`
+- **接口路径**：`/api/school-admin/{id}/query-student/{studentId}`
 - **请求方法**：GET
 - **接口说明**：学校管理员查询指定学生账号信息。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学校管理员账号的唯一标识符
-    - 路径参数（Path Variable）：`studentid` - 学生账号的唯一标识符
+    - 路径参数（Path Variable）：`studentId` - 学生账号的唯一标识符
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
