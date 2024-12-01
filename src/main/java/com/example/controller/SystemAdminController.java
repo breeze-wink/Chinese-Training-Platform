@@ -259,6 +259,7 @@ public class SystemAdminController {
         }
 
         response.getData().setDescription(knowledgePoint.getDescription());
+        response.getData().setType(knowledgePoint.getType());
         response.getData().setName(knowledgePoint.getName());
 
         response.setMessage("知识点查询成功");
