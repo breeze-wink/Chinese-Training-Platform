@@ -13,6 +13,7 @@ public class QueryKnowledgePointResponse {
     @Setter
     public static class KnowledgePointInfo {
         private String name;
+        private String type;
         private String description;
     }
 
