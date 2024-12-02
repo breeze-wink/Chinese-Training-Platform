@@ -984,45 +984,14 @@
         ```
 
 
-### Get Study Hour
 
-- **接口路径**：`/api/student/{id}/get-studyhour`
-- **请求方法**：GET
-- **接口说明**：学生获取自己的学习时长和在班里的占比。
-- **请求说明**：
-
-- 请求参数：
-    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
-- 请求体：无
-
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "学生学习时长和其时长在班里的占比获取成功",
-      "data": [
-      {
-         "hours": "double", 例：156.3
-         "percentage": "double", 例：95%
-      },
-     ]
-    }
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "学生学习时长和其时长在班里的占比排名失败",
-      "data": null
-    }
-    ```
   
 ### Get Average Homework Score and Class Rank
 
-- **接口路径**：`/api/student/{id}/get-scoreRank`
+- **接口路径**：`/api/student/{id}/get-avg-score`
 - **请求方法**：GET
 - **接口说明**：学生获取自己的作业平均分和班级排名。
 - **请求说明**：
-
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学生的唯一标识符
   - 请求体：无
@@ -1033,16 +1002,10 @@
     ```json
     {
       "message": "学生作业平均分和班级排名获取成功",
-      "data": [
-      {
-         "averageHomeworkScore": "double", // 作业平均分,例84
-         "classRank": "long"// 班级排名，例6
-      },
-      {
-         "averageHomeworkScore": "double", // 作业平均分
-         "classRank": "long"// 班级排名
-      },
-     ]
+      "data": {
+          "averageHomeworkScore": "double", // 作业平均分,例84
+          "classRank": "long"// 班级排名，例6
+      }
     }
 - **失败响应** (`400 Bad Request`):
   ```json
@@ -1052,34 +1015,37 @@
   }
   ```
 
-### Get Five Dimensional Scores
-- **接口路径**：`/api/student/{id}/get-five-dimensional-scores`
+### Get Multidimensional Scores
+- **接口路径**：`/api/student/{id}/get-multidimensional-scores`
 - **请求方法**：GET
-- **接口说明**：学生获取自己的五维数据得分率。
+- **接口说明**：学生获取自己的各类题目得分率。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学生的唯一标识符
   - 请求体：无
-
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "五维数据得分率获取成功",
-      "data": {
-        "accumulationAndApplication": "double", // 积累与运用得分率
-        "composition": "double", // 作文得分率
-        "classicReading": "double", // 名著阅读得分率
-        "ancientPoetryReading": "double", // 古诗文阅读得分率
-        "modernReading": "double" // 现代文阅读得分率
-      }
+      "message": "各类题目得分率获取成功",
+      "data": [
+        {
+          "name": "string",
+          "score": "double"
+        },
+        {
+          "name": "string",
+          "score": "double"
+        },
+        ...
+      ]
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "获取五维数据得分率失败",
+      "message": "得分率获取失败",
       "data": null
     }
     ```
@@ -1093,41 +1059,31 @@
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 学生的唯一标识符
   - 请求体：无
-
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "学生短板得分获取成功",
+      "message": "学生短板得分率获取成功",
       "data": [
         {
-          "weaknessName": "积累与运用", // 短板名称
+          "type": "string", //题型（知识点大类）
+          "weaknessName": "string", // 短板名称（知识点小类）
           "weaknessScore": "double" // 短板得分率
         },
         {
-          "weaknessName": "现代文阅读", // 短板名称
-          "weaknessScore": "double" // 短板得分率
+          "type": "string",
+          "weaknessName": "string",
+          "weaknessScore": "double"
         },
-        {
-          "weaknessName": "古诗文阅读", // 短板名称
-          "weaknessScore": "double" // 短板得分率
-        },
-        {
-          "weaknessName": "名著阅读", // 短板名称
-          "weaknessScore": "double" // 短板得分率
-        },
-        {
-          "weaknessName": "作文", // 短板名称
-          "weaknessScore": "double" // 短板得分率
-        }
+        ...
       ]
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "获取学生短板得分失败",
+      "message": "获取学生短板得分率失败",
       "data": null
     }
     ```
@@ -1149,14 +1105,15 @@
     {
       "message": "学生历史分数波动数据获取成功",
       "data": [
-         {
-            "date": "string", //作业的起止时间？？？，HOW DO YOU THINK
-            "score": "double"
-         },
         {
-            "date": "string", //作业的起止时间？？？
-            "score": "double"
-         },
+          "date": "string", //assignmentEndTime
+          "score": "double"
+        },
+        {
+          "date": "string",
+          "score": "double"
+        },
+        ...
       ]
     }
     ```
