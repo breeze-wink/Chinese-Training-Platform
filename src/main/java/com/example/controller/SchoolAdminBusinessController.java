@@ -130,9 +130,12 @@ public class SchoolAdminBusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
-        for (ClassStudent classStudent : classStudents) {
+        if(!classStudents.isEmpty()){
+            ClassStudent classStudent = classStudents.get(0);
             classService.removeStudentFromClass(classStudent.getClassId(), studentId);
         }
+        student.setSchoolId(null);
+        studentService.updateStudent(student);
         response.setMessage("学生账号删除成功");
         return ResponseEntity.ok(response);
     }

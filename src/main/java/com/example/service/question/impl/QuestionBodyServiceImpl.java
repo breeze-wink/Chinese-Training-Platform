@@ -48,4 +48,10 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     public int deleteQuestionBody(Long id) {
         return questionBodyMapper.delete(id);
     }
+
+    @Override
+    @Transactional
+    public List<QuestionBody> getQuestionBodiesByType(String type) {
+        return questionBodyMapper.getQuestionBodiesByType(type);
+    }
 }

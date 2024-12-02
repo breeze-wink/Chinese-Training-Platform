@@ -573,14 +573,26 @@
 - 请求体(`JSON` 格式)：
   ```json
   {
-    "num" : "int",
     "name" : "string",
-    "data": [
+    "knowledgePoints": [
       {
-        "knowledgePointId": "long"
+        "knowledgePointId": "long",
+        "num": int
       },
       {
-        "knowledgePointId": "long"
+        "knowledgePointId": "long",
+        "num": int
+      },
+      ...
+    ],
+    "questionBodyTypes": [
+      {
+        "type": "string",
+        "num": int
+      },
+      {
+        "type": "string",
+        "num": int
       },
       ...
     ]
@@ -2776,7 +2788,7 @@
 
 
 
-### Delete School Administrator Account
+### Delete School Administrator Account `finished`
 
 - **接口路径**：`/api/system-admin/delete-school-admin-account/{id}`
 - **请求方法**：DELETE

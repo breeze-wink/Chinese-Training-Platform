@@ -28,4 +28,7 @@ public interface QuestionBodyMapper {
     // 删除记录
     @Delete("DELETE FROM question_body WHERE id = #{id}")
     int delete(Long id);
+
+    @Select("SELECT * FROM question_body WHERE type = #{type}")
+    List<QuestionBody> getQuestionBodiesByType(String type);
 }
