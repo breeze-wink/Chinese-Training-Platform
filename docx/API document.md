@@ -859,6 +859,34 @@
       ```
 
 
+### Delete Practice `finished`
+- **接口路径**：`/api/student/{id}/delete-practice`
+- **请求方法**：`DELETE`
+- **接口说明**：学生用户删除未完成的练习。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+
+```json
+{
+  "practiceId" : "long"
+}
+```
+- **响应说明**
+  - 响应格式: `JSON`
+    - **成功响应** (`200 OK`):
+      ```json
+      {
+        "message" : "练习删除成功",
+      }
+      ```
+    - **失败响应** (`400 Bad Request`):
+      ```json
+      {
+        "message": "练习删除失败",
+      }
+      ```
 
 ### Get Unfinished Assignment List
 - **接口路径**：`/api/student/{id}/get-unfinished-assignment-list`
@@ -944,7 +972,189 @@
         ```
 
 
+### Get Study Hour
 
+- **接口路径**：`/api/student/{id}/get-studyhour`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的学习时长和在班里的占比。
+- **请求说明**：
+
+- 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生学习时长和其时长在班里的占比获取成功",
+      "data": [
+      {
+         "hours": "double", 例：156.3
+         "percentage": "double", 例：95%
+      },
+     ]
+    }
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "学生学习时长和其时长在班里的占比排名失败",
+      "data": null
+    }
+    ```
+  
+### Get Average Homework Score and Class Rank
+
+- **接口路径**：`/api/student/{id}/get-scoreRank`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的作业平均分和班级排名。
+- **请求说明**：
+
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生作业平均分和班级排名获取成功",
+      "data": [
+      {
+         "averageHomeworkScore": "double", // 作业平均分,例84
+         "classRank": "long"// 班级排名，例6
+      },
+      {
+         "averageHomeworkScore": "double", // 作业平均分
+         "classRank": "long"// 班级排名
+      },
+     ]
+    }
+- **失败响应** (`400 Bad Request`):
+  ```json
+  {
+    "message": "获取作业平均分和班级排名失败",
+    "data": null
+  }
+  ```
+
+### Get Five Dimensional Scores
+- **接口路径**：`/api/student/{id}/get-five-dimensional-scores`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的五维数据得分率。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "五维数据得分率获取成功",
+      "data": {
+        "accumulationAndApplication": "double", // 积累与运用得分率
+        "composition": "double", // 作文得分率
+        "classicReading": "double", // 名著阅读得分率
+        "ancientPoetryReading": "double", // 古诗文阅读得分率
+        "modernReading": "double" // 现代文阅读得分率
+      }
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "获取五维数据得分率失败",
+      "data": null
+    }
+    ```
+
+### Get Weakness Scores
+
+- **接口路径**：`/api/student/{id}/get-weakness-scores`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的短板得分，包括短板名称和得分率。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生短板得分获取成功",
+      "data": [
+        {
+          "weaknessName": "积累与运用", // 短板名称
+          "weaknessScore": "double" // 短板得分率
+        },
+        {
+          "weaknessName": "现代文阅读", // 短板名称
+          "weaknessScore": "double" // 短板得分率
+        },
+        {
+          "weaknessName": "古诗文阅读", // 短板名称
+          "weaknessScore": "double" // 短板得分率
+        },
+        {
+          "weaknessName": "名著阅读", // 短板名称
+          "weaknessScore": "double" // 短板得分率
+        },
+        {
+          "weaknessName": "作文", // 短板名称
+          "weaknessScore": "double" // 短板得分率
+        }
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "获取学生短板得分失败",
+      "data": null
+    }
+    ```
+
+### Get Score Fluctuations
+
+- **接口路径**：`/api/student/{id}/score-fluctuations`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的历史分数波动数据。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生历史分数波动数据获取成功",
+      "data": [
+         {
+            "date": "string", //作业的起止时间？？？，HOW DO YOU THINK
+            "score": "double"
+         },
+        {
+            "date": "string", //作业的起止时间？？？
+            "score": "double"
+         },
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "获取历史分数波动数据失败",
+      "data": null
+    }
+    ```
 
 
 ## Teacher
