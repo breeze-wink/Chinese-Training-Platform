@@ -2,6 +2,7 @@ package com.example.util;
 
 import com.example.model.user.BaseUser;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -29,12 +30,20 @@ public class JwtTokenUtil {
 
     // 从 Token 中获取用户名
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims;
+        SecretKey key = SECRET_KEY;
+        try {
+        claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+        } catch (ExpiredJwtException e) {
+            claims = e.getClaims();
+        }
+
         String subject = claims.getSubject();
+
         return subject.split(":")[0]; // 返回复合标识符中的username部分
     }
 
