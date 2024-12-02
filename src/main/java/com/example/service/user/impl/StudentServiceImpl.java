@@ -42,6 +42,11 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public Student getStudentByUsername(String username) {
+        return studentMapper.findByUsername(username);
+    }
+
+    @Override
     public List<Student> getAllStudents() {
         return studentMapper.selectAll();
     }

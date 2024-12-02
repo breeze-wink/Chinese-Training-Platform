@@ -53,4 +53,11 @@ public class SystemAdminServiceImpl implements SystemAdminService {
             return null;
         return systemAdmin;
     }
+
+    @Override
+    public SystemAdmin getSystemAdminByUsername(String username) {
+        return systemAdminMapper.findByUsername(username);
+    }
+
+
 }

@@ -14,6 +14,7 @@ import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SystemAdminServiceImpl;
+import com.example.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -34,16 +35,18 @@ import java.util.List;
 public class SystemAdminController {
     private final SystemAdminService systemAdminService;
     private final CourseStandardService courseStandardService;
-
     private final KnowledgePointService knowledgePointService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public SystemAdminController(SystemAdminServiceImpl systemAdminService,
                                  CourseStandardServiceImpl courseStandardService,
-                                 KnowledgePointServiceImpl knowledgePointService) {
+                                 KnowledgePointServiceImpl knowledgePointService,
+                                 JwtTokenUtil jwtTokenUtil) {
         this.systemAdminService = systemAdminService;
         this.courseStandardService = courseStandardService;
         this.knowledgePointService = knowledgePointService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/login")
@@ -55,6 +58,8 @@ public class SystemAdminController {
 
         SystemAdminLoginResponse response = new SystemAdminLoginResponse();
         if (admin != null) {
+            String token = jwtTokenUtil.generateToken(admin);
+            response.setToken(token);
             response.setMessage("success");
             response.setId(admin.getId());
             return ResponseEntity.ok(response);

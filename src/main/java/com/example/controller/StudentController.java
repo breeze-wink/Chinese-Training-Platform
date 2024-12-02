@@ -13,6 +13,7 @@ import com.example.service.essay.EssayService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
 import com.example.service.utils.EmailService;
+import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -35,6 +36,7 @@ public class StudentController {
     private final EssayService essayService;
     private final ClassStudentService classStudentService;
     private final ClassService classService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public StudentController(StudentService studentService,
@@ -42,13 +44,15 @@ public class StudentController {
                              SchoolService schoolService,
                              EssayService essayService,
                              ClassStudentService classStudentService,
-                             ClassService classService) {
+                             ClassService classService,
+                             JwtTokenUtil jwtTokenUtil) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.schoolService = schoolService;
         this.essayService = essayService;
         this.classStudentService = classStudentService;
         this.classService = classService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/login")
@@ -60,11 +64,13 @@ public class StudentController {
 
         StudentLoginResponse response = new StudentLoginResponse();
         if (student != null) {
+            // 生成JWT
+            String jwt = jwtTokenUtil.generateToken(student);
+            response.setToken(jwt);
             response.setMessage("success");
             response.setId(student.getId());
             return ResponseEntity.ok(response);
-        }
-        else {
+        } else {
             response.setMessage("用户名或密码错误");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }

@@ -17,6 +17,7 @@ import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
 
 import com.example.service.utils.EmailService;
+import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,20 @@ public class SchoolAdminManagementController {
     private final SchoolService schoolService;
     private final AuthorizationCodeService authorizationCodeService;
 
+    private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
 
     @Autowired
     public SchoolAdminManagementController(SchoolAdminService schoolAdminService,
                                            SchoolService schoolService,
                                            AuthorizationCodeService authorizationCodeService,
-                                           EmailService emailService) {
+                                           EmailService emailService,
+                                           JwtTokenUtil jwtTokenUtil) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
         this.authorizationCodeService = authorizationCodeService;
         this.emailService = emailService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/login")
@@ -53,6 +57,8 @@ public class SchoolAdminManagementController {
 
         if (admin != null) {
             SchoolAdminLoginResponse response = new SchoolAdminLoginResponse();
+            String jwt = jwtTokenUtil.generateToken(admin);
+            response.setToken(jwt);
             response.setMessage("success");
             response.setId(admin.getId());
             return ResponseEntity.ok(response);
