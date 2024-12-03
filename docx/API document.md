@@ -986,7 +986,7 @@
 
 
   
-### Get Average Homework Score and Class Rank
+### Get Average Homework Score and Class Rank `finished`
 
 - **接口路径**：`/api/student/{id}/get-avg-score`
 - **请求方法**：GET
@@ -1015,7 +1015,7 @@
   }
   ```
 
-### Get Multidimensional Scores
+### Get Multidimensional Scores `finished`
 - **接口路径**：`/api/student/{id}/get-multidimensional-scores`
 - **请求方法**：GET
 - **接口说明**：学生获取自己的各类题目得分率。
@@ -1050,7 +1050,7 @@
     }
     ```
 
-### Get Weakness Scores
+### Get Weakness Scores `finished`
 
 - **接口路径**：`/api/student/{id}/get-weakness-scores`
 - **请求方法**：GET
@@ -1088,7 +1088,7 @@
     }
     ```
 
-### Get Score Fluctuations
+### Get Score Fluctuations `finished`
 
 - **接口路径**：`/api/student/{id}/score-fluctuations`
 - **请求方法**：GET
@@ -1106,7 +1106,7 @@
       "message": "学生历史分数波动数据获取成功",
       "data": [
         {
-          "date": "string", //assignmentEndTime
+          "date": "string", //提交时间
           "score": "double"
         },
         {

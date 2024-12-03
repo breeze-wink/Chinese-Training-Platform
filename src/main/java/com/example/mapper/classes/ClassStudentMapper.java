@@ -21,9 +21,11 @@ public interface ClassStudentMapper {
     List<ClassStudent> selectByClassId(Long classId);
 
     @Select("SELECT * FROM class_student WHERE studentId = #{studentId}")
-    List<ClassStudent> selectByStudentId(Long studentId);
+    List<ClassStudent> selectClassStudentsByStudentId(Long studentId);
 
     @Delete("DELETE FROM class_student WHERE classId = #{classID}")
     int removeClass(Long classId);
 
+    @Select("SELECT * FROM class_student WHERE studentId = #{studentId}")
+    ClassStudent selectByStudentId(Long studentId);
 }
