@@ -3,18 +3,33 @@ package com.example.controller;
 import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
 import com.example.dto.response.student.*;
+import com.example.model.classes.ClassStudent;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Practice;
 import com.example.model.question.PracticeQuestion;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
+import com.example.model.submission.AssignmentSubmission;
 import com.example.model.submission.PracticeAnswer;
+import com.example.model.user.StatsStudent;
+import com.example.service.classes.ClassStudentService;
+import com.example.service.classes.impl.ClassStudentServiceImpl;
 import com.example.service.course.KnowledgePointService;
+import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.question.PracticeQuestionService;
 import com.example.service.question.PracticeService;
 import com.example.service.question.QuestionBodyService;
 import com.example.service.question.QuestionService;
+import com.example.service.question.impl.PracticeQuestionServiceImpl;
+import com.example.service.question.impl.PracticeServiceImpl;
+import com.example.service.question.impl.QuestionBodyServiceImpl;
+import com.example.service.question.impl.QuestionServiceImpl;
+import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.PracticeAnswerService;
+import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
+import com.example.service.submission.impl.PracticeAnswerServiceImpl;
+import com.example.service.user.StatsStudentService;
+import com.example.service.user.impl.StatsStudentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/student")
@@ -36,14 +48,20 @@ public class StudentBusinessController {
     private final PracticeQuestionService practiceQuestionService;
     private final PracticeAnswerService practiceAnswerService;
     private final QuestionBodyService questionBodyService;
+    private final StatsStudentService statsStudentService;
+    private final ClassStudentService classStudentService;
+    private final AssignmentSubmissionService assignmentSubmissionService;
 
     @Autowired
-    public StudentBusinessController (PracticeService practiceService,
-                                      KnowledgePointService knowledgePointService,
-                                      QuestionService questionService,
-                                      PracticeQuestionService practiceQuestionService,
-                                      PracticeAnswerService practiceAnswerService,
-                                      QuestionBodyService questionBodyService
+    public StudentBusinessController (PracticeServiceImpl practiceService,
+                                      KnowledgePointServiceImpl knowledgePointService,
+                                      QuestionServiceImpl questionService,
+                                      PracticeQuestionServiceImpl practiceQuestionService,
+                                      PracticeAnswerServiceImpl practiceAnswerService,
+                                      QuestionBodyServiceImpl questionBodyService,
+                                      StatsStudentServiceImpl statsStudentService,
+                                      ClassStudentServiceImpl classStudentService,
+                                      AssignmentSubmissionServiceImpl assignmentSubmissionService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -51,6 +69,9 @@ public class StudentBusinessController {
         this.practiceQuestionService = practiceQuestionService;
         this.practiceAnswerService = practiceAnswerService;
         this.questionBodyService = questionBodyService;
+        this.statsStudentService = statsStudentService;
+        this.classStudentService = classStudentService;
+        this.assignmentSubmissionService = assignmentSubmissionService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -502,4 +523,171 @@ public class StudentBusinessController {
         return ResponseEntity.ok(response);
     }
 
+
+
+    @GetMapping("{id}/get-avg-score")
+    public ResponseEntity<AvgScoreResponse> getAvgScore(@PathVariable Long id) {
+        AvgScoreResponse response = new AvgScoreResponse();
+        AvgScoreResponse.infoData data = new AvgScoreResponse.infoData();
+        data.setAverageHomeworkScore(null);
+        data.setClassRank(null);
+        List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
+        if(statsStudents != null && (!statsStudents.isEmpty())){
+            long totalScore = 0L;
+            long score = 0L;
+            for(StatsStudent statsStudent : statsStudents){
+                if(statsStudent.getTotalScore() != null){
+                    totalScore += statsStudent.getTotalScore();
+                }
+                if(statsStudent.getScore() != null){
+                    score += statsStudent.getScore();
+                }
+            }
+            double averageHomeworkScore = 100 * (double) score / (double) totalScore;
+            averageHomeworkScore = Double.parseDouble(String.format("%.2f", averageHomeworkScore));
+            data.setAverageHomeworkScore(averageHomeworkScore);
+        }
+        ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
+        if(classStudent != null){
+            List<ClassStudent> classStudents = classStudentService.getClassStudentsByClassId(classStudent.getClassId());
+            long[][] stats = new long[classStudents.size()][2];
+            for(int i = 0; i < classStudents.size(); i++){
+                stats[i][0] = classStudents.get(i).getStudentId();
+                long totalScore = 0L;
+                long score = 0L;
+                List<StatsStudent> statsStudentsTemp = statsStudentService.getStatsStudentByStudentId(classStudents.get(i).getStudentId());
+                for(StatsStudent statsStudent : statsStudentsTemp){
+                    if(statsStudent.getTotalScore() != null){
+                        totalScore += statsStudent.getTotalScore();
+                    }
+                    if(statsStudent.getScore() != null){
+                        score += statsStudent.getScore();
+                    }
+                }
+                stats[i][1] = 0L;
+                if(totalScore != 0){
+                    stats[i][1] = (long)(1000 * (double) score / (double) totalScore);
+                }
+            }
+            Arrays.sort(stats, Comparator.comparingLong(o -> o[1]));
+            for(int i = 0; i <stats.length ; i++){
+                if(stats[i][0] == id){
+                    data.setClassRank((long)(stats.length - i));
+                    break;
+                }
+            }
+        }
+        response.setData(data);
+        response.setMessage("平均分获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("{id}/get-multidimensional-scores")
+    public ResponseEntity<MultidimensionalScoresResponse> getMultidimensionalScores(@PathVariable Long id) {
+        MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
+        List<MultidimensionalScoresResponse.infoData> data = new ArrayList<>();
+        List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
+        List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
+        for(KnowledgePoint knowledgePoint : knowledgePoints) {
+            MultidimensionalScoresResponse.infoData infoData = new MultidimensionalScoresResponse.infoData();
+            infoData.setName(knowledgePoint.getType());
+            infoData.setScore(null);
+            boolean flag = false;
+            for (MultidimensionalScoresResponse.infoData datum : data) {
+                if (datum.getName().equals(knowledgePoint.getType())) {
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                long totalScore = 0L;
+                long score = 0L;
+                for(StatsStudent statsStudent : statsStudents) {
+                    if(knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId()).getType().equals(infoData.getName())){
+                        if(statsStudent.getTotalScore() != null){
+                            totalScore += statsStudent.getTotalScore();
+                        }
+                        if(statsStudent.getScore() != null){
+                            score += statsStudent.getScore();
+                        }
+                    }
+                }
+                if(totalScore != 0){
+                    double scorePercentage = 100 * (double) score / (double) totalScore;
+                    scorePercentage = Double.parseDouble(String.format("%.2f", scorePercentage));
+                    infoData.setScore(scorePercentage);
+                }
+                data.add(infoData);
+            }
+        }
+        response.setData(data);
+        response.setMessage("各项成绩获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("{id}/get-weakness-scores")
+    public ResponseEntity<WeaknessScoresResponse> getWeaknessScores(@PathVariable Long id) {
+        WeaknessScoresResponse response = new WeaknessScoresResponse();
+        List<WeaknessScoresResponse.infoData> data = new ArrayList<>();
+        List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
+        List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
+        for(KnowledgePoint knowledgePoint : knowledgePoints) {
+            WeaknessScoresResponse.infoData infoData = new WeaknessScoresResponse.infoData();
+            infoData.setType(knowledgePoint.getType());
+            infoData.setWeaknessName(null);
+            infoData.setWeaknessScore(null);
+            boolean flag = false;
+            for (WeaknessScoresResponse.infoData datum : data) {
+                if (datum.getType().equals(knowledgePoint.getType())) {
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                for(StatsStudent statsStudent : statsStudents) {
+                    KnowledgePoint knowledgePointTemp = knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId());
+                    if(knowledgePointTemp.getType().equals(infoData.getType())){
+                        double scoreTemp;
+                        if(statsStudent.getTotalScore() != null && statsStudent.getScore() != null){
+                            scoreTemp = 100 * (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
+                        }
+                        else{
+                            scoreTemp = 0;
+                        }
+                        if(infoData.getWeaknessName() == null || infoData.getWeaknessScore() == null || scoreTemp < infoData.getWeaknessScore()){
+                            infoData.setWeaknessName(knowledgePointTemp.getName());
+                            infoData.setWeaknessScore(scoreTemp);
+                        }
+                    }
+                }
+                data.add(infoData);
+            }
+        }
+        response.setData(data);
+        response.setMessage("短板获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("{id}/score-fluctuations")
+    public ResponseEntity<HistoryScoresResponse> getHistoryScores(@PathVariable Long id) {
+        HistoryScoresResponse response = new HistoryScoresResponse();
+        List<HistoryScoresResponse.infoData> data = new ArrayList<>();
+        List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(id);
+        submissions.sort(Comparator.comparing(AssignmentSubmission::getSubmitTime).reversed());
+        for(int i = 0; i < submissions.size() && i < 10; i++){
+            HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
+            infoData.setDate(submissions.get(i).getSubmitTime().toString());
+            infoData.setScore(null);
+            if(submissions.get(i).getTotalScore() != null){
+                infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
+            }
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("历史成绩获取成功");
+        return ResponseEntity.ok(response);
+    }
 }

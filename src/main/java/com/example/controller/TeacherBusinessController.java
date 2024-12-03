@@ -467,7 +467,7 @@ public class TeacherBusinessController {
     @DeleteMapping("/{teacherId}/classes/remove-student")
     public ResponseEntity<Message> removeStudentFromClass(@PathVariable Long teacherId, @RequestParam Long studentId) {
         Message response = new Message();
-        List<ClassStudent> classStudents = classStudentService.getClassStudentByStudentId(studentId);
+        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
         if(classStudents.isEmpty()){
             response.setMessage("学生不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

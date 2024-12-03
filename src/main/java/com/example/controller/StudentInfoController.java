@@ -128,7 +128,7 @@ public class StudentInfoController {
     @DeleteMapping("/{id}/account-deactivation")
     public ResponseEntity<Message> studentAccountDeactivation(@PathVariable Long id) {
         Message response = new Message();
-        List<ClassStudent> classStudents = classStudentService.getClassStudentByStudentId(id);
+        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(id);
         for (ClassStudent classStudent : classStudents) {
             classService.removeStudentFromClass(classStudent.getClassId(), id);
         }
@@ -147,7 +147,7 @@ public class StudentInfoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         JoinClass joinClass = joinClassService.selectJoinClassByStudentIdAndClassId(id, clazz.getId());
-        List<ClassStudent> classStudent = classStudentService.getClassStudentByStudentId(id);
+        List<ClassStudent> classStudent = classStudentService.getClassStudentsByStudentId(id);
         if(!classStudent.isEmpty()){
             response.setMessage("请勿重复加入班级");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
