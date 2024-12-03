@@ -8,4 +8,5 @@ import lombok.Setter;
 public class StudentLoginResponse {
     private String message;
     private Long id;
+    private String token;
 }
