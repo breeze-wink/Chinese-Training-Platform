@@ -2,6 +2,7 @@ package com.example.util;
 
 import com.example.model.user.BaseUser;
 import com.example.service.user.UserService;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,19 +43,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @Nullable HttpServletResponse response,
                                     @Nullable FilterChain filterChain)
             throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
+//        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+//        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Origin, Accept");
+//        response.setHeader("Access-Control-Allow-Credentials", "true");
+        try {
+            String token = request.getHeader("Authorization");
 
-        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String username = jwtTokenUtil.getUsernameFromToken(token);
-            String className = jwtTokenUtil.getClassNameFromToken(token);
+            if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtTokenUtil.getUsernameFromToken(token);
+                String className = jwtTokenUtil.getClassNameFromToken(token);
 
-            if (username != null) {
-                BaseUser user = userService.loadUserByUsernameAndClassName(username, className);
-                if (user != null && jwtTokenUtil.validateToken(token)) {
-                    Authentication authentication = getAuthentication(user);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (username != null) {
+                    BaseUser user = userService.loadUserByUsernameAndClassName(username, className);
+                    if (user != null && jwtTokenUtil.validateToken(token)) {
+                        Authentication authentication = getAuthentication(user);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             }
+        } catch (SignatureException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid JWT signature.");
+            return;
         }
 
         if (filterChain != null) {
