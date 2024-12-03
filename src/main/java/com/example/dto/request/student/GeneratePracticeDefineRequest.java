@@ -8,13 +8,21 @@ import java.util.List;
 @Getter
 @Setter
 public class GeneratePracticeDefineRequest {
-    private Integer num;
     private String name;
-    private List<InfoData> data;
+    private List<KnowledgePoint> knowledgePoints;
+    private List<QuestionBodyType> questionBodyTypes;
 
     @Setter
     @Getter
-    public static class InfoData {
+    public static class KnowledgePoint {
         private Long knowledgePointId;
+        private Integer num;
+    }
+
+    @Setter
+    @Getter
+    public static class QuestionBodyType {
+        private String type;
+        private Integer num;
     }
 }

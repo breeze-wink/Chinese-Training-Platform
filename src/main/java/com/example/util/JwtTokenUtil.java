@@ -2,7 +2,9 @@ package com.example.util;
 
 import com.example.model.user.BaseUser;
 import io.jsonwebtoken.Claims;
+
 import io.jsonwebtoken.ExpiredJwtException;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -30,6 +32,7 @@ public class JwtTokenUtil {
 
     // 从 Token 中获取用户名
     public String getUsernameFromToken(String token) {
+
         Claims claims;
         SecretKey key = SECRET_KEY;
         try {

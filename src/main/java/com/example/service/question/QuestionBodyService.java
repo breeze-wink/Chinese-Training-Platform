@@ -20,4 +20,5 @@ public interface QuestionBodyService {
 
     // 删除题目记录
     int deleteQuestionBody(Long id);
+    List<QuestionBody> getQuestionBodiesByType(String type);
 }

@@ -23,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
@@ -41,6 +42,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+
                                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                                 .requestMatchers("/api/student/login").permitAll()
                                 .requestMatchers("/api/teacher/login").permitAll()
@@ -56,8 +58,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+
         return http.build();
     }
+
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -67,6 +71,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

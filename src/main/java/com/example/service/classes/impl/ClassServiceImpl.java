@@ -106,7 +106,12 @@ public class ClassServiceImpl implements ClassService {
         for(ClassGroup classGroup : classGroups){
             classGroupService.removeStudentFromGroup(classGroup.getId(), studentId);
         }
-        return classStudentMapper.delete(classId, studentId);
+        Student student = studentMapper.selectById(studentId);
+        if(classStudentMapper.delete(classId, studentId) == 1){
+            student.setSchoolId(null);
+            return studentMapper.update(student);
+        }
+        return 0;
     }
 
     @Override
