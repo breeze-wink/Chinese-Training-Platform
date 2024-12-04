@@ -1,10 +1,10 @@
 package com.example.controller;
 
-import com.example.dto.request.SystemAdminController.CreateKnowledgePointRequest;
-import com.example.dto.request.SystemAdminController.SystemAdminChangePasswordRequest;
-import com.example.dto.request.SystemAdminController.SystemAdminLoginRequest;
+import com.example.dto.request.system.CreateKnowledgePointRequest;
+import com.example.dto.request.system.SystemAdminChangePasswordRequest;
+import com.example.dto.request.system.SystemAdminLoginRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.SystemAdminController.*;
+import com.example.dto.response.system.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.user.SystemAdmin;
@@ -14,6 +14,7 @@ import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SystemAdminServiceImpl;
+import com.example.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -34,16 +35,18 @@ import java.util.List;
 public class SystemAdminController {
     private final SystemAdminService systemAdminService;
     private final CourseStandardService courseStandardService;
-
     private final KnowledgePointService knowledgePointService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public SystemAdminController(SystemAdminServiceImpl systemAdminService,
                                  CourseStandardServiceImpl courseStandardService,
-                                 KnowledgePointServiceImpl knowledgePointService) {
+                                 KnowledgePointServiceImpl knowledgePointService,
+                                 JwtTokenUtil jwtTokenUtil) {
         this.systemAdminService = systemAdminService;
         this.courseStandardService = courseStandardService;
         this.knowledgePointService = knowledgePointService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/login")
@@ -55,6 +58,8 @@ public class SystemAdminController {
 
         SystemAdminLoginResponse response = new SystemAdminLoginResponse();
         if (admin != null) {
+            String token = jwtTokenUtil.generateToken(admin);
+            response.setToken(token);
             response.setMessage("success");
             response.setId(admin.getId());
             return ResponseEntity.ok(response);
@@ -259,6 +264,7 @@ public class SystemAdminController {
         }
 
         response.getData().setDescription(knowledgePoint.getDescription());
+        response.getData().setType(knowledgePoint.getType());
         response.getData().setName(knowledgePoint.getName());
 
         response.setMessage("知识点查询成功");

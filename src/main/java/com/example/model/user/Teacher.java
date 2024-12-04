@@ -2,16 +2,12 @@ package com.example.model.user;
 
 import lombok.Getter;
 import lombok.Setter;
-@Getter
-@Setter
-public class Teacher {
 
-    private Long id;
+@Setter
+@Getter
+public class Teacher extends BaseUser {
     private String name;
-    private String email;
-    private String username;
-    private String password;
     private String phoneNumber;
-    private Long schoolId; // 外键，关联School表的id
+    private Long schoolId;
     private Integer permission;
 }

@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.response.*;
-import com.example.dto.response.SchoolAdminController.*;
+import com.example.dto.response.school.*;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.user.AuthorizationCode;
@@ -130,9 +130,12 @@ public class SchoolAdminBusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
-        for (ClassStudent classStudent : classStudents) {
+        if(!classStudents.isEmpty()){
+            ClassStudent classStudent = classStudents.get(0);
             classService.removeStudentFromClass(classStudent.getClassId(), studentId);
         }
+        student.setSchoolId(null);
+        studentService.updateStudent(student);
         response.setMessage("学生账号删除成功");
         return ResponseEntity.ok(response);
     }

@@ -1,11 +1,11 @@
 package com.example.controller;
 
-import com.example.dto.request.TeacherController.CreateGroupRequest;
-import com.example.dto.request.TeacherController.TeacherCreateClassRequest;
-import com.example.dto.request.TeacherController.UpdateClassRequest;
-import com.example.dto.request.TeacherController.UploadQuestionRequest;
+import com.example.dto.request.teacher.CreateGroupRequest;
+import com.example.dto.request.teacher.TeacherCreateClassRequest;
+import com.example.dto.request.teacher.UpdateClassRequest;
+import com.example.dto.request.teacher.UploadQuestionRequest;
 import com.example.dto.response.*;
-import com.example.dto.response.TeacherController.*;
+import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
@@ -467,7 +467,7 @@ public class TeacherBusinessController {
     @DeleteMapping("/{teacherId}/classes/remove-student")
     public ResponseEntity<Message> removeStudentFromClass(@PathVariable Long teacherId, @RequestParam Long studentId) {
         Message response = new Message();
-        List<ClassStudent> classStudents = classStudentService.getClassStudentByStudentId(studentId);
+        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
         if(classStudents.isEmpty()){
             response.setMessage("学生不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

@@ -70,15 +70,14 @@ public class TeacherServiceImpl implements TeacherService {
         return teacherMapper.findByUsername(username) != null;
     }
 
-    @Override
-    @Transactional
-    public Long getTeacherSchoolId(Long teacherId) {
-        Teacher teacher = getTeacherById(teacherId);
-        return teacher.getSchoolId();
-    }
 
     @Override
     public List<Teacher> getTeachersBySchoolId(Long schoolId) {
         return teacherMapper.selectBySchoolId(schoolId);
+    }
+
+    @Override
+    public Teacher getTeacherByUsername(String username) {
+        return teacherMapper.findByUsername(username);
     }
 }

@@ -1,14 +1,14 @@
 package com.example.controller;
 
-import com.example.dto.request.SchoolAdminController.SchoolAdminBindEmailRequest;
-import com.example.dto.request.SchoolAdminController.SchoolAdminLoginRequest;
-import com.example.dto.response.SchoolAdminController.SchoolEmailVerifyResponse;
-import com.example.dto.request.SchoolAdminController.SchoolAdminChangePasswordRequest;
+import com.example.dto.request.school.SchoolAdminBindEmailRequest;
+import com.example.dto.request.school.SchoolAdminLoginRequest;
+import com.example.dto.response.school.SchoolEmailVerifyResponse;
+import com.example.dto.request.school.SchoolAdminChangePasswordRequest;
 import com.example.dto.request.UpdateNameRequest;
 import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.response.Message;
-import com.example.dto.response.SchoolAdminController.SchoolAdminInfoResponse;
-import com.example.dto.response.SchoolAdminController.SchoolAdminLoginResponse;
+import com.example.dto.response.school.SchoolAdminInfoResponse;
+import com.example.dto.response.school.SchoolAdminLoginResponse;
 import com.example.model.user.AuthorizationCode;
 import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
@@ -17,6 +17,7 @@ import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
 
 import com.example.service.utils.EmailService;
+import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,20 @@ public class SchoolAdminManagementController {
     private final SchoolService schoolService;
     private final AuthorizationCodeService authorizationCodeService;
 
+    private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
 
     @Autowired
     public SchoolAdminManagementController(SchoolAdminService schoolAdminService,
                                            SchoolService schoolService,
                                            AuthorizationCodeService authorizationCodeService,
-                                           EmailService emailService) {
+                                           EmailService emailService,
+                                           JwtTokenUtil jwtTokenUtil) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
         this.authorizationCodeService = authorizationCodeService;
         this.emailService = emailService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/login")
@@ -53,6 +57,8 @@ public class SchoolAdminManagementController {
 
         if (admin != null) {
             SchoolAdminLoginResponse response = new SchoolAdminLoginResponse();
+            String jwt = jwtTokenUtil.generateToken(admin);
+            response.setToken(jwt);
             response.setMessage("success");
             response.setId(admin.getId());
             return ResponseEntity.ok(response);

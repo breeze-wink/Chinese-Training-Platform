@@ -573,14 +573,26 @@
 - 请求体(`JSON` 格式)：
   ```json
   {
-    "num" : "int",
     "name" : "string",
-    "data": [
+    "knowledgePoints": [
       {
-        "knowledgePointId": "long"
+        "knowledgePointId": "long",
+        "num": int
       },
       {
-        "knowledgePointId": "long"
+        "knowledgePointId": "long",
+        "num": int
+      },
+      ...
+    ],
+    "questionBodyTypes": [
+      {
+        "type": "string",
+        "num": int
+      },
+      {
+        "type": "string",
+        "num": int
       },
       ...
     ]
@@ -859,6 +871,34 @@
       ```
 
 
+### Delete Practice `finished`
+- **接口路径**：`/api/student/{id}/delete-practice`
+- **请求方法**：`DELETE`
+- **接口说明**：学生用户删除未完成的练习。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+
+```json
+{
+  "practiceId" : "long"
+}
+```
+- **响应说明**
+  - 响应格式: `JSON`
+    - **成功响应** (`200 OK`):
+      ```json
+      {
+        "message" : "练习删除成功",
+      }
+      ```
+    - **失败响应** (`400 Bad Request`):
+      ```json
+      {
+        "message": "练习删除失败",
+      }
+      ```
 
 ### Get Unfinished Assignment List
 - **接口路径**：`/api/student/{id}/get-unfinished-assignment-list`
@@ -945,6 +985,145 @@
 
 
 
+  
+### Get Average Homework Score and Class Rank `finished`
+
+- **接口路径**：`/api/student/{id}/get-avg-score`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的作业平均分和班级排名。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生作业平均分和班级排名获取成功",
+      "data": {
+          "averageHomeworkScore": "double", // 作业平均分,例84
+          "classRank": "long"// 班级排名，例6
+      }
+    }
+- **失败响应** (`400 Bad Request`):
+  ```json
+  {
+    "message": "获取作业平均分和班级排名失败",
+    "data": null
+  }
+  ```
+
+### Get Multidimensional Scores `finished`
+- **接口路径**：`/api/student/{id}/get-multidimensional-scores`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的各类题目得分率。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "各类题目得分率获取成功",
+      "data": [
+        {
+          "name": "string",
+          "score": "double"
+        },
+        {
+          "name": "string",
+          "score": "double"
+        },
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "得分率获取失败",
+      "data": null
+    }
+    ```
+
+### Get Weakness Scores `finished`
+
+- **接口路径**：`/api/student/{id}/get-weakness-scores`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的短板得分，包括短板名称和得分率。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生短板得分率获取成功",
+      "data": [
+        {
+          "type": "string", //题型（知识点大类）
+          "weaknessName": "string", // 短板名称（知识点小类）
+          "weaknessScore": "double" // 短板得分率
+        },
+        {
+          "type": "string",
+          "weaknessName": "string",
+          "weaknessScore": "double"
+        },
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "获取学生短板得分率失败",
+      "data": null
+    }
+    ```
+
+### Get Score Fluctuations `finished`
+
+- **接口路径**：`/api/student/{id}/score-fluctuations`
+- **请求方法**：GET
+- **接口说明**：学生获取自己的历史分数波动数据。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 请求体：无
+
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "学生历史分数波动数据获取成功",
+      "data": [
+        {
+          "date": "string", //提交时间
+          "score": "double"
+        },
+        {
+          "date": "string",
+          "score": "double"
+        },
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "获取历史分数波动数据失败",
+      "data": null
+    }
+    ```
 
 
 ## Teacher
@@ -2776,7 +2955,7 @@
 
 
 
-### Delete School Administrator Account
+### Delete School Administrator Account `finished`
 
 - **接口路径**：`/api/system-admin/delete-school-admin-account/{id}`
 - **请求方法**：DELETE
@@ -3360,7 +3539,8 @@
       "message" : "string"
     }
     ```
-### Update Name
+
+### Update Name `finished`
 
 - **接口路径**：`/api/school-admin/{id}/update-name`
 - **请求方法**：PUT
@@ -3390,66 +3570,7 @@
     }
     ```
 
-### Update Username 
-
-- **接口路径**：`/api/school-admin/{id}/update-username`
-- **请求方法**：PUT
-- **接口说明**：学校管理员账号修改用户名。
-- **请求说明**
-  - 请求头: `Content-Type` : `application/json`
-  - 请求参数:
-    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
-    - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "username" : "string"
-    }
-    ```
-- **响应说明**
-  - 响应格式: `JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message" : "success"
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message" : "string"
-    }
-    ```
-### Update Name
-
-- **接口路径**：`/api/school-admin/{id}/update-name`
-- **请求方法**：PUT
-- **接口说明**：学校管理员账号修改负责人名字。
-- **请求说明**
-  - 请求头: `Content-Type` : `application/json`
-  - 请求参数:
-    - 路径参数（Path Variable）：`id` - 学校管理员的唯一标识符
-    - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "name" : "string"
-    }
-    ```
-- **响应说明**
-  - 响应格式: `JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message" : "success"
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message" : "string"
-    }
-    ```    
-
-### Change Password
+### Change Password `finished`
 
 - **接口路径**：`/api/school-admin/{id}/change-password`
 - **请求方法**：POST

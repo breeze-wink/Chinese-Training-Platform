@@ -14,4 +14,6 @@ public interface SchoolAdminService {
     SchoolAdmin authenticate(String account, String password);
 
     boolean checkExistUsername(String name);
+
+    SchoolAdmin getSchoolAdminByUsername(String username);
 }
