@@ -31,4 +31,7 @@ public interface QuestionBodyMapper {
 
     @Select("SELECT * FROM question_body WHERE type = #{type}")
     List<QuestionBody> getQuestionBodiesByType(String type);
+
+    @Select("SELECT type FROM question_body")
+    List<String> getAllTypes();
 }

@@ -355,7 +355,7 @@ public class TeacherBusinessController {
             questionBodyService.createQuestionBody(questionBody);
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
-                questionService.creatQuestion(question);
+                questionService.createQuestion(question);
             }
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {

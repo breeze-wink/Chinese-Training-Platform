@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface PracticeQuestionService {
     int addPracticeQuestion(PracticeQuestion practiceQuestion);
+    void addPracticeQuestions(List<PracticeQuestion> practiceQuestions);
+
     int deletePracticeQuestion(Long id);
     int deletePracticeQuestionByPracticeId(Long practiceId);
     PracticeQuestion getPracticeQuestionById(Long id);

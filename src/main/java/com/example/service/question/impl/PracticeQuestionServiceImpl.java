@@ -21,6 +21,14 @@ public class PracticeQuestionServiceImpl implements PracticeQuestionService {
     }
 
     @Override
+    public void addPracticeQuestions(List<PracticeQuestion> practiceQuestions) {
+        if (practiceQuestions == null || practiceQuestions.isEmpty()) {
+            return;
+        }
+        practiceQuestionMapper.insertPracticeQuestions(practiceQuestions);
+    }
+
+    @Override
     public int deletePracticeQuestion(Long id) {
         return practiceQuestionMapper.deletePracticeQuestion(id);
     }
