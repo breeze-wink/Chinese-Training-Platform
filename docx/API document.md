@@ -2376,23 +2376,27 @@
 - **接口说明**：教师获取所有题目。
 
 - **请求说明**：
-  - 无需额外请求参数。
-
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
 - **响应说明**：
   - **响应格式**：JSON
   - **成功响应**（200 OK）：
     ```json
     {
       "message": "获取题目成功",
-      "data": {
-        "questions": [
-          {
-            "id": "number", // 对应数据库中的 id 字段
-            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-          }
-        ]
-      }
+      "data": [
+        {
+          "id": "long", // 对应数据库中的 id 字段
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+          "createrName": "string"
+        },
+        {
+          "id": "long", // 对应数据库中的 id 字段
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+          "createrName": "string"
+        },
+        ...
+      ]
     }
     ```
   - **失败响应**（400 Bad Request）：
@@ -2407,27 +2411,34 @@
 - **接口路径**：`/api/teacher/{id}/get-questions` `problem`
 - **请求方法**：GET
 - **接口说明**：教师获取题目信息。
-
 - **请求说明**：
-  - 无需额外请求参数。
-
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Query Parameter）`bodyId` - 题目的唯一标识符
 - **响应说明**：
   - **响应格式**：JSON
   - **成功响应**（200 OK）：
     ```json
     {
       "message": "获取题目成功",
-      "data": {
-        "questions": [
-          {
-            "id": "number", // 对应数据库中的 id 字段
-        "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-        "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-        "creatorId": "number", // 对应数据库中的 creatorId 字段
-        "bodyId": "number" 
-          }
-        ]
-      }
+      "body": "string",
+      "data": [
+        {
+          "content": "string"
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+          "options": ["string", "string", "string", "string"],
+          "answer": "string",
+          "knowledgePointName": "string"
+        },
+        {
+          "content": "string"
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+          "options": ["string", "string", "string", "string"],
+          "answer": "string",
+          "knowledgePointName": "string"
+        },
+        ...
+      ]
     }
     ```
   - **失败响应**（400 Bad Request）：
