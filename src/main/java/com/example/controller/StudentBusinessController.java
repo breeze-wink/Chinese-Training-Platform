@@ -15,6 +15,7 @@ import com.example.service.question.PracticeService;
 import com.example.service.question.QuestionBodyService;
 import com.example.service.question.QuestionService;
 import com.example.service.submission.PracticeAnswerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,7 +116,7 @@ public class StudentBusinessController {
 
     @PostMapping("/{id}/practice/generate-define")
     public ResponseEntity<GeneratePracticeDefineResponse> generatePracticeDefine(
-        @PathVariable Long id, @RequestBody GeneratePracticeDefineRequest request) {
+        @PathVariable Long id, @RequestBody GeneratePracticeDefineRequest request) throws JsonProcessingException {
 
         GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
         Practice practice = new Practice();
@@ -354,7 +355,7 @@ public class StudentBusinessController {
     }
 
     @PostMapping("/{id}/continue-practice")
-    public ResponseEntity<ContinuePracticeResponse> continuePractice(@PathVariable Long id, @RequestBody ContinuePracticeRequest request) {
+    public ResponseEntity<ContinuePracticeResponse> continuePractice(@PathVariable Long id, @RequestBody ContinuePracticeRequest request) throws JsonProcessingException {
         ContinuePracticeResponse response = new ContinuePracticeResponse();
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(request.getPracticeId());
         List<ContinuePracticeResponse.InfoData> data = new ArrayList<>();
@@ -384,7 +385,7 @@ public class StudentBusinessController {
     }
 
     @PostMapping("/{id}/practice/complete")
-    public ResponseEntity<CompletePracticeResponse> completePractice(@PathVariable Long id, @RequestBody CompletePracticeRequest request) {
+    public ResponseEntity<CompletePracticeResponse> completePractice(@PathVariable Long id, @RequestBody CompletePracticeRequest request) throws JsonProcessingException {
         CompletePracticeResponse response = new CompletePracticeResponse();
         PracticeQuestion test = practiceQuestionService.getPracticeQuestionById(request.getData().get(0).getPracticeQuestionId());
         Practice practice = practiceService.getPracticeById(test.getPracticeId());
@@ -434,7 +435,7 @@ public class StudentBusinessController {
     }
 
     @GetMapping("/{id}/practice/get-answer")
-    public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) {
+    public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) throws JsonProcessingException {
         GetAnswerResponse response = new GetAnswerResponse();
         response.setTotalScore(practiceService.getPracticeById(practiceId).getTotalScore().doubleValue());
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
