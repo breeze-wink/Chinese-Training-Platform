@@ -63,7 +63,7 @@ public class QuestionServiceImplTest {
     @Test
     void testDeleteQuestion() throws Exception {
 //        questionService.createQuestion(question); // 确保存在可以删除的记录
-        int result = questionService.deleteQuestion(287L);
+        int result = questionService.deleteQuestion(291L);
         assertTrue(result > 0);
     }
 

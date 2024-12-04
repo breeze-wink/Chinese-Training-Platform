@@ -15,4 +15,10 @@ public interface QuestionService {
 
     public void syncToRedis(Question question);
     List<Question> getQuestionsByQuestionBodyId(Long questionBodyId);
+
+    void deleteFromRedis(Long id);
+
+    List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds);
+
+    List<Question> getQuestionsByIds(List<Long> questionIds);
 }

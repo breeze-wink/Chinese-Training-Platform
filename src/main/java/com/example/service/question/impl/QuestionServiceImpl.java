@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,7 +39,7 @@ public class QuestionServiceImpl implements QuestionService {
     public int createQuestion(Question question) {
         int result = questionMapper.insert(question);
         // 发送同步消息
-        rabbitMQProducer.sendQuestionSyncMessage(question);
+        rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.CREATE_OPERATION);
         return result;
     }
 
@@ -49,14 +50,14 @@ public class QuestionServiceImpl implements QuestionService {
         int result = questionMapper.delete(id);
         // 发送同步消息
         if (question != null) {
-            rabbitMQProducer.sendQuestionSyncMessage(question);
+            rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
         }
         return result;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Question getQuestionById(Long id) throws JsonProcessingException {
+    public Question getQuestionById(Long id) {
         // 尝试从缓存获取
         String cacheKey = "question:" + id;
         Object object = redisTemplate.opsForValue().get(cacheKey);
@@ -71,8 +72,17 @@ public class QuestionServiceImpl implements QuestionService {
         }
         return question;
     }
-
     @Override
+    @Transactional
+    public List<Question> getQuestionsByIds(List<Long> questionIds) {
+        List<Question> questions = new ArrayList<>();
+        for (Long id : questionIds) {
+            questions.add(getQuestionById(id));
+        }
+        return questions;
+    }
+    @Override
+    @Transactional
     public List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId) {
         // 尝试从缓存获取
         String cacheKey = "questions:knowledgePoint:" + knowledgePointId;
@@ -145,6 +155,24 @@ public class QuestionServiceImpl implements QuestionService {
         }
         return questions;
     }
+
+    @Override
+    public void deleteFromRedis(Long id) {
+        String cacheKey = "question:" + id;
+        redisTemplate.delete(cacheKey);
+    }
+
+    @Override
+    @Transactional
+    public List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds) {
+        List<Question> questions = new ArrayList<>();
+        for (Long knowledgePointId : knowledgePointIds) {
+            questions.addAll(getQuestionsByKnowledgePointId(knowledgePointId));
+        }
+        return questions;
+    }
+
+
 
     @Override
     public void syncToRedis(Question question) {

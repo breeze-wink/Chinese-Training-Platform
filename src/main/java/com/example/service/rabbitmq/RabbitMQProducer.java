@@ -2,6 +2,9 @@
 
    import com.example.config.RabbitMQConfig;
    import com.example.model.question.Question;
+   import com.example.model.question.QuestionBody;
+   import com.example.service.rabbitmq.dto.QuestionBodySyncMessage;
+   import com.example.service.rabbitmq.dto.QuestionSyncMessage;
    import com.fasterxml.jackson.core.JsonProcessingException;
    import com.fasterxml.jackson.databind.ObjectMapper;
    import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -13,7 +16,8 @@
 
    @Service
    public class RabbitMQProducer {
-
+       public static String CREATE_OPERATION = "create";
+       public static String DELETE_OPERATION = "delete";
        private final RabbitTemplate rabbitTemplate;
        private final ObjectMapper objectMapper;
 
@@ -24,13 +28,30 @@
        }
 
        @Async
-       public void sendQuestionSyncMessage(Question question) {
+       public void sendQuestionSyncMessage(Question question, String operation) {
            try {
-               String message = objectMapper.writeValueAsString(question);
-               rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, message);
+               QuestionSyncMessage syncMessage = new QuestionSyncMessage();
+               syncMessage.setOperation(operation);
+               syncMessage.setQuestion(question);
+               String message = objectMapper.writeValueAsString(syncMessage);
+               rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.QUESTION_ROUTING_KEY, message);
            } catch (JsonProcessingException e) {
                e.printStackTrace();
            }
+       }
+
+       @Async
+       public void sendQuestionBodySyncMessage(QuestionBody questionBody, String operation) {
+           try {
+               QuestionBodySyncMessage syncMessage = new QuestionBodySyncMessage();
+               syncMessage.setOperation(operation);
+               syncMessage.setQuestionBody(questionBody);
+               String message = objectMapper.writeValueAsString(syncMessage);
+               rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.QUESTION_BODY_ROUTING_KEY, message);
+           } catch (JsonProcessingException e) {
+               e.printStackTrace();
+           }
+
        }
    }
    
