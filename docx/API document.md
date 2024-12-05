@@ -2474,6 +2474,71 @@
     }
     ```
 
+### 获取问题（根据筛选条件） `waiting`
+
+- **接口路径**：`/api/teacher/{id}/search-questions`
+- **请求方法**：POST
+- **接口说明**：教师查找题目。
+
+- **请求说明**
+- 路径参数（Path Variable）：`id` - 用户的唯一标识符
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数:
+    - 请求体(`JSON` 格式)：
+    ```json
+  {
+  "type": "选择",        // 题目类型，选择、填空、问答、作文、全部
+  "knowledgeType": "积累与运用", // 知识点大类
+  "knowledgeId": "1", // 知识点ID
+  "difficulty": "普通",  // 难度级别，容易、普通、困难、全部
+  "mode": "latest",      // 模式，如最新上传latest、最多使用mostUsed、默认‘’等
+  "sortOrder": "asc",    // 排序顺序，"asc" 或 "desc"
+  "page": 1,             // 当前页
+  "pageSize": 10,        // 每页显示数量
+  "search": "关键词"     // 搜索关键词（可能为空）
+  }
+    ```
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+    ```json
+{
+"questions": [
+{
+"id": 1,
+"body": "题干1",          // 题干
+"question": "问题1",      // 问题内容
+"answer": "答案1",        // 答案
+"explanation": "解析1",   // 解析
+"difficulty": "普通",     // 难度
+"type": "选择",           // 题型
+"knowledge": "知识点1"    // 知识点
+},
+{
+"id": 2,
+"body": "题干2",
+"question": "问题2",
+"answer": "答案2",
+"explanation": "解析2",
+"difficulty": "困难",
+"type": "填空",
+"knowledge": "知识点2"
+}
+],
+"totalCount": 50,    // 总记录数
+"pageSize": 10,      // 每页显示的题目数量
+"currentPage": 1,    // 当前页
+"totalPages": 5      // 总页数
+}
+
+    ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败"
+    }
+    ```
 
 
 ## SystemAdmin
