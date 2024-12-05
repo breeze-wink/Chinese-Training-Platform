@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
 
 
 @RestController
@@ -225,7 +224,7 @@ public class StudentBusinessController {
                     infoData.setQuestionContent(question.getContent());
                     infoData.setType(question.getType());
                     if (Objects.equals(infoData.getType(), "CHOICE")) {
-                        infoData.setQuestionOptions(getOptionsByQuestion(question.getOptions()));
+                        infoData.setQuestionOptions(drawOptions(question.getOptions()));
                     }
                 }
 
@@ -284,7 +283,7 @@ public class StudentBusinessController {
                     infoData.setType(subQ.getType());
                     infoData.setPracticeQuestionId(pq.getId());
                     if ("CHOICE".equals(infoData.getType())) {
-                        infoData.setQuestionOptions(getOptionsByQuestion(subQ.getQuestionOptions()));
+                        infoData.setQuestionOptions(drawOptions(subQ.getQuestionOptions()));
                     }
                     data.add(infoData);
                 }
@@ -416,7 +415,7 @@ public class StudentBusinessController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    private static List<String> getOptionsByQuestion(String optionString) {
+    private static List<String> drawOptions(String optionString) {
         List<String> choices = new ArrayList<>(List.of(optionString.split("\\$\\$")));
         char choiceOption = 'A';
         for(int j = 0; j < choices.size(); j++){
@@ -465,7 +464,7 @@ public class StudentBusinessController {
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
                 Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
-                List<String> choices = getOptionsByQuestion(question.getOptions());
+                List<String> choices = drawOptions(question.getOptions());
                 infoData.getQuestionOptions().addAll(choices);
             }
             infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
@@ -546,7 +545,7 @@ public class StudentBusinessController {
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
                 Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
-                List<String> answerArray = getOptionsByQuestion(question.getOptions());
+                List<String> answerArray = drawOptions(question.getOptions());
                 infoData.setQuestionOptions(answerArray);
                 if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
                     infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
