@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.dto.redis.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final RabbitMQProducer rabbitMQProducer;
     private final QuestionService questionService;
-    private final ObjectMapper objectMapper = new ObjectMapper(); // Jackson 的 ObjectMapper，用于序列化和反序列化
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public QuestionBodyServiceImpl(QuestionBodyMapper questionBodyMapper,
@@ -51,7 +50,6 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     public QuestionBody getQuestionBodyById(Long id) {
         String cashKey = "questionBody:" + id;
         Object object = redisTemplate.opsForValue().get(cashKey);
-        ObjectMapper objectMapper = new ObjectMapper();
         if (object != null) {
             return objectMapper.convertValue(object, QuestionBody.class);
         }
@@ -73,88 +71,7 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
         return questionBodies;
     }
 
-    @Override
-    @Transactional
-    public List<PreassembledPracticeQuestion> getPreassembledQuestionsByTypes(List<String> types) {
-        List<PreassembledPracticeQuestion> result = new ArrayList<>();
-        for (String type : types) {
-            String cacheKey = "preassembled_questions:" + type;
-            Object object = redisTemplate.opsForValue().get(cacheKey);
-            List<PreassembledPracticeQuestion> cachedQuestions = objectMapper.convertValue(object
-                    ,objectMapper.getTypeFactory().constructCollectionType(List.class, PreassembledPracticeQuestion.class));
 
-            if (cachedQuestions == null) {
-                // 如果缓存中没有，刷新缓存
-                flushPreassembledQuestionsByType(type);
-                objectMapper.convertValue(object
-                        ,objectMapper.getTypeFactory().constructCollectionType(List.class, PreassembledPracticeQuestion.class));
-            }
-            if (cachedQuestions != null) {
-                result.addAll(cachedQuestions);
-            }
-        }
-        return result;
-    }
-
-    @Transactional
-    @Override
-    public void flushPreassembledQuestions() {
-        List<String> allTypes = questionBodyMapper.getAllTypes();
-        for (String type : allTypes) {
-            flushPreassembledQuestionsByType(type);
-        }
-    }
-
-    @Transactional
-    protected void flushPreassembledQuestionsByType(String type) {
-        String cacheKey = "preassembled_questions:" + type;
-        List<PreassembledPracticeQuestion> preassembledQuestions = assemblePreassembledQuestionsByType(type);
-        if (preassembledQuestions != null && !preassembledQuestions.isEmpty()) {
-            // 将预组装的题目列表存入 Redis，设置过期时间，例如 1 小时
-            redisTemplate.opsForValue().set(cacheKey, preassembledQuestions, 1, TimeUnit.HOURS);
-        } else {
-            // 如果没有题目，删除缓存
-            redisTemplate.delete(cacheKey);
-        }
-    }
-
-
-    @Transactional
-    protected List<PreassembledPracticeQuestion> assemblePreassembledQuestionsByType(String type) {
-        List<PreassembledPracticeQuestion> preassembledQuestions = new ArrayList<>();
-        // 获取指定类型的所有 QuestionBody
-        List<QuestionBody> questionBodies = getQuestionBodiesByType(type);
-        if (questionBodies == null || questionBodies.isEmpty()) {
-            return preassembledQuestions;
-        }
-
-        for (QuestionBody questionBody : questionBodies) {
-            // 获取与 QuestionBody 关联的所有 Question
-            List<Question> questions = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
-            if (questions == null || questions.isEmpty()) {
-                continue;
-            }
-
-            // 组装 PreassembledPracticeQuestion
-            PreassembledPracticeQuestion preassembledQuestion = new PreassembledPracticeQuestion();
-            preassembledQuestion.setQuestionBody(questionBody.getBody());
-
-            List<SubQuestion> subQuestions = questions.stream().map(question -> {
-                SubQuestion subQuestion = new SubQuestion();
-                subQuestion.setQuestionId(question.getId());
-                subQuestion.setQuestionContent(question.getContent());
-                subQuestion.setType(question.getType());
-                if ("CHOICE".equals(question.getType())) {
-                    subQuestion.setQuestionOptions(question.getOptions());
-                }
-                return subQuestion;
-            }).collect(Collectors.toList());
-            preassembledQuestion.setType(type);
-            preassembledQuestion.setSubQuestions(subQuestions);
-            preassembledQuestions.add(preassembledQuestion);
-        }
-        return preassembledQuestions;
-    }
 
     @Transactional
     @Override
@@ -185,6 +102,11 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     @Transactional
     public List<QuestionBody> getQuestionBodiesByType(String type) {
         return questionBodyMapper.getQuestionBodiesByType(type);
+    }
+
+    @Override
+    public List<String> getAllTypes() {
+        return questionBodyMapper.getAllTypes();
     }
 
     @Override

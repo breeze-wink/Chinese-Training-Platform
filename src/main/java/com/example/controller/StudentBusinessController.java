@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.dto.redis.PreassembledPracticeQuestion;
+import com.example.dto.redis.PreAssembledQuestion;
 import com.example.dto.redis.SubQuestion;
 import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
@@ -18,14 +18,8 @@ import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.impl.ClassStudentServiceImpl;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
-import com.example.service.question.PracticeQuestionService;
-import com.example.service.question.PracticeService;
-import com.example.service.question.QuestionBodyService;
-import com.example.service.question.QuestionService;
-import com.example.service.question.impl.PracticeQuestionServiceImpl;
-import com.example.service.question.impl.PracticeServiceImpl;
-import com.example.service.question.impl.QuestionBodyServiceImpl;
-import com.example.service.question.impl.QuestionServiceImpl;
+import com.example.service.question.*;
+import com.example.service.question.impl.*;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.PracticeAnswerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,7 +39,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
 
 
 @RestController
@@ -56,6 +49,7 @@ public class StudentBusinessController {
     private final QuestionService questionService;
     private final PracticeQuestionService practiceQuestionService;
     private final PracticeAnswerService practiceAnswerService;
+    private final PreAssembledQuestionService preAssembledQuestionService;
     private final QuestionBodyService questionBodyService;
     private final StatsStudentService statsStudentService;
     private final ClassStudentService classStudentService;
@@ -68,6 +62,7 @@ public class StudentBusinessController {
                                       PracticeQuestionServiceImpl practiceQuestionService,
                                       PracticeAnswerServiceImpl practiceAnswerService,
                                       QuestionBodyServiceImpl questionBodyService,
+                                      PreAssembledQuestionServiceImpl preAssembledQuestionService,
                                       StatsStudentServiceImpl statsStudentService,
                                       ClassStudentServiceImpl classStudentService,
                                       AssignmentSubmissionServiceImpl assignmentSubmissionService
@@ -78,6 +73,7 @@ public class StudentBusinessController {
         this.practiceQuestionService = practiceQuestionService;
         this.practiceAnswerService = practiceAnswerService;
         this.questionBodyService = questionBodyService;
+        this.preAssembledQuestionService = preAssembledQuestionService;
         this.statsStudentService = statsStudentService;
         this.classStudentService = classStudentService;
         this.assignmentSubmissionService = assignmentSubmissionService;
@@ -244,11 +240,11 @@ public class StudentBusinessController {
                     .collect(Collectors.toList());
 
             // 从 Redis 获取预组装的题目列表
-            List<PreassembledPracticeQuestion> preassembledQuestions = questionBodyService.getPreassembledQuestionsByTypes(types);
-            List<PreassembledPracticeQuestion> finalBigQuestions = new ArrayList<>();
+            List<PreAssembledQuestion> preassembledQuestions = preAssembledQuestionService.getPreAssembledQuestionsByTypes(types);
+            List<PreAssembledQuestion> finalBigQuestions = new ArrayList<>();
             for (GeneratePracticeDefineRequest.QuestionBodyType questionBodyType : request.getQuestionBodyTypes()) {
                 //取出当前类型
-                List<PreassembledPracticeQuestion> typeQuestions = preassembledQuestions.stream()
+                List<PreAssembledQuestion> typeQuestions = preassembledQuestions.stream()
                         .filter(q -> q.getType().equals(questionBodyType.getType()))
                         .collect(Collectors.toList());
 
@@ -256,12 +252,12 @@ public class StudentBusinessController {
 
                 // 高效随机抽取
                 Collections.shuffle(typeQuestions);
-                List<PreassembledPracticeQuestion> selectedTypeQuestions = typeQuestions.stream()
+                List<PreAssembledQuestion> selectedTypeQuestions = typeQuestions.stream()
                         .limit(questionBodyType.getNum())
                         .toList();
                 finalBigQuestions.addAll(selectedTypeQuestions);
             }
-            for (PreassembledPracticeQuestion preassembledQuestion : finalBigQuestions) {
+            for (PreAssembledQuestion preassembledQuestion : finalBigQuestions) {
                 // 组装 InfoData 和 PracticeQuestion
                 // 先创建 PracticeQuestion 实体列表
 

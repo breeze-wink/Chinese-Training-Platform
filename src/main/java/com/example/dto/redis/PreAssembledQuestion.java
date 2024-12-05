@@ -1,4 +1,4 @@
-// PreassembledPracticeQuestion.java
+// PreAssembledQuestion.java
 package com.example.dto.redis;
 
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PreassembledPracticeQuestion implements Serializable {
+public class PreAssembledQuestion implements Serializable {
     @Serial
     private static final long serialVersionUID = 1;
 

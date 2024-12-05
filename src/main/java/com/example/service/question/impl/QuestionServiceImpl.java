@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -73,7 +75,7 @@ public class QuestionServiceImpl implements QuestionService {
         return question;
     }
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Question> getQuestionsByIds(List<Long> questionIds) {
         List<Question> questions = new ArrayList<>();
         for (Long id : questionIds) {
@@ -81,8 +83,19 @@ public class QuestionServiceImpl implements QuestionService {
         }
         return questions;
     }
+
     @Override
     @Transactional
+    @Async
+    public void flushKnowledgePointCache(Long id) {
+        String cacheKey = "questions:knowledgePoint:" + id;
+        List<Question> questions = questionMapper.getQuestionsByKnowledgePointId(id);
+        if (questions != null && !questions.isEmpty()) {
+            redisTemplate.opsForValue().set(cacheKey, questions);
+        }
+    }
+
+    @Override
     public List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId) {
         // 尝试从缓存获取
         String cacheKey = "questions:knowledgePoint:" + knowledgePointId;
@@ -107,28 +120,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Question> getAllQuestions() {
-        // 尝试从缓存获取
-        String cacheKey = "questions:all";
-        List<?> cachedQuestions = (List<?>) redisTemplate.opsForValue().get(cacheKey);
-        if (cachedQuestions != null) {
-            // 将缓存中的数据转换为 List<Question>
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                return objectMapper.convertValue(cachedQuestions, objectMapper.getTypeFactory().constructCollectionType(List.class, Question.class));
-            } catch (Exception e) {
-                // 记录日志
-                log.error("Failed to convert cached questions to List<Question> for all questions", e);
-            }
-        }
-
-        // 从数据库获取并缓存
-        List<Question> questions = questionMapper.selectAll();
-        if (questions != null && !questions.isEmpty()) {
-            redisTemplate.opsForValue().set(cacheKey, questions);
-        }
-        return questions;
+        return questionMapper.selectAll();
     }
 
     @Override
@@ -156,14 +149,10 @@ public class QuestionServiceImpl implements QuestionService {
         return questions;
     }
 
-    @Override
-    public void deleteFromRedis(Long id) {
-        String cacheKey = "question:" + id;
-        redisTemplate.delete(cacheKey);
-    }
+
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds) {
         List<Question> questions = new ArrayList<>();
         for (Long knowledgePointId : knowledgePointIds) {
@@ -173,10 +162,18 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
 
-
+    @Override
+    public void deleteFromRedis(Question question) {
+        String cacheKey = "question:" + question.getId();
+        redisTemplate.delete(cacheKey);
+        cacheKey = "questions:knowledgePoint:" + question.getKnowledgePointId();
+        redisTemplate.delete(cacheKey);
+    }
     @Override
     public void syncToRedis(Question question) {
         String cacheKey = "question:" + question.getId();
         redisTemplate.opsForValue().set(cacheKey, question);
+        cacheKey = "questions:knowledgePoint:" + question.getKnowledgePointId();
+        redisTemplate.delete(cacheKey);
     }
 }

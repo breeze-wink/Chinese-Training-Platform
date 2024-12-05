@@ -11,6 +11,7 @@ import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
+import com.example.service.cache.CacheRefreshService;
 import com.example.service.classes.*;
 import com.example.service.classes.impl.*;
 import com.example.service.course.CourseStandardService;
@@ -45,6 +46,7 @@ public class TeacherBusinessController {
     private final StudentService studentService;
     private final GroupStudentService groupStudentService;
     private final KnowledgePointService knowledgePointService;
+    private final CacheRefreshService cacheRefreshService;
 
     private final QuestionService questionService;
 
@@ -60,7 +62,8 @@ public class TeacherBusinessController {
                                      KnowledgePointServiceImpl knowledgePointService,
                                      QuestionServiceImpl questionService,
                                      QuestionBodyServiceImpl questionBodyService,
-                                     JoinClassServiceImpl joinClassService
+                                     JoinClassServiceImpl joinClassService,
+                                     CacheRefreshService cacheRefreshService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -72,6 +75,7 @@ public class TeacherBusinessController {
         this.questionService = questionService;
         this.questionBodyService = questionBodyService;
         this.joinClassService = joinClassService;
+        this.cacheRefreshService = cacheRefreshService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -357,6 +361,7 @@ public class TeacherBusinessController {
                 Question question = getQuestion(id, questionInfo, questionBody);
                 questionService.createQuestion(question);
             }
+            cacheRefreshService.markTypeCacheOutOfDate(request.getQuestionType());
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {
             e.printStackTrace();
