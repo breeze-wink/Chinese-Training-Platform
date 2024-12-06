@@ -1,9 +1,6 @@
 package com.example.controller;
 
-import com.example.dto.request.teacher.CreateGroupRequest;
-import com.example.dto.request.teacher.TeacherCreateClassRequest;
-import com.example.dto.request.teacher.UpdateClassRequest;
-import com.example.dto.request.teacher.UploadQuestionRequest;
+import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
 import com.example.dto.response.student.AvgScoreResponse;
 import com.example.dto.response.student.HistoryScoresResponse;
@@ -75,8 +72,7 @@ public class TeacherBusinessController {
                                      QuestionBodyServiceImpl questionBodyService,
                                      JoinClassServiceImpl joinClassService,
                                      StatsStudentServiceImpl statsStudentService,
-                                     AssignmentSubmissionServiceImpl assignmentSubmissionService
-                                     JoinClassServiceImpl joinClassService,
+                                     AssignmentSubmissionServiceImpl assignmentSubmissionService,
                                      CacheRefreshService cacheRefreshService
                                      ) {
         this.courseStandardService = courseStandardService;
@@ -372,7 +368,9 @@ public class TeacherBusinessController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 }
             }
-            questionBodyService.createQuestionBody(questionBody);
+            if (questionBody.getBody() != null) {
+                questionBodyService.createQuestionBody(questionBody);
+            }
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
                 questionService.createQuestion(question);
@@ -388,7 +386,7 @@ public class TeacherBusinessController {
 
     private static Question getQuestion(Long id, UploadQuestionRequest.QuestionInfo questionInfo, QuestionBody questionBody) {
         Question question = new Question();
-        question.setBodyId(questionBody.getId());
+        question.setBodyId(questionBody.getBody() == null ? null : questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
@@ -791,5 +789,10 @@ public class TeacherBusinessController {
         response.setData(data);
         response.setMessage("历史成绩获取成功");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/search-questions")
+    public ResponseEntity<SearchQuestionsResponse> searchQuestions(@RequestBody SearchQuestionsRequest request) {
+
     }
 }

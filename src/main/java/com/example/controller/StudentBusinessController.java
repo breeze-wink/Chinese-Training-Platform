@@ -217,7 +217,9 @@ public class StudentBusinessController {
                 if (question != null) {
                     questionBody = questionBodyMap.get(question.getBodyId());
                     infoData.setPracticeQuestionId(practiceQuestion.getId());
-                    infoData.setQuestionBody(questionBody.getBody());
+                    if (questionBody != null) {
+                        infoData.setQuestionBody(questionBody.getBody());
+                    }
                     infoData.setQuestionContent(question.getContent());
                     infoData.setType(question.getType());
                     if (Objects.equals(infoData.getType(), "CHOICE")) {

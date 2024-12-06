@@ -66,7 +66,11 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     public List<QuestionBody> getQuestionBodiesByIds(ArrayList<Long> ids) {
         List<QuestionBody> questionBodies = new ArrayList<>();
         for (Long id : ids) {
-            questionBodies.add(getQuestionBodyById(id));
+            QuestionBody questionBody = getQuestionBodyById(id);
+            if (questionBody != null) {
+                questionBodies.add(getQuestionBodyById(id));
+
+            }
         }
         return questionBodies;
     }
