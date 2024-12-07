@@ -10,6 +10,8 @@ import java.util.List;
 @Setter
 public class GetQuestionResponse {
     private String message;
+    private String creator;
+    private String knowledgePointType;
     private String body;
     private List<infoData> data;
 

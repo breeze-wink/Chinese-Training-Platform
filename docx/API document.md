@@ -2381,7 +2381,7 @@
     }
     ```
 
-###  Get All Questions
+###  Get All Questions `problem`
 
 - **接口路径**：`/api/teacher/{id}/get-all-questions`
 - **请求方法**：GET
@@ -2399,15 +2399,15 @@
       "data": [
         {
           "id": "long", // 对应数据库中的 id 字段
+          "uploadTime": "string",
+          "knowledgePoint": "string",
           "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-          "createrName": "string",
-          "uploadTime": "string"
         },
         {
           "id": "long", // 对应数据库中的 id 字段
+          "uploadTime": "string",
+          "knowledgePoint": "string",
           "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-          "createrName": "string",
-          "uploadTime": "string"
         },
         ...
       ]
@@ -2428,13 +2428,15 @@
 - **请求说明**：
   - 请求参数:
     - 路径参数（Path Variable）：`id` - 教师的唯一标识符
-    - 查询参数（Query Parameter）`bodyId` - 题目的唯一标识符
+    - 查询参数（Query Parameter）`questionId` - 题目的唯一标识符
 - **响应说明**：
   - **响应格式**：JSON
   - **成功响应**（200 OK）：
     ```json
     {
       "message": "获取题目成功",
+      "creator": "string",//创建者
+      "knowledgePointType": "string",
       "body": "string",
       "data": [
         {
@@ -2467,13 +2469,13 @@
 
 ### Delete Question `finished`
 
-- **接口路径**：`/api/teacher/delete-question/{id}`
+- **接口路径**：`/api/teacher/{id}/delete-question`
 - **请求方法**：DELETE
 - **接口说明**：教师删除指定ID的题目。
 
 - **请求说明**：
-  - **路径参数**：
-    - `id`：题目的唯一标识符(bodyId)。
+  - **路径参数**：`id`：教师的唯一标识符。
+  - **查询参数**：`questionId`：题目的唯一标识符。
 
 - **响应说明**：
   - **响应格式**：JSON
