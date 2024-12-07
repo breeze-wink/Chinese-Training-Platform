@@ -45,47 +45,54 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
         }
 
         // 判断查询类型：大题或小题
-        boolean isBigQuestion = (request.getKnowledgeType() != null && !request.getKnowledgeType().isEmpty());
+
+        boolean isBigQuestion = request.getKnowledgeId() == null;
 
         if (isBigQuestion) {
             // 查询大题
-            List<BigQuestionResult> bigQuestionResults = searchQuestionMapper.searchBigQuestions(
-                    request.getKnowledgeType(),
-                    request.getDifficulty(),
-                    request.getMode(),
-                    request.getSortOrder(),
-                    offset,
-                    request.getPageSize(),
-                    request.getSearch()
-            );
+            try {
+                List<BigQuestionResult> bigQuestionResults = searchQuestionMapper.searchBigQuestions(
+                        request.getKnowledgeType(),
+                        request.getDifficulty(),
+                        request.getMode(),
+                        request.getSortOrder(),
+                        offset,
+                        request.getPageSize(),
+                        request.getSearch()
+                );
+                // 设置大题数据
+                for (BigQuestionResult result : bigQuestionResults) {
+                    SearchQuestionsResponse.BigQuestion bigQuestion = new SearchQuestionsResponse.BigQuestion();
+                    bigQuestion.setBodyId(result.getBodyId());
+                    bigQuestion.setBody(result.getBody());
+                    bigQuestion.setDifficulty(result.getTotalScore() / result.getCompleteCount());
+                    bigQuestion.setReferencedCount(result.getReferencedCount());
+                    // 查询子题
+                    List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(result.getBodyId());
+                    List<SearchQuestionsResponse.SubQuestion> subQuestionDTOs = convertToSubQuestions(subQuestions);
+                    bigQuestion.setSubQuestion(subQuestionDTOs);
+                    response.getBigQuestions().add(bigQuestion);
+                }
 
-            // 设置大题数据
-            for (BigQuestionResult result : bigQuestionResults) {
-                SearchQuestionsResponse.BigQuestion bigQuestion = new SearchQuestionsResponse.BigQuestion();
-                bigQuestion.setBodyId(result.getBodyId());
-                bigQuestion.setBody(result.getBody());
-                bigQuestion.setDifficulty(determineDifficulty(result.getTotalScore(), result.getCompleteCount()));
+                // 获取总记录数
+                int totalCount = searchQuestionMapper.countBigQuestions(
+                        request.getKnowledgeType(),
+                        request.getDifficulty(),
+                        request.getSearch()
+                );
+                response.setPageSize(request.getPageSize() == bigQuestionResults.size() ?
+                        request.getPageSize() : bigQuestionResults.size());
 
-                // 查询子题
-                List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(result.getBodyId());
-                List<SearchQuestionsResponse.SubQuestion> subQuestionDTOs = convertToSubQuestions(subQuestions);
-                bigQuestion.setSubQuestion(subQuestionDTOs);
-                response.getBigQuestions().add(bigQuestion);
+                response.setTotalCount(totalCount);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            // 获取总记录数
-           int totalCount = searchQuestionMapper.countBigQuestions(
-                    request.getType(),
-                    request.getKnowledgeType(),
-                    request.getDifficulty(),
-                    request.getSearch()
-            );
-            response.setTotalCount(totalCount);
         }
         else {
             // 查询小题
             List<QuestionResult> questionResults = searchQuestionMapper.searchSmallQuestions(
-                    request.getType(),
+                    type2enum(request.getType()),
                     request.getKnowledgeId(),
                     request.getDifficulty(),
                     request.getMode(),
@@ -101,26 +108,32 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
                 question.setQuestionId(result.getQuestionId());
                 question.setBody(result.getBody());
                 question.setQuestion(result.getContent());
-                question.setAnswer(result.getAnswer());
-                question.setExplanation("解析"); // 需要根据实际数据填充
-                question.setDifficulty(determineDifficulty(result.getTotalScore(), result.getCompleteCount()));
+                String answers = result.getAnswer();
+                String[] temps = answers.split("\\$\\$");
+                if (temps.length > 1) {
+                    question.setAnswer(temps[0]);
+                    question.setExplanation(temps[1]); // 需要根据实际数据填充
+                }
+                question.setDifficulty(result.getTotalScore() / result.getCompleteCount());
                 question.setType(result.getType());
+                question.setReferencedCount(result.getReferencedCount());
                 question.setKnowledge(result.getKnowledgeName()); // 设置实际知识点名称
                 response.getQuestions().add(question);
             }
 
             // 获取总记录数
             long totalCount = searchQuestionMapper.countSmallQuestions(
-                    request.getType(),
+                    type2enum(request.getType()),
                     request.getKnowledgeId(),
                     request.getDifficulty(),
                     request.getSearch()
             );
+            response.setPageSize(questionResults.size() == request.getPageSize() ?
+                                 request.getPageSize() : questionResults.size());
             response.setTotalCount((int) totalCount);
         }
 
         // 设置分页信息
-        response.setPageSize(request.getPageSize());
         response.setCurrentPage(request.getPage());
         int totalPages = (int) Math.ceil((double) response.getTotalCount() / request.getPageSize());
         response.setTotalPages(totalPages);
@@ -133,8 +146,12 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             SearchQuestionsResponse.SubQuestion sub = new SearchQuestionsResponse.SubQuestion();
             sub.setQuestion(q.getContent());
             String answer = q.getAnswer();
-            sub.setAnswer(answer);
-            sub.setExplanation(answer); // 需要根据实际数据填充
+
+            String[] temps = answer.split("\\$\\$");
+            sub.setAnswer(temps[0]);
+            if (temps.length > 1) {
+                sub.setExplanation(answer); // 需要根据实际数据填充
+            }
             sub.setType(q.getType());
             // 获取知识点名称
             String knowledgeName = fetchKnowledgeName(q.getKnowledgePointId());
@@ -163,4 +180,15 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             return "困难";
         }
     }
+
+    private String type2enum(String type) {
+        return switch (type) {
+            case "选择" -> "CHOICE";
+            case "填空" -> "FILL_IN_BLANK";
+            case "简答" -> "SHORT_ANSWER";
+            case "作文" -> "ESSAY";
+            default -> "";
+        };
+    }
+
 }

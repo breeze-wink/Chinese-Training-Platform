@@ -22,7 +22,8 @@ public class SearchQuestionsResponse {
         private Long bodyId;
         private String body;
         private List<SubQuestion> subQuestion = new ArrayList<>();
-        private String difficulty;
+        private Double difficulty;
+        private Integer referencedCount;
     }
 
     @Data
@@ -32,6 +33,7 @@ public class SearchQuestionsResponse {
         private String explanation;
         private String type;
         private String knowledge;
+        private Integer referencedCount;
     }
 
     @Data
@@ -41,7 +43,8 @@ public class SearchQuestionsResponse {
         private String question;
         private String answer;
         private String explanation;
-        private String difficulty;
+        private Integer referencedCount;
+        private Double difficulty;
         private String type;
         private String knowledge;
     }
