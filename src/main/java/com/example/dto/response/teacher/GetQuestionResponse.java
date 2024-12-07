@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class GetQuestionResponse {
     private String message;
+    private Long bodyId;
     private String creator;
     private String knowledgePointType;
     private String body;
@@ -18,6 +19,7 @@ public class GetQuestionResponse {
     @Getter
     @Setter
     public static class infoData {
+        private Long questionId;
         private String content;
         private String type;
         List<String> options;
