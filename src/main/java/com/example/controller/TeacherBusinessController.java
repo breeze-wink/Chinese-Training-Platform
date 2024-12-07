@@ -31,8 +31,11 @@ import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.user.StatsStudentService;
 import com.example.service.user.StudentService;
+import com.example.service.user.TeacherService;
 import com.example.service.user.impl.StatsStudentServiceImpl;
 import com.example.service.user.impl.StudentServiceImpl;
+import com.example.service.user.impl.TeacherServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -60,6 +63,7 @@ public class TeacherBusinessController {
     private final JoinClassService joinClassService;
     private final StatsStudentService statsStudentService;
     private final AssignmentSubmissionService assignmentSubmissionService;
+    private final TeacherService teacherService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -72,7 +76,8 @@ public class TeacherBusinessController {
                                      QuestionBodyServiceImpl questionBodyService,
                                      JoinClassServiceImpl joinClassService,
                                      StatsStudentServiceImpl statsStudentService,
-                                     AssignmentSubmissionServiceImpl assignmentSubmissionService
+                                     AssignmentSubmissionServiceImpl assignmentSubmissionService,
+                                     TeacherServiceImpl teacherService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -86,6 +91,7 @@ public class TeacherBusinessController {
         this.joinClassService = joinClassService;
         this.statsStudentService = statsStudentService;
         this.assignmentSubmissionService = assignmentSubmissionService;
+        this.teacherService = teacherService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -524,35 +530,43 @@ public class TeacherBusinessController {
 
 
     @GetMapping("{id}/get-question")
-    public ResponseEntity<GetQuestionResponse> getQuestion(@PathVariable Long id, @RequestParam Long bodyId) {
+    public ResponseEntity<GetQuestionResponse> getQuestion(@PathVariable Long id, @RequestParam Long questionId) throws JsonProcessingException {
         GetQuestionResponse response = new GetQuestionResponse();
         List<GetQuestionResponse.infoData> data = new ArrayList<>();
-        QuestionBody questionBody = questionBodyService.getQuestionBodyById(bodyId);
-        if(questionBody == null){
+        Question question = questionService.getQuestionById(questionId);
+        if(question == null){
             response.setMessage("问题不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        List<Question> questions = questionService.getQuestionsByQuestionBodyId(bodyId);
+        response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
+        response.setKnowledgePointType(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getType());
         response.setBody(null);
-        if(questionBody.getBody() != null && !questionBody.getBody().isEmpty()){
-            response.setBody(questionBody.getBody());
+        List<Question> questions = new ArrayList<>();
+        if(question.getBodyId() != null){
+            questions = questionService.getQuestionsByQuestionBodyId(question.getBodyId());
+            response.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
         }
-        for(Question question : questions){
+        else{
+            questions.add(question);
+        }
+        for(Question q : questions){
             GetQuestionResponse.infoData infoData = new GetQuestionResponse.infoData();
-            infoData.setContent(question.getContent());
-            infoData.setType(question.getType());
-            infoData.setOptions(null);
-            if(Objects.equals(infoData.getType(), "CHOICE")){
-                infoData.setOptions(drawOptions(question.getOptions()));
+            infoData.setContent(q.getContent());
+            infoData.setType(q.getType());
+            if(Objects.equals(q.getType(), "CHOICE")){
+                infoData.setOptions(drawOptions(q.getOptions()));
             }
-            String [] temp = question.getAnswer().split("\\$\\$");
+            String [] temp = q.getAnswer().split("\\$\\$");
             infoData.setAnswer(temp[0]);
-            infoData.setAnalysis(temp[1]);
-            infoData.setKnowledgePointName(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getName());
+            infoData.setAnalysis(null);
+            if(temp.length > 1){
+                infoData.setAnalysis(temp[1]);
+            }
+            infoData.setKnowledgePointName(knowledgePointService.getKnowledgePointById(q.getKnowledgePointId()).getName());
             data.add(infoData);
         }
         response.setData(data);
-        response.setMessage("问题获取成功");
+        response.setMessage("获取问题成功");
         return ResponseEntity.ok(response);
     }
 
@@ -571,25 +585,24 @@ public class TeacherBusinessController {
     }
 
 
-    @DeleteMapping("/delete-question/{id}")
-    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id) {
+    @DeleteMapping("{id}/delete-question")
+    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long questionId) throws JsonProcessingException {
         Message response = new Message();
-        QuestionBody questionBody = questionBodyService.getQuestionBodyById(id);
-        if(questionBody == null){
+        Question question = questionService.getQuestionById(questionId);
+        if(question == null){
             response.setMessage("问题不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        else{
-            int result = questionBodyService.deleteQuestionBody(id);
-            if(result == 0){
-                response.setMessage("删除失败");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            else{
-                response.setMessage("删除成功");
-                return ResponseEntity.ok(response);
-            }
+        if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
+            questionService.deleteQuestion(questionId);
+            questionService.deleteFromRedis(questionId);
         }
+        else{
+            questionBodyService.deleteQuestionBody(question.getBodyId());
+            questionService.deleteFromRedis(questionId);
+        }
+        response.setMessage("删除成功");
+        return ResponseEntity.ok(response);
     }
 
 
