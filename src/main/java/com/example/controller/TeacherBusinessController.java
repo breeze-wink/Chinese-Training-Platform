@@ -527,12 +527,16 @@ public class TeacherBusinessController {
             response.setMessage("问题不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
+        response.setCreator(null);
+        if(question.getCreatorId() != null){
+            response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
+        }
         response.setKnowledgePointType(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getType());
         response.setBody(null);
         response.setBodyId(null);
         List<Question> questions = new ArrayList<>();
         if(question.getBodyId() != null){
+            response.setBodyId(question.getBodyId());
             questions = questionService.getQuestionsByQuestionBodyId(question.getBodyId());
             response.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
         }
@@ -544,7 +548,7 @@ public class TeacherBusinessController {
             infoData.setQuestionId(q.getId());
             infoData.setContent(q.getContent());
             infoData.setType(q.getType());
-            if(Objects.equals(q.getType(), "CHOICE")){
+            if(Objects.equals(q.getType(), "CHOICE") && q.getOptions() != null){
                 infoData.setOptions(drawOptions(q.getOptions()));
             }
             String [] temp = q.getAnswer().split("\\$\\$");
