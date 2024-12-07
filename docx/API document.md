@@ -2438,8 +2438,10 @@
       "creator": "string",//创建者
       "knowledgePointType": "string",
       "body": "string",
+      "bodyId": "long",
       "data": [
         {
+          "questionId": "long",
           "content": "string",
           "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
           "options": ["string", "string", "string", "string"],
@@ -2448,6 +2450,7 @@
           "knowledgePointName": "string"
         },
         {
+          "questionId": "long",
           "content": "string",
           "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
           "options": ["string", "string", "string", "string"],
@@ -2474,8 +2477,9 @@
 - **接口说明**：教师删除指定ID的题目。
 
 - **请求说明**：
-  - **路径参数**：`id`：教师的唯一标识符。
-  - **查询参数**：`questionId`：题目的唯一标识符。
+  - **路径参数**：`id`："long"//教师的唯一标识符。
+  - **查询参数**：`questionId`："long"//题目的唯一标识符。
+                `type`: "string"//"big"OR"small"，判断大题还是小题。
 
 - **响应说明**：
   - **响应格式**：JSON

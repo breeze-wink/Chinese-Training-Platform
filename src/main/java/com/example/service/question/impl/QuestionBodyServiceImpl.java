@@ -95,10 +95,17 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     @Transactional
     public int deleteQuestionBody(Long id) {
         QuestionBody questionBody = getQuestionBodyById(id);
+        List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(id);
         int result = questionBodyMapper.delete(id);
         if (questionBody != null) {
+            for (Question subQuestion : subQuestions)
+            {
+                rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
+            }
             rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.DELETE_OPERATION);
         }
+        String cacheKey = "questions:questionBody:" + id;
+        redisTemplate.delete(cacheKey);
         return result;
     }
 
