@@ -109,34 +109,4 @@ public class SystemAdminBusinessController {
         }
     }
 
-
-
-    @GetMapping("/get-all-questions")
-    public ResponseEntity<QuestionsResponse> getAllQuestions() {
-        QuestionsResponse response = new QuestionsResponse();
-        response.setQuestions(new ArrayList<>());
-        List<Question> questions = questionService.getAllQuestions();
-        for (Question question : questions) {
-            QuestionsResponse.questionInfo info = new QuestionsResponse.questionInfo();
-            info.setId(question.getId());
-            info.setDescription(question.getContent());
-
-            //TODO:
-        }
-        return ResponseEntity.ok(response);
-    }
-    @DeleteMapping("/delete-question/{id}")
-    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id) {
-        try{
-            Question question = questionService.getQuestionById(id);
-            if (question == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("删除失败，未找到题目"));
-            }
-            questionService.deleteQuestion(id);
-            return ResponseEntity.ok(new Message("删除成功"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("删除失败," + e.getMessage()));
-        }
-    }
-
 }

@@ -1,6 +1,7 @@
 package com.example.service.rabbitmq.RabbitMQConsumer;
 import com.example.config.RabbitMQConfig;
 import com.example.model.question.Question;
+import com.example.service.cache.CacheRefreshService;
 import com.example.service.rabbitmq.dto.QuestionSyncMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,10 +16,15 @@ public class QuestionConsumer {
     private final QuestionService questionService;
     private final ObjectMapper objectMapper;
 
+    private final CacheRefreshService cacheRefreshService;
+
     @Autowired
-    public QuestionConsumer(QuestionService questionService, ObjectMapper objectMapper) {
+    public QuestionConsumer(QuestionService questionService,
+                            ObjectMapper objectMapper,
+                            CacheRefreshService cacheRefreshService) {
         this.questionService = questionService;
         this.objectMapper = objectMapper;
+        this.cacheRefreshService = cacheRefreshService;
     }
 
     @RabbitListener(queues = RabbitMQConfig.QUESTION_QUEUE_NAME)
@@ -33,8 +39,9 @@ public class QuestionConsumer {
                 questionService.syncToRedis(question);
             } else if ("delete".equals(operation)) {
                 // 处理删除操作
-                questionService.deleteFromRedis(question.getId());
+                questionService.deleteFromRedis(question);
             }
+            cacheRefreshService.markKnowledgeCacheOutOfDate(question.getKnowledgePointId());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

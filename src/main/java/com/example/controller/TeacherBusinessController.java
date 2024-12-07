@@ -1,9 +1,7 @@
 package com.example.controller;
 
-import com.example.dto.request.teacher.CreateGroupRequest;
-import com.example.dto.request.teacher.TeacherCreateClassRequest;
-import com.example.dto.request.teacher.UpdateClassRequest;
-import com.example.dto.request.teacher.UploadQuestionRequest;
+import com.example.dto.redis.PreAssembledQuestion;
+import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
 import com.example.dto.response.student.AvgScoreResponse;
 import com.example.dto.response.student.HistoryScoresResponse;
@@ -15,6 +13,8 @@ import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
+import com.example.model.question.QuestionStatistic;
+import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.user.StatsStudent;
 import com.example.service.classes.*;
@@ -23,8 +23,7 @@ import com.example.service.course.CourseStandardService;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
-import com.example.service.question.QuestionBodyService;
-import com.example.service.question.QuestionService;
+import com.example.service.question.*;
 import com.example.service.question.impl.QuestionBodyServiceImpl;
 import com.example.service.question.impl.QuestionServiceImpl;
 import com.example.service.submission.AssignmentSubmissionService;
@@ -58,10 +57,15 @@ public class TeacherBusinessController {
     private final StudentService studentService;
     private final GroupStudentService groupStudentService;
     private final KnowledgePointService knowledgePointService;
+    private final CacheRefreshService cacheRefreshService;
+
     private final QuestionService questionService;
     private final QuestionBodyService questionBodyService;
     private final JoinClassService joinClassService;
     private final StatsStudentService statsStudentService;
+    private final SearchQuestionService searchQuestionService;
+
+    private final QuestionStatisticService questionStatisticService;
     private final AssignmentSubmissionService assignmentSubmissionService;
     private final TeacherService teacherService;
     @Autowired
@@ -77,6 +81,9 @@ public class TeacherBusinessController {
                                      JoinClassServiceImpl joinClassService,
                                      StatsStudentServiceImpl statsStudentService,
                                      AssignmentSubmissionServiceImpl assignmentSubmissionService,
+                                     CacheRefreshService cacheRefreshService,
+                                     SearchQuestionService searchQuestionService,
+                                     QuestionStatisticService questionStatisticService
                                      TeacherServiceImpl teacherService
                                      ) {
         this.courseStandardService = courseStandardService;
@@ -89,8 +96,11 @@ public class TeacherBusinessController {
         this.questionService = questionService;
         this.questionBodyService = questionBodyService;
         this.joinClassService = joinClassService;
+        this.cacheRefreshService = cacheRefreshService;
         this.statsStudentService = statsStudentService;
         this.assignmentSubmissionService = assignmentSubmissionService;
+        this.searchQuestionService = searchQuestionService;
+        this.questionStatisticService = questionStatisticService;
         this.teacherService = teacherService;
     }
 
@@ -337,46 +347,25 @@ public class TeacherBusinessController {
         Message response = new Message();
         try {
             QuestionBody questionBody = new QuestionBody();
-            if(request.getQuestionType() == null || request.getQuestionType().isEmpty()){
-                response.setMessage("题型不能为空");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
            
             questionBody.setBody(request.getBody());
             questionBody.setType(request.getQuestionType());
 
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
-            if (questions == null || questions.isEmpty()) {
-                response.setMessage("题目数量不能为零");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+            if (questionBody.getBody() != null) {
+                questionBodyService.createQuestionBody(questionBody);
+                QuestionStatistic questionStatistic = new QuestionStatistic();
+                questionStatistic.setId(questionBody.getId());
+                questionStatistic.setType("big");
+                questionStatisticService.insert(questionStatistic);
             }
-            else if(questions.size() > 1 && (request.getBody() == null || request.getBody().isEmpty())){
-                response.setMessage("组合题题干不能为空");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            for(UploadQuestionRequest.QuestionInfo questionInfo : questions){
-                if(questionInfo.getProblem() == null || questionInfo.getProblem().isEmpty()){
-                    response.setMessage("题目不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-                else if(questionInfo.getType() == null || questionInfo.getType().isEmpty()){
-                    response.setMessage("题目类型不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-                else if(questionInfo.getKnowledgePointId() == null){
-                    response.setMessage("知识点不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-                else if(questionInfo.getType().equals("CHOICE") && (questionInfo.getChoices() == null || questionInfo.getChoices().isEmpty())){
-                    response.setMessage("选择题选项不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-            }
-            questionBodyService.createQuestionBody(questionBody);
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
                 questionService.createQuestion(question);
+                cacheRefreshService.markKnowledgeCacheOutOfDate(question.getKnowledgePointId());
             }
+            cacheRefreshService.markTypeCacheOutOfDate(request.getQuestionType());
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -387,7 +376,7 @@ public class TeacherBusinessController {
 
     private static Question getQuestion(Long id, UploadQuestionRequest.QuestionInfo questionInfo, QuestionBody questionBody) {
         Question question = new Question();
-        question.setBodyId(questionBody.getId());
+        question.setBodyId(questionBody.getBody() == null ? null : questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
@@ -797,5 +786,12 @@ public class TeacherBusinessController {
         response.setData(data);
         response.setMessage("历史成绩获取成功");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/search-questions")
+    public ResponseEntity<SearchQuestionsResponse> searchQuestions(@RequestBody SearchQuestionsRequest request) {
+        SearchQuestionsResponse response = searchQuestionService.searchQuestions(request);
+        return ResponseEntity.ok(response);
+
     }
 }

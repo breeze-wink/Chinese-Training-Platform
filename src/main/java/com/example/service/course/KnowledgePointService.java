@@ -9,6 +9,8 @@ public interface KnowledgePointService {
     int removeKnowledgePoint(Long id);
     int updateKnowledgePoint(KnowledgePoint point);
     KnowledgePoint getKnowledgePointById(Long id);
+
+    String getKnowledgePointNameById(Long id);
     List<KnowledgePoint> getAllKnowledgePoints();
 
     List<KnowledgePoint> getAllKnowledgePointsOrderByType();
