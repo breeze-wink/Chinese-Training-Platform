@@ -51,7 +51,7 @@
         <if test="knowledgeType != null and knowledgeType != ''">
             AND qb.type = #{knowledgeType}
         </if>
-        <if test="difficulty != null and difficulty != '全部'">
+        <if test="difficulty != null and difficulty != ''">
             AND (
             qs.completeCount = 0
             OR (qs.totalScore / qs.completeCount) BETWEEN
@@ -65,7 +65,7 @@
         </if>
 
         <if test="search != null and search != ''">
-            AND (qb.body LIKE CONCAT('%', #{search}, '%')
+            AND qb.body LIKE CONCAT('%', #{search}, '%')
         </if>
 
         <if test="mode == 'latest'">
@@ -106,7 +106,7 @@
         <if test="knowledgeType != null and knowledgeType != ''">
             AND qb.type = #{knowledgeType}
         </if>
-        <if test="difficulty != null and difficulty != '全部'">
+        <if test="difficulty != null and difficulty != ''">
             AND (
             qs.completeCount = 0
             OR (qs.totalScore / qs.completeCount) BETWEEN
@@ -150,13 +150,13 @@
         ON q.knowledgePointId = kp.id
         WHERE
         1=1
-        <if test="type != null and type != '全部'">
+        <if test="type != null and type != ''">
             AND q.type = #{type}
         </if>
         <if test="knowledgeId != null and knowledgeId != ''">
             AND q.knowledgePointId = #{knowledgeId}
         </if>
-        <if test="difficulty != null and difficulty != '全部'">
+        <if test="difficulty != null and difficulty != ''">
             AND (
             qs.completeCount = 0
             OR (qs.totalScore / qs.completeCount) BETWEEN
@@ -216,13 +216,13 @@
         ON q.knowledgePointId = kp.id
         WHERE
         1=1
-        <if test="type != null and type != '全部'">
+        <if test="type != null and type != ''">
             AND q.type = #{type}
         </if>
         <if test="knowledgeId != null and knowledgeId != ''">
             AND q.knowledgePointId = #{knowledgeId}
         </if>
-        <if test="difficulty != null and difficulty != '全部'">
+        <if test="difficulty != null and difficulty != ''">
             AND (
             qs.completeCount = 0
             OR (qs.totalScore / qs.completeCount) BETWEEN
@@ -236,7 +236,9 @@
         </if>
 
         <if test="search != null and search != ''">
-            AND q.content LIKE CONCAT('%', #{search}, '%')
+            AND (qb.body LIKE CONCAT('%', #{search}, '%')
+            OR q.content LIKE CONCAT('%', #{search}, '%')
+            OR q.answer LIKE CONCAT('%', #{search}, '%'))
         </if>
     </select>
 

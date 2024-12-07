@@ -83,7 +83,7 @@ public class TeacherBusinessController {
                                      AssignmentSubmissionServiceImpl assignmentSubmissionService,
                                      CacheRefreshService cacheRefreshService,
                                      SearchQuestionService searchQuestionService,
-                                     QuestionStatisticService questionStatisticService
+                                     QuestionStatisticService questionStatisticService,
                                      TeacherServiceImpl teacherService
                                      ) {
         this.courseStandardService = courseStandardService;
@@ -584,11 +584,11 @@ public class TeacherBusinessController {
         }
         if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
             questionService.deleteQuestion(questionId);
-            questionService.deleteFromRedis(questionId);
+            questionService.deleteFromRedis(question);
         }
         else{
             questionBodyService.deleteQuestionBody(question.getBodyId());
-            questionService.deleteFromRedis(questionId);
+            questionService.deleteFromRedis(question);
         }
         response.setMessage("删除成功");
         return ResponseEntity.ok(response);
