@@ -45,6 +45,7 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
         }
 
         // 判断查询类型：大题或小题
+
         boolean isBigQuestion = request.getKnowledgeId() == null;
 
         if (isBigQuestion) {
@@ -86,7 +87,6 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
 
         }
         else {
@@ -146,6 +146,7 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             SearchQuestionsResponse.SubQuestion sub = new SearchQuestionsResponse.SubQuestion();
             sub.setQuestion(q.getContent());
             String answer = q.getAnswer();
+
             String[] temps = answer.split("\\$\\$");
             sub.setAnswer(temps[0]);
             if (temps.length > 1) {
@@ -189,4 +190,5 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             default -> "";
         };
     }
+
 }

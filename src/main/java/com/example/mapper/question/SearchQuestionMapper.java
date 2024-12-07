@@ -23,6 +23,7 @@ public interface SearchQuestionMapper {
 
     // 统计大题总数
     int countBigQuestions(
+
             @Param("knowledgeType") String knowledgeType,
             @Param("difficulty") String difficulty,
             @Param("search") String search

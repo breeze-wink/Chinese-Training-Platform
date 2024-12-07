@@ -527,11 +527,16 @@ public class TeacherBusinessController {
             response.setMessage("问题不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
+        response.setCreator(null);
+        if(question.getCreatorId() != null){
+            response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
+        }
         response.setKnowledgePointType(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getType());
         response.setBody(null);
+        response.setBodyId(null);
         List<Question> questions = new ArrayList<>();
         if(question.getBodyId() != null){
+            response.setBodyId(question.getBodyId());
             questions = questionService.getQuestionsByQuestionBodyId(question.getBodyId());
             response.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
         }
@@ -540,9 +545,10 @@ public class TeacherBusinessController {
         }
         for(Question q : questions){
             GetQuestionResponse.infoData infoData = new GetQuestionResponse.infoData();
+            infoData.setQuestionId(q.getId());
             infoData.setContent(q.getContent());
             infoData.setType(q.getType());
-            if(Objects.equals(q.getType(), "CHOICE")){
+            if(Objects.equals(q.getType(), "CHOICE") && q.getOptions() != null){
                 infoData.setOptions(drawOptions(q.getOptions()));
             }
             String [] temp = q.getAnswer().split("\\$\\$");
@@ -575,20 +581,29 @@ public class TeacherBusinessController {
 
 
     @DeleteMapping("{id}/delete-question")
-    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long questionId) throws JsonProcessingException {
+    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
         Message response = new Message();
-        Question question = questionService.getQuestionById(questionId);
-        if(question == null){
-            response.setMessage("问题不存在");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        if(Objects.equals(type, "small")){
+            Question question = questionService.getQuestionById(questionId);
+            if(question == null){
+                response.setMessage("问题不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
+                questionService.deleteQuestion(questionId);
+            }
+            else{
+                questionBodyService.deleteQuestionBody(question.getBodyId());
+
+            }
         }
-        if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
-            questionService.deleteQuestion(questionId);
-            questionService.deleteFromRedis(question);
-        }
-        else{
-            questionBodyService.deleteQuestionBody(question.getBodyId());
-            questionService.deleteFromRedis(question);
+        else if(Objects.equals(type, "big")){
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(questionId);
+            if(questionBody == null){
+                response.setMessage("问题不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            questionBodyService.deleteQuestionBody(questionId);
         }
         response.setMessage("删除成功");
         return ResponseEntity.ok(response);

@@ -53,6 +53,10 @@ public class QuestionServiceImpl implements QuestionService {
         // 发送同步消息
         if (question != null) {
             rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
+            if (question.getBodyId() != null) {
+                String cacheKey = "questions:questionBody:" + question.getBodyId();
+                redisTemplate.delete(cacheKey);
+            }
         }
         return result;
     }
