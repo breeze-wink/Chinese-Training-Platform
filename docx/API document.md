@@ -985,7 +985,7 @@
 
 
 
-  
+
 ### Get Average Homework Score and Class Rank `finished`
 
 - **接口路径**：`/api/student/{id}/get-avg-score`
@@ -2497,7 +2497,6 @@
 - **接口说明**：教师查找题目。
 
 - **请求说明**
-  - 路径参数（Path Variable）：`id` - 用户的唯一标识符
     - 请求头: `Content-Type` : `application/json`
     - 请求参数:
       - 请求体(`JSON` 格式)：
@@ -2553,8 +2552,8 @@
   "currentPage": 1,    // 当前页
   "totalPages": 5      // 总页数
   }
-
-    ```
+  
+  ```
   - **失败响应**（400 Bad Request）：
     ```json
     {

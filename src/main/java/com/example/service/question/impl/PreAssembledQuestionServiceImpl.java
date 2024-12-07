@@ -41,22 +41,32 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
     public List<PreAssembledQuestion> getPreAssembledQuestionsByTypes(List<String> types) {
         List<PreAssembledQuestion> result = new ArrayList<>();
         for (String type : types) {
-            String cacheKey = "preassembled_questions:" + type;
-            Object object = redisTemplate.opsForValue().get(cacheKey);
-            List<PreAssembledQuestion> cachedQuestions = objectMapper.convertValue(object
-                    ,objectMapper.getTypeFactory().constructCollectionType(List.class, PreAssembledQuestion.class));
+            List<PreAssembledQuestion> cachedQuestions = getPreAssembledQuestionsByType(type);
 
-            if (cachedQuestions == null) {
-                // 如果缓存中没有，刷新缓存
-                flushPreAssembledQuestionsByType(type);
-                objectMapper.convertValue(object
-                        ,objectMapper.getTypeFactory().constructCollectionType(List.class, PreAssembledQuestion.class));
-            }
+
             if (cachedQuestions != null) {
                 result.addAll(cachedQuestions);
             }
         }
         return result;
+    }
+
+
+    @Transactional
+    @Override
+    public List<PreAssembledQuestion> getPreAssembledQuestionsByType(String type) {
+        String cacheKey = "preassembled_questions:" + type;
+        Object object = redisTemplate.opsForValue().get(cacheKey);
+        List<PreAssembledQuestion> cachedQuestions = objectMapper.convertValue(object
+                ,objectMapper.getTypeFactory().constructCollectionType(List.class, PreAssembledQuestion.class));
+        if (cachedQuestions == null) {
+            // 如果缓存中没有，刷新缓存
+            flushPreAssembledQuestionsByType(type);
+            object = redisTemplate.opsForValue().get(cacheKey);
+            cachedQuestions = objectMapper.convertValue(object
+                    ,objectMapper.getTypeFactory().constructCollectionType(List.class, PreAssembledQuestion.class));
+        }
+        return cachedQuestions;
     }
 
     @Transactional

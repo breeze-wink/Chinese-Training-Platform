@@ -56,6 +56,11 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
     }
 
     @Override
+    public String getKnowledgePointNameById(Long id) {
+        return knowledgePointMapper.selectById(id).getName();
+    }
+
+    @Override
     public List<KnowledgePoint> getAllKnowledgePoints() {
         return knowledgePointMapper.selectAll();
     }

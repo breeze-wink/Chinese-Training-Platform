@@ -8,8 +8,8 @@ import java.util.List;
 @Mapper
 public interface QuestionStatisticMapper {
 
-    @Insert("INSERT INTO question_statistic (id, type, uploadTime, totalScore, completeCount, referencedCount) " +
-            "VALUES (#{id}, #{type}, #{uploadTime}, #{totalScore}, #{completeCount}, #{referencedCount})")
+    @Insert("INSERT INTO question_statistic (id, type) " +
+            "VALUES (#{id}, #{type})")
     void insert(QuestionStatistic questionStatistic);
 
     @Update("UPDATE question_statistic SET " +

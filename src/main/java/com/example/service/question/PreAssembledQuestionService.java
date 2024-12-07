@@ -8,6 +8,10 @@ import java.util.List;
 
 public interface PreAssembledQuestionService {
     List<PreAssembledQuestion> getPreAssembledQuestionsByTypes(List<String> types);
+
+    @Transactional
+    List<PreAssembledQuestion> getPreAssembledQuestionsByType(String type);
+
     void flushPreAssembledQuestions();
 
     @Transactional
