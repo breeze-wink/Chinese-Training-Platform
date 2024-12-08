@@ -490,6 +490,32 @@ public class TeacherBusinessController {
 
 
 
+    @GetMapping("{id}/get-all-questions")
+    public ResponseEntity<GetAllQuestionsResponse> getAllQuestions(@PathVariable Long id) {
+        GetAllQuestionsResponse response = new GetAllQuestionsResponse();
+        List<GetAllQuestionsResponse.infoData> data = new ArrayList<>();
+        List<Question> questions = questionService.getAllQuestions();
+        for (Question question : questions) {
+            GetAllQuestionsResponse.infoData infoData = new GetAllQuestionsResponse.infoData();
+            infoData.setId(question.getId());
+            infoData.setType(question.getType());
+            KnowledgePoint knowledgePoint = knowledgePointService.getKnowledgePointById(question.getKnowledgePointId());
+            if(knowledgePoint != null && knowledgePoint.getName() != null){
+                infoData.setKnowledgePoint(knowledgePoint.getName());
+            }
+            QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
+            if(questionStatistic != null && questionStatistic.getUploadTime() != null){
+                infoData.setUploadTime(String.valueOf(questionStatistic.getUploadTime()));
+            }
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
     @GetMapping("{id}/get-question")
     public ResponseEntity<GetQuestionResponse> getQuestion(@PathVariable Long id, @RequestParam Long questionId) throws JsonProcessingException {
         GetQuestionResponse response = new GetQuestionResponse();
@@ -553,16 +579,16 @@ public class TeacherBusinessController {
 
 
     @DeleteMapping("{id}/delete-question")
-    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
+    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long deleteId, @RequestParam String type) throws JsonProcessingException {
         Message response = new Message();
         if(Objects.equals(type, "small")){
-            Question question = questionService.getQuestionById(questionId);
+            Question question = questionService.getQuestionById(deleteId);
             if(question == null){
                 response.setMessage("问题不存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
-                questionService.deleteQuestion(questionId);
+                questionService.deleteQuestion(deleteId);
             }
             else{
                 questionBodyService.deleteQuestionBody(question.getBodyId());
@@ -570,12 +596,12 @@ public class TeacherBusinessController {
             }
         }
         else if(Objects.equals(type, "big")){
-            QuestionBody questionBody = questionBodyService.getQuestionBodyById(questionId);
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(deleteId);
             if(questionBody == null){
                 response.setMessage("问题不存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            questionBodyService.deleteQuestionBody(questionId);
+            questionBodyService.deleteQuestionBody(deleteId);
         }
         response.setMessage("删除成功");
         return ResponseEntity.ok(response);
