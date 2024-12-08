@@ -1,7 +1,9 @@
 package com.example.service.question;
 
+import com.example.dto.redis.PreAssembledQuestion;
 import com.example.model.question.QuestionBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface QuestionBodyService {
@@ -21,4 +23,13 @@ public interface QuestionBodyService {
     // 删除题目记录
     int deleteQuestionBody(Long id);
     List<QuestionBody> getQuestionBodiesByType(String type);
+
+    List<String> getAllTypes();
+    void syncToRedis(QuestionBody questionBody);
+
+    void deleteFromRedis(Long id);
+
+    List<QuestionBody> getQuestionBodiesByIds(ArrayList<Long> longs);
+
+
 }

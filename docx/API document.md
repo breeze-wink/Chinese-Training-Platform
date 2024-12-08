@@ -985,7 +985,7 @@
 
 
 
-  
+
 ### Get Average Homework Score and Class Rank `finished`
 
 - **接口路径**：`/api/student/{id}/get-avg-score`
@@ -1773,7 +1773,7 @@
     }
     ```
 
-### Get Student's Average Homework Score and Class Rank 
+### Get Student's Average Homework Score and Class Rank `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-student-situation`
 - **请求方法**：GET
@@ -1784,7 +1784,7 @@
     - 路径参数（Path Variable）：`id` - 教师的唯一标识符
     - 查询参数（Query Parameter）：`studentId` - 学生的唯一标识符
   - 请求体：无
-  
+
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
@@ -1792,24 +1792,23 @@
     {
       "message": "学生作业平均分和班级排名获取成功",
       "data": {
-        "averageHomeworkScore": 85.5, // 作业平均分
-        "classRank": 10 // 班级排名
+          "averageHomeworkScore": "double", // 作业平均分,例84
+          "classRank": "long"// 班级排名，例6
       }
     }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "获取作业平均分和班级排名失败",
-      "data": null
-    }
-    ```
+- **失败响应** (`400 Bad Request`):
+  ```json
+  {
+    "message": "获取作业平均分和班级排名失败",
+    "data": null
+  }
+  ```
 
-### Get Student's Five Dimensional Scores
+### Get Student's Multidimensional Scores `finished`
 
-- **接口路径**：`/api/teacher/{id}/get-student-five-dimensional-scores`
+- **接口路径**：`/api/teacher/{id}/get-student-multidimensional-scores`
 - **请求方法**：GET
-- **接口说明**：教师用户获取某个学生的五维数据得分率。
+- **接口说明**：教师用户获取某个学生的多维数据得分率。
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 教师的唯一标识符
@@ -1821,26 +1820,30 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "五维数据得分率获取成功",
-      "data": {
-        "accumulationAndApplication": 92, // 积累与运用得分率
-        "composition": 85, // 作文得分率
-        "classicReading": 88, // 名著阅读得分率
-        "ancientPoetryReading": 90, // 古诗文阅读得分率
-        "modernReading": 87 // 现代文阅读得分率
-      }
+      "message": "各类题目得分率获取成功",
+      "data": [
+        {
+          "name": "string",
+          "score": "double"
+        },
+        {
+          "name": "string",
+          "score": "double"
+        },
+        ...
+      ]
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "获取五维数据得分率失败",
+      "message": "得分率获取失败",
       "data": null
     }
     ```
 
 
-### Get Student's Weakness Scores
+### Get Student's Weakness Scores `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-student-weakness-scores`
 - **请求方法**：GET
@@ -1856,33 +1859,32 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "学生短板得分获取成功",
+      "message": "学生短板得分率获取成功",
       "data": [
         {
-          "weaknessName": "积累与运用", // 短板名称
-          "weaknessScore": 75 // 短板得分率
+          "type": "string", //题型（知识点大类）
+          "weaknessName": "string", // 短板名称（知识点小类）
+          "weaknessScore": "double" // 短板得分率
         },
         {
-          "weaknessName": "现代文阅读",
-          "weaknessScore": 78
+          "type": "string",
+          "weaknessName": "string",
+          "weaknessScore": "double"
         },
-        {
-          "weaknessName": "作文",
-          "weaknessScore": 70
-        }
+        ...
       ]
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "获取学生短板得分失败",
+      "message": "获取学生短板得分率失败",
       "data": null
     }
     ```
 
 
-### Get Student's Historical Homework Scores 
+### Get Student's Historical Homework Scores `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-student-historical-homework-scores`
 - **请求方法**：GET
@@ -1898,14 +1900,24 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "学生历史作业得分率获取成功",
-      "data": [90, 85, 88, 92, 80] // 历史作业得分率的列表
+      "message": "学生历史分数波动数据获取成功",
+      "data": [
+        {
+          "date": "string", //提交时间
+          "score": "double"
+        },
+        {
+          "date": "string",
+          "score": "double"
+        },
+        ...
+      ]
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "获取学生历史作业得分率失败",
+      "message": "获取历史分数波动数据失败",
       "data": null
     }
     ```
@@ -2369,30 +2381,36 @@
     }
     ```
 
-###  Get All Questions
+###  Get All Questions `problem`
 
 - **接口路径**：`/api/teacher/{id}/get-all-questions`
 - **请求方法**：GET
 - **接口说明**：教师获取所有题目。
 
 - **请求说明**：
-  - 无需额外请求参数。
-
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
 - **响应说明**：
   - **响应格式**：JSON
   - **成功响应**（200 OK）：
     ```json
     {
       "message": "获取题目成功",
-      "data": {
-        "questions": [
-          {
-            "id": "number", // 对应数据库中的 id 字段
-            "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-            "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-          }
-        ]
-      }
+      "data": [
+        {
+          "id": "long", // 对应数据库中的 id 字段
+          "uploadTime": "string",
+          "knowledgePoint": "string",
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+        },
+        {
+          "id": "long", // 对应数据库中的 id 字段
+          "uploadTime": "string",
+          "knowledgePoint": "string",
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+        },
+        ...
+      ]
     }
     ```
   - **失败响应**（400 Bad Request）：
@@ -2402,15 +2420,15 @@
       "data": null
     }
     ```
-###  Get  Question
+###  Get  Question `finished`
 
-- **接口路径**：`/api/teacher/{id}/get-questions` `problem`
+- **接口路径**：`/api/teacher/{id}/get-question` `problem`
 - **请求方法**：GET
 - **接口说明**：教师获取题目信息。
-
 - **请求说明**：
-  - 无需额外请求参数。
-
+  - 请求参数:
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+    - 查询参数（Query Parameter）`questionId` - 题目的唯一标识符
 - **响应说明**：
   - **响应格式**：JSON
   - **成功响应**（200 OK）：
@@ -2428,6 +2446,7 @@
           }
         ]
       }
+
     }
     ```
   - **失败响应**（400 Bad Request）：
@@ -2440,13 +2459,14 @@
 
 ### Delete Question `finished`
 
-- **接口路径**：`/api/teacher/delete-question/{id}`
+- **接口路径**：`/api/teacher/{id}/delete-question`
 - **请求方法**：DELETE
 - **接口说明**：教师删除指定ID的题目。
 
 - **请求说明**：
-  - **路径参数**：
-    - `id`：题目的唯一标识符(bodyId)。
+  - **路径参数**：`id`："long"//教师的唯一标识符。
+  - **查询参数**：`questionId`："long"//题目的唯一标识符。
+                `type`: "string"//"big"OR"small"，判断大题还是小题。
 
 - **响应说明**：
   - **响应格式**：JSON
@@ -2463,6 +2483,76 @@
     }
     ```
 
+### 获取问题（根据筛选条件） `waiting`
+
+- **接口路径**：`/api/teacher/search-questions`
+- **请求方法**：POST
+- **接口说明**：教师查找题目。
+
+- **请求说明**
+    - 请求头: `Content-Type` : `application/json`
+    - 请求参数:
+      - 请求体(`JSON` 格式)：
+      ```json
+      {
+      "type": "选择",        // 题目类型，选择、填空、问答、作文、全部
+      "knowledgeType": "积累与运用", // 知识点大类
+      "knowledgeId": "1", // 知识点ID
+      "difficulty": "普通",  // 难度级别，容易、普通、困难、全部
+      "mode": "latest",      // 模式，如最新上传latest、最多使用mostUsed、默认‘’等
+      "sortOrder": "asc",    // 排序顺序，"asc" 或 "desc"
+      "page": 1,             // 当前页
+      "pageSize": 10,        // 每页显示数量
+      "search": "关键词"     // 搜索关键词（可能为空）
+      }
+      ```
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+  ```json
+  {
+  "bigQuestions": [ //若传的是knowledgeId则为空
+    {
+      "bodyId": 1,
+      "body": "题干1",          // 题干 
+      "subQuestion": [
+        {
+        "question": "问题1",      // 问题内容
+        "answer": "答案1",        // 答案
+        "explanation": "解析1",   // 解析
+        "type": "选择",           // 题型
+        "knowledge": "知识点1"    // 知识点
+        },
+      ], 
+      "difficulty": "普通",     // 难度
+    }
+  ],
+  "questions": [ //若传的是type则为空
+  {
+    "questionId": 1, //如果传的是knowledgeId这个不为空
+    "body": "题干1",          // 题干 可能为空(单题)
+    "question": "问题1",      // 问题内容
+    "answer": "答案1",        // 答案
+    "explanation": "解析1",   // 解析
+    "difficulty": "普通",     // 难度
+    "type": "选择",           // 题型
+    "knowledge": "知识点1"    // 知识点
+  }
+  ],
+  "totalCount": 50,    // 总记录数
+  "pageSize": 10,      // 每页显示的题目数量
+  "currentPage": 1,    // 当前页
+  "totalPages": 5      // 总页数
+  }
+  
+  ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败"
+    }
+    ```
 
 
 
