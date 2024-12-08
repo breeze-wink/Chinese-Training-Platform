@@ -2437,18 +2437,28 @@
     ```json
     {
       "message": "获取题目成功",
-      "data": {
-        "questions": [
-          {
-            "id": "number", // 对应数据库中的 id 字段
-        "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-        "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
-        "creatorId": "number", // 对应数据库中的 creatorId 字段
-        "bodyId": "number" 
-          }
-        ]
-      }
-
+      "creator": "string",//创建者
+      "knowledgePointType": "string",
+      "body": "string",
+      "data": [
+        {
+          "content": "string",
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+          "options": ["string", "string", "string", "string"],
+          "answer": "string",
+          "analysis": "string",
+          "knowledgePointName": "string"
+        },
+        {
+          "content": "string",
+          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+          "options": ["string", "string", "string", "string"],
+          "answer": "string",
+          "analysis": "string",
+          "knowledgePointName": "string"
+        },
+        ...
+      ]
     }
     ```
   - **失败响应**（400 Bad Request）：
@@ -2467,8 +2477,8 @@
 
 - **请求说明**：
   - **路径参数**：`id`："long"//教师的唯一标识符。
-  - **查询参数**：`questionId`："long"//题目的唯一标识符。
-                `type`: "string"//"big"OR"small"，判断大题还是小题。
+  - **查询参数**：`deleteId`："long"//题目的唯一标识符。
+                `type`: "string"//"big"OR"small"，判断deleteId的类型。
 
 - **响应说明**：
   - **响应格式**：JSON
@@ -3737,7 +3747,7 @@
     }
     ```
 
-### Query Class Details
+### Query Class Details `finished`
 
 - **接口路径**：`/api/school-admin/{id}/query-class`
 - **请求方法**：GET
