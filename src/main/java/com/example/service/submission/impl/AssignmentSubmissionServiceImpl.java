@@ -22,4 +22,10 @@ public class AssignmentSubmissionServiceImpl implements AssignmentSubmissionServ
     public List<AssignmentSubmission> selectByStudentId(Long studentId) {
         return assignmentSubmissionMapper.selectByStudentId(studentId);
     }
+
+    @Override
+    @Transactional
+    public AssignmentSubmission selectByAssignmentIdAndStudentId(Long assignmentId, Long studentId) {
+        return assignmentSubmissionMapper.selectByAssignmentIdAndStudentId(assignmentId, studentId);
+    }
 }

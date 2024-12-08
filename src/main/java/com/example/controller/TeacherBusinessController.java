@@ -331,6 +331,10 @@ public class TeacherBusinessController {
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
                 questionService.createQuestion(question);
+                QuestionStatistic questionStatistic = new QuestionStatistic();
+                questionStatistic.setId(question.getId());
+                questionStatistic.setType("small");
+                questionStatisticService.insert(questionStatistic);
                 cacheRefreshService.markKnowledgeCacheOutOfDate(question.getKnowledgePointId());
             }
             cacheRefreshService.markTypeCacheOutOfDate(request.getQuestionType());

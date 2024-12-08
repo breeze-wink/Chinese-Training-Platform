@@ -6,16 +6,19 @@ import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
 import com.example.dto.response.student.*;
 import com.example.model.classes.ClassStudent;
+import com.example.model.classes.Clazz;
+import com.example.model.classes.GroupStudent;
 import com.example.model.course.KnowledgePoint;
-import com.example.model.question.Practice;
-import com.example.model.question.PracticeQuestion;
-import com.example.model.question.Question;
-import com.example.model.question.QuestionBody;
+import com.example.model.question.*;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.submission.PracticeAnswer;
 import com.example.model.user.StatsStudent;
+import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassStudentService;
+import com.example.service.classes.GroupStudentService;
+import com.example.service.classes.impl.ClassGroupServiceImpl;
 import com.example.service.classes.impl.ClassStudentServiceImpl;
+import com.example.service.classes.impl.GroupStudentServiceImpl;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.question.*;
@@ -54,6 +57,9 @@ public class StudentBusinessController {
     private final StatsStudentService statsStudentService;
     private final ClassStudentService classStudentService;
     private final AssignmentSubmissionService assignmentSubmissionService;
+    private final GroupStudentService groupStudentService;
+    private final AssignmentRecipientService assignmentRecipientService;
+    private final AssignmentService assignmentService;
 
     @Autowired
     public StudentBusinessController (PracticeServiceImpl practiceService,
@@ -65,7 +71,10 @@ public class StudentBusinessController {
                                       PreAssembledQuestionServiceImpl preAssembledQuestionService,
                                       StatsStudentServiceImpl statsStudentService,
                                       ClassStudentServiceImpl classStudentService,
-                                      AssignmentSubmissionServiceImpl assignmentSubmissionService
+                                      AssignmentSubmissionServiceImpl assignmentSubmissionService,
+                                      GroupStudentServiceImpl groupStudentService,
+                                      AssignmentRecipientServiceImpl assignmentRecipientService,
+                                      AssignmentServiceImpl assignmentService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -77,6 +86,9 @@ public class StudentBusinessController {
         this.statsStudentService = statsStudentService;
         this.classStudentService = classStudentService;
         this.assignmentSubmissionService = assignmentSubmissionService;
+        this.groupStudentService = groupStudentService;
+        this.assignmentRecipientService = assignmentRecipientService;
+        this.assignmentService = assignmentService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -763,6 +775,174 @@ public class StudentBusinessController {
         }
         response.setData(data);
         response.setMessage("历史成绩获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/get-unfinished-assignment-list")
+    public ResponseEntity<UnfinishedAssignmentResponse> getUnfinishedAssignments(@PathVariable Long id) {
+        UnfinishedAssignmentResponse response = new UnfinishedAssignmentResponse();
+        List<UnfinishedAssignmentResponse.infoData> data = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        List<AssignmentRecipient> assignmentsByStudentId = assignmentRecipientService.selectByRecipient("STUDENT", id);
+        if(assignmentsByStudentId != null){
+            for(AssignmentRecipient assignment : assignmentsByStudentId){
+                Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
+                if(assignmentTemp.getEndTime().isBefore(now)){
+                    continue;
+                }
+                UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
+                infoData.setAssignmentId(assignmentTemp.getId());
+                infoData.setTitle(assignmentTemp.getTitle());
+                if(assignmentTemp.getDescription() != null){
+                    infoData.setDescription(assignmentTemp.getDescription());
+                }
+                infoData.setStartTime(assignmentTemp.getStartTime().toString());
+                infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                data.add(infoData);
+            }
+        }
+        ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
+        if(classStudent != null){
+            Long classId = classStudent.getClassId();
+            if(classId != null){
+                List<AssignmentRecipient> assignmentsByClassId = assignmentRecipientService.selectByRecipient("CLASS", classId);
+                if(assignmentsByClassId != null){
+                    for(AssignmentRecipient assignment : assignmentsByClassId){
+                        Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
+                        if(assignmentTemp.getEndTime().isBefore(now)){
+                            continue;
+                        }
+                        UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
+                        infoData.setAssignmentId(assignmentTemp.getId());
+                        infoData.setTitle(assignmentTemp.getTitle());
+                        if(assignmentTemp.getDescription() != null){
+                            infoData.setDescription(assignmentTemp.getDescription());
+                        }
+                        infoData.setStartTime(assignmentTemp.getStartTime().toString());
+                        infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                        data.add(infoData);
+                    }
+                }
+                List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByStudentId(id);
+                if(groupStudents != null){
+                    for(GroupStudent groupStudent : groupStudents){
+                        List<AssignmentRecipient> assignmentsByGroupId = assignmentRecipientService.selectByRecipient("GROUP", groupStudent.getGroupId());
+                        if(assignmentsByGroupId != null){
+                            for(AssignmentRecipient assignment : assignmentsByGroupId){
+                                Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
+                                if(assignmentTemp.getEndTime().isBefore(now)){
+                                    continue;
+                                }
+                                UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
+                                infoData.setAssignmentId(assignmentTemp.getId());
+                                infoData.setTitle(assignmentTemp.getTitle());
+                                if(assignmentTemp.getDescription() != null){
+                                    infoData.setDescription(assignmentTemp.getDescription());
+                                }
+                                infoData.setStartTime(assignmentTemp.getStartTime().toString());
+                                infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                                data.add(infoData);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        data.sort(Comparator.comparing(UnfinishedAssignmentResponse.infoData::getEndTime).reversed());
+        response.setData(data);
+        response.setMessage("未截止作业获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/get-finished-assignment-list")
+    public ResponseEntity<FinishedAssignmentResponse> getFinishedAssignments(@PathVariable Long id) {
+        FinishedAssignmentResponse response = new FinishedAssignmentResponse();
+        List<FinishedAssignmentResponse.infoData> data = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        List<AssignmentRecipient> assignmentsByStudentId = assignmentRecipientService.selectByRecipient("STUDENT", id);
+        if(assignmentsByStudentId != null){
+            for(AssignmentRecipient assignment : assignmentsByStudentId){
+                Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
+                if(assignmentTemp.getEndTime().isAfter(now)){
+                    continue;
+                }
+                FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
+                infoData.setAssignmentId(assignmentTemp.getId());
+                infoData.setTitle(assignmentTemp.getTitle());
+                if(assignmentTemp.getDescription() != null){
+                    infoData.setDescription(assignmentTemp.getDescription());
+                }
+                infoData.setStartTime(assignmentTemp.getStartTime().toString());
+                infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
+                if(submission != null && submission.getTotalScore() != null){
+                    infoData.setTotalScore(submission.getTotalScore().doubleValue());
+                }
+                data.add(infoData);
+            }
+        }
+        ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
+        if(classStudent != null){
+            Long classId = classStudent.getClassId();
+            if(classId != null){
+                List<AssignmentRecipient> assignmentsByClassId = assignmentRecipientService.selectByRecipient("CLASS", classId);
+                if(assignmentsByClassId != null){
+                    for(AssignmentRecipient assignment : assignmentsByClassId){
+                        Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
+                        if(assignmentTemp.getEndTime().isAfter(now)){
+                            continue;
+                        }
+                        FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
+                        infoData.setAssignmentId(assignmentTemp.getId());
+                        infoData.setTitle(assignmentTemp.getTitle());
+                        if(assignmentTemp.getDescription() != null){
+                            infoData.setDescription(assignmentTemp.getDescription());
+                        }
+                        infoData.setStartTime(assignmentTemp.getStartTime().toString());
+                        infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                        AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
+                        if(submission != null && submission.getTotalScore() != null){
+                            infoData.setTotalScore(submission.getTotalScore().doubleValue());
+                        }
+                        data.add(infoData);
+                    }
+                }
+                List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByStudentId(id);
+                if(groupStudents != null){
+                    for(GroupStudent groupStudent : groupStudents){
+                        List<AssignmentRecipient> assignmentsByGroupId = assignmentRecipientService.selectByRecipient("GROUP", groupStudent.getGroupId());
+                        if(assignmentsByGroupId != null){
+                            for(AssignmentRecipient assignment : assignmentsByGroupId){
+                                Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
+                                if(assignmentTemp.getEndTime().isAfter(now)){
+                                    continue;
+                                }
+                                FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
+                                infoData.setAssignmentId(assignmentTemp.getId());
+                                infoData.setTitle(assignmentTemp.getTitle());
+                                if(assignmentTemp.getDescription() != null){
+                                    infoData.setDescription(assignmentTemp.getDescription());
+                                }
+                                infoData.setStartTime(assignmentTemp.getStartTime().toString());
+                                infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                                AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
+                                if(submission != null && submission.getTotalScore() != null){
+                                    infoData.setTotalScore(submission.getTotalScore().doubleValue());
+                                }
+                                data.add(infoData);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        data.sort(Comparator.comparing(FinishedAssignmentResponse.infoData::getEndTime).reversed());
+        response.setData(data);
+        response.setMessage("已截止作业获取成功");
         return ResponseEntity.ok(response);
     }
 }

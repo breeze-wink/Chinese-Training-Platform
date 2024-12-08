@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface AssignmentSubmissionService {
     List<AssignmentSubmission> selectByStudentId(Long studentId);
+    AssignmentSubmission selectByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
 }
