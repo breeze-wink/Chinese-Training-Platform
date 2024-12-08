@@ -14,4 +14,5 @@ public interface ClassGroupService {
     List<ClassGroup> getGroupsByCreatorId(Long classId);
     ClassGroup getGroupById(Long groupId);
     List<ClassGroup> getAllGroups();
+    List<ClassGroup> selectByClassId(Long classId);
 }
