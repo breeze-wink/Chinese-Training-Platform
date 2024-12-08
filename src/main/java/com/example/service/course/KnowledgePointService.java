@@ -21,4 +21,8 @@ public interface KnowledgePointService {
     void flushKnowledgePointCache();
 
     Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> getAllKnowledgePointsWithDescriptionGroupByType();
+
+    void deleteFromRedis(KnowledgePoint knowledgePoint);
+
+    void syncToRedis(KnowledgePoint knowledgePoint);
 }

@@ -1,6 +1,7 @@
    package com.example.service.rabbitmq;
 
    import com.example.config.RabbitMQConfig;
+   import com.example.model.course.KnowledgePoint;
    import com.example.model.question.Question;
    import com.example.model.question.QuestionBody;
    import com.example.service.rabbitmq.dto.QuestionBodySyncMessage;
@@ -52,6 +53,16 @@
                e.printStackTrace();
            }
 
+       }
+
+       @Async
+       public void sendKnowledgePointSyncMessage(KnowledgePoint knowledgePoint, String operation) {
+            try{
+                String message = objectMapper.writeValueAsString(knowledgePoint);
+                rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.KNOWLEDGE_POINT_ROUTING_KEY, message);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
        }
    }
    

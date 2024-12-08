@@ -12,9 +12,11 @@ public class RabbitMQConfig {
 
     public static final String QUESTION_QUEUE_NAME = "sync_question_queue";
     public static final String QUESTION_BODY_QUEUE_NAME = "sync_question_body_queue";
+    public static final String KNOWLEDGE_POINT_QUEUE_NAME = "sync_knowledge_point_queue";
     public static final String EXCHANGE_NAME = "sync_exchange";
     public static final String QUESTION_ROUTING_KEY = "sync_question_key";
     public static final String QUESTION_BODY_ROUTING_KEY = "sync_question_body_key";
+    public static final String KNOWLEDGE_POINT_ROUTING_KEY = "sync_knowledge_point_key";
 
     @Bean
     public Queue syncQuestionQueue() {
@@ -24,6 +26,11 @@ public class RabbitMQConfig {
     @Bean
     public Queue syncQuestionBodyQueue() {
         return new Queue(QUESTION_BODY_QUEUE_NAME, true);
+    }
+
+    @Bean
+    public Queue syncKnowledgePointQueue() {
+        return new Queue(KNOWLEDGE_POINT_QUEUE_NAME, true);
     }
 
     @Bean
@@ -42,4 +49,11 @@ public class RabbitMQConfig {
     public Binding syncQuestionBodyBinding() {
         return BindingBuilder.bind(syncQuestionBodyQueue()).to(syncExchange()).with(QUESTION_BODY_ROUTING_KEY);
     }
+
+    @Bean
+    public Binding syncKnowledgePointBinding() {
+        return BindingBuilder.bind(syncKnowledgePointQueue()).to(syncExchange()).with(KNOWLEDGE_POINT_ROUTING_KEY);
+    }
+
+
 }

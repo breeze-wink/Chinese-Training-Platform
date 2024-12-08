@@ -37,43 +37,63 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
     @Override
     @Transactional
     public int addKnowledgePoint(KnowledgePoint point) {
-        if (point == null) {
-            throw new IllegalArgumentException("KnowledgePoint object cannot be null");
-        }
-        return knowledgePointMapper.insert(point);
+        int result =  knowledgePointMapper.insert(point);
+        rabbitMQProducer.sendKnowledgePointSyncMessage(point, RabbitMQProducer.CREATE_OPERATION);
+        return result;
     }
 
     @Override
     @Transactional
     public int removeKnowledgePoint(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID cannot be null or less than or equal to zero");
-        }
-        // 检查是否有其他记录引用了这个知识点
+        KnowledgePoint knowledgePoint = getKnowledgePointById(id);
+        int result = knowledgePointMapper.delete(id);
 
-        return knowledgePointMapper.delete(id);
+        if (knowledgePoint != null) {
+            rabbitMQProducer.sendKnowledgePointSyncMessage(knowledgePoint, RabbitMQProducer.DELETE_OPERATION);
+        }
+
+        return result;
     }
 
     @Override
     @Transactional
     public int updateKnowledgePoint(KnowledgePoint point) {
-        if (point == null || point.getId() == null || point.getId() <= 0) {
-            throw new IllegalArgumentException("KnowledgePoint object must have a valid ID");
-        }
-        return knowledgePointMapper.update(point);
+        int result = knowledgePointMapper.update(point);
+
+        rabbitMQProducer.sendKnowledgePointSyncMessage(point, RabbitMQProducer.CREATE_OPERATION);
+
+        return result;
     }
 
     @Override
     public KnowledgePoint getKnowledgePointById(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID cannot be null or less than or equal to zero");
+        String cacheKey = "knowledgePoint" + id;
+        Object object = redisTemplate.opsForValue().get(cacheKey);
+        KnowledgePoint knowledgePoint;
+        if (object == null) {
+            knowledgePoint = knowledgePointMapper.selectById(id);
+            if (knowledgePoint != null) {
+                redisTemplate.opsForValue().set(cacheKey, knowledgePoint);
+            }
         }
-        return knowledgePointMapper.selectById(id);
+        knowledgePoint = objectMapper.convertValue(object, KnowledgePoint.class);
+        return knowledgePoint;
+
     }
 
     @Override
     public String getKnowledgePointNameById(Long id) {
-        return knowledgePointMapper.selectById(id).getName();
+        String cacheKey = "knowledgePointName" + id;
+        Object object = redisTemplate.opsForValue().get(cacheKey);
+        if (object == null) {
+            KnowledgePoint knowledgePoint = knowledgePointMapper.selectById(id);
+            if (knowledgePoint != null) {
+                redisTemplate.opsForValue().set(cacheKey, knowledgePoint.getName());
+                return knowledgePoint.getName();
+            }
+            return null;
+        }
+        return objectMapper.convertValue(object, String.class);
     }
 
     @Override
@@ -149,6 +169,30 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
         redisTemplate.opsForValue().set(cacheKey2, groupedPointsWithDescription);
     }
 
+    @Override
+    public void deleteFromRedis(KnowledgePoint knowledgePoint) {
+        String cacheKey = "knowledgePoint:" + knowledgePoint.getId();
+        redisTemplate.delete(cacheKey);
+        cacheKey = "knowledgePointName" + knowledgePoint.getId();
+        redisTemplate.delete(cacheKey);
+        cacheKey = "knowledgePointsGroupByType";
+        redisTemplate.delete(cacheKey);
+        cacheKey = "knowledgePointsGroupWithDescriptionByType";
+        redisTemplate.delete(cacheKey);
+        flushKnowledgePointCache();
+    }
 
+    @Override
+    public void syncToRedis(KnowledgePoint knowledgePoint) {
+        String cacheKey = "knowledgePoint:" + knowledgePoint.getId();
+        redisTemplate.opsForValue().set(cacheKey, knowledgePoint);
+        cacheKey = "knowledgePointName" + knowledgePoint.getId();
+        redisTemplate.opsForValue().set(cacheKey, knowledgePoint.getName());
+        cacheKey = "knowledgePointsGroupByType";
+        redisTemplate.delete(cacheKey);
+        cacheKey = "knowledgePointsGroupWithDescriptionByType";
+        redisTemplate.delete(cacheKey);
+        flushKnowledgePointCache();
 
+    }
 }

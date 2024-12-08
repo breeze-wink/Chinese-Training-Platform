@@ -47,7 +47,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public int deleteQuestion(Long id) throws JsonProcessingException {
+    public int deleteQuestion(Long id) {
         Question question = getQuestionById(id);
         int result = questionMapper.delete(id);
         // 发送同步消息
