@@ -22,7 +22,9 @@ public interface KnowledgePointService {
 
     Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> getAllKnowledgePointsWithDescriptionGroupByType();
 
+
     void deleteFromRedis(KnowledgePoint knowledgePoint);
 
     void syncToRedis(KnowledgePoint knowledgePoint);
+
 }
