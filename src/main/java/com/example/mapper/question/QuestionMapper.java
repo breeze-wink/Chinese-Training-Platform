@@ -29,4 +29,6 @@ public interface QuestionMapper {
 
     @Select("SELECT * FROM question WHERE bodyId = #{questionBodyId}")
     List<Question> getQuestionsByQuestionBodyId(Long questionBodyId);
+
+//    List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds);
 }

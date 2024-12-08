@@ -1,28 +1,40 @@
 package com.example.controller;
 
-import com.example.dto.request.teacher.CreateGroupRequest;
-import com.example.dto.request.teacher.TeacherCreateClassRequest;
-import com.example.dto.request.teacher.UpdateClassRequest;
-import com.example.dto.request.teacher.UploadQuestionRequest;
+import com.example.dto.redis.PreAssembledQuestion;
+import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
+import com.example.dto.response.student.AvgScoreResponse;
+import com.example.dto.response.student.HistoryScoresResponse;
+import com.example.dto.response.student.MultidimensionalScoresResponse;
+import com.example.dto.response.student.WeaknessScoresResponse;
 import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
+import com.example.model.question.QuestionStatistic;
+import com.example.service.cache.CacheRefreshService;
+import com.example.model.submission.AssignmentSubmission;
+import com.example.model.user.StatsStudent;
 import com.example.service.classes.*;
 import com.example.service.classes.impl.*;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
-import com.example.service.question.QuestionBodyService;
-import com.example.service.question.QuestionService;
+import com.example.service.question.*;
 import com.example.service.question.impl.QuestionBodyServiceImpl;
 import com.example.service.question.impl.QuestionServiceImpl;
+import com.example.service.submission.AssignmentSubmissionService;
+import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
+import com.example.service.user.StatsStudentService;
 import com.example.service.user.StudentService;
+import com.example.service.user.TeacherService;
+import com.example.service.user.impl.StatsStudentServiceImpl;
 import com.example.service.user.impl.StudentServiceImpl;
+import com.example.service.user.impl.TeacherServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -45,11 +57,17 @@ public class TeacherBusinessController {
     private final StudentService studentService;
     private final GroupStudentService groupStudentService;
     private final KnowledgePointService knowledgePointService;
+    private final CacheRefreshService cacheRefreshService;
 
     private final QuestionService questionService;
-
     private final QuestionBodyService questionBodyService;
     private final JoinClassService joinClassService;
+    private final StatsStudentService statsStudentService;
+    private final SearchQuestionService searchQuestionService;
+
+    private final QuestionStatisticService questionStatisticService;
+    private final AssignmentSubmissionService assignmentSubmissionService;
+    private final TeacherService teacherService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -60,7 +78,13 @@ public class TeacherBusinessController {
                                      KnowledgePointServiceImpl knowledgePointService,
                                      QuestionServiceImpl questionService,
                                      QuestionBodyServiceImpl questionBodyService,
-                                     JoinClassServiceImpl joinClassService
+                                     JoinClassServiceImpl joinClassService,
+                                     StatsStudentServiceImpl statsStudentService,
+                                     AssignmentSubmissionServiceImpl assignmentSubmissionService,
+                                     CacheRefreshService cacheRefreshService,
+                                     SearchQuestionService searchQuestionService,
+                                     QuestionStatisticService questionStatisticService,
+                                     TeacherServiceImpl teacherService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -72,6 +96,12 @@ public class TeacherBusinessController {
         this.questionService = questionService;
         this.questionBodyService = questionBodyService;
         this.joinClassService = joinClassService;
+        this.cacheRefreshService = cacheRefreshService;
+        this.statsStudentService = statsStudentService;
+        this.assignmentSubmissionService = assignmentSubmissionService;
+        this.searchQuestionService = searchQuestionService;
+        this.questionStatisticService = questionStatisticService;
+        this.teacherService = teacherService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -317,46 +347,25 @@ public class TeacherBusinessController {
         Message response = new Message();
         try {
             QuestionBody questionBody = new QuestionBody();
-            if(request.getQuestionType() == null || request.getQuestionType().isEmpty()){
-                response.setMessage("题型不能为空");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
            
             questionBody.setBody(request.getBody());
             questionBody.setType(request.getQuestionType());
 
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
-            if (questions == null || questions.isEmpty()) {
-                response.setMessage("题目数量不能为零");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+            if (questionBody.getBody() != null) {
+                questionBodyService.createQuestionBody(questionBody);
+                QuestionStatistic questionStatistic = new QuestionStatistic();
+                questionStatistic.setId(questionBody.getId());
+                questionStatistic.setType("big");
+                questionStatisticService.insert(questionStatistic);
             }
-            else if(questions.size() > 1 && (request.getBody() == null || request.getBody().isEmpty())){
-                response.setMessage("组合题题干不能为空");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            for(UploadQuestionRequest.QuestionInfo questionInfo : questions){
-                if(questionInfo.getProblem() == null || questionInfo.getProblem().isEmpty()){
-                    response.setMessage("题目不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-                else if(questionInfo.getType() == null || questionInfo.getType().isEmpty()){
-                    response.setMessage("题目类型不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-                else if(questionInfo.getKnowledgePointId() == null){
-                    response.setMessage("知识点不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-                else if(questionInfo.getType().equals("CHOICE") && (questionInfo.getChoices() == null || questionInfo.getChoices().isEmpty())){
-                    response.setMessage("选择题选项不能为空");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-                }
-            }
-            questionBodyService.createQuestionBody(questionBody);
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
                 Question question = getQuestion(id, questionInfo, questionBody);
-                questionService.creatQuestion(question);
+                questionService.createQuestion(question);
+                cacheRefreshService.markKnowledgeCacheOutOfDate(question.getKnowledgePointId());
             }
+            cacheRefreshService.markTypeCacheOutOfDate(request.getQuestionType());
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -367,7 +376,7 @@ public class TeacherBusinessController {
 
     private static Question getQuestion(Long id, UploadQuestionRequest.QuestionInfo questionInfo, QuestionBody questionBody) {
         Question question = new Question();
-        question.setBodyId(questionBody.getId());
+        question.setBodyId(questionBody.getBody() == null ? null : questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
@@ -507,26 +516,297 @@ public class TeacherBusinessController {
         }
     }
 
-    @DeleteMapping("/delete-question/{id}")
-    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id) {
-        Message response = new Message();
-        QuestionBody questionBody = questionBodyService.getQuestionBodyById(id);
-        if(questionBody == null){
+
+
+    @GetMapping("{id}/get-question")
+    public ResponseEntity<GetQuestionResponse> getQuestion(@PathVariable Long id, @RequestParam Long questionId) throws JsonProcessingException {
+        GetQuestionResponse response = new GetQuestionResponse();
+        List<GetQuestionResponse.infoData> data = new ArrayList<>();
+        Question question = questionService.getQuestionById(questionId);
+        if(question == null){
             response.setMessage("问题不存在");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        else{
-            int result = questionBodyService.deleteQuestionBody(id);
-            if(result == 0){
-                response.setMessage("删除失败");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            else{
-                response.setMessage("删除成功");
-                return ResponseEntity.ok(response);
-            }
+        response.setCreator(null);
+        if(question.getCreatorId() != null){
+            response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
         }
+        response.setKnowledgePointType(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getType());
+        response.setBody(null);
+        response.setBodyId(null);
+        List<Question> questions = new ArrayList<>();
+        if(question.getBodyId() != null){
+            response.setBodyId(question.getBodyId());
+            questions = questionService.getQuestionsByQuestionBodyId(question.getBodyId());
+            response.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+        }
+        else{
+            questions.add(question);
+        }
+        for(Question q : questions){
+            GetQuestionResponse.infoData infoData = new GetQuestionResponse.infoData();
+            infoData.setQuestionId(q.getId());
+            infoData.setContent(q.getContent());
+            infoData.setType(q.getType());
+            if(Objects.equals(q.getType(), "CHOICE") && q.getOptions() != null){
+                infoData.setOptions(drawOptions(q.getOptions()));
+            }
+            String [] temp = q.getAnswer().split("\\$\\$");
+            infoData.setAnswer(temp[0]);
+            infoData.setAnalysis(null);
+            if(temp.length > 1){
+                infoData.setAnalysis(temp[1]);
+            }
+            infoData.setKnowledgePointName(knowledgePointService.getKnowledgePointById(q.getKnowledgePointId()).getName());
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("获取问题成功");
+        return ResponseEntity.ok(response);
     }
 
 
+    private static List<String> drawOptions(String optionString) {
+        List<String> choices = new ArrayList<>(List.of(optionString.split("\\$\\$")));
+        char choiceOption = 'A';
+        for(int j = 0; j < choices.size(); j++){
+            String [] test = choices.get(j).split("\\.");
+            if(choiceOption != test[0].charAt(0)){
+                choices.set(j, choiceOption + "." + choices.get(j));
+            }
+            choiceOption++;
+        }
+        return choices;
+    }
+
+
+    @DeleteMapping("{id}/delete-question")
+    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
+        Message response = new Message();
+        if(Objects.equals(type, "small")){
+            Question question = questionService.getQuestionById(questionId);
+            if(question == null){
+                response.setMessage("问题不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
+                questionService.deleteQuestion(questionId);
+            }
+            else{
+                questionBodyService.deleteQuestionBody(question.getBodyId());
+
+            }
+        }
+        else if(Objects.equals(type, "big")){
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(questionId);
+            if(questionBody == null){
+                response.setMessage("问题不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            questionBodyService.deleteQuestionBody(questionId);
+        }
+        response.setMessage("删除成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/get-student-situation")
+    public ResponseEntity<AvgScoreResponse> getAvgScore(@PathVariable Long id, @RequestParam Long studentId) {
+        AvgScoreResponse response = new AvgScoreResponse();
+        AvgScoreResponse.infoData data = new AvgScoreResponse.infoData();
+        data.setAverageHomeworkScore(null);
+        data.setClassRank(null);
+        Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
+        if(!Objects.equals(clazz.getCreatorId(), id)){
+            response.setMessage("无权限");
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
+        if(statsStudents != null && (!statsStudents.isEmpty())){
+            long totalScore = 0L;
+            long score = 0L;
+            for(StatsStudent statsStudent : statsStudents){
+                if(statsStudent.getTotalScore() != null){
+                    totalScore += statsStudent.getTotalScore();
+                }
+                if(statsStudent.getScore() != null){
+                    score += statsStudent.getScore();
+                }
+            }
+            double averageHomeworkScore = 100 * (double) score / (double) totalScore;
+            averageHomeworkScore = Double.parseDouble(String.format("%.2f", averageHomeworkScore));
+            data.setAverageHomeworkScore(averageHomeworkScore);
+        }
+        ClassStudent classStudent = classStudentService.getClassStudentByStudentId(studentId);
+        if(classStudent != null){
+            List<ClassStudent> classStudents = classStudentService.getClassStudentsByClassId(classStudent.getClassId());
+            long[][] stats = new long[classStudents.size()][2];
+            for(int i = 0; i < classStudents.size(); i++){
+                stats[i][0] = classStudents.get(i).getStudentId();
+                long totalScore = 0L;
+                long score = 0L;
+                List<StatsStudent> statsStudentsTemp = statsStudentService.getStatsStudentByStudentId(classStudents.get(i).getStudentId());
+                for(StatsStudent statsStudent : statsStudentsTemp){
+                    if(statsStudent.getTotalScore() != null){
+                        totalScore += statsStudent.getTotalScore();
+                    }
+                    if(statsStudent.getScore() != null){
+                        score += statsStudent.getScore();
+                    }
+                }
+                stats[i][1] = 0L;
+                if(totalScore != 0){
+                    stats[i][1] = (long)(1000 * (double) score / (double) totalScore);
+                }
+            }
+            Arrays.sort(stats, Comparator.comparingLong(o -> o[1]));
+            for(int i = 0; i <stats.length ; i++){
+                if(stats[i][0] == studentId){
+                    data.setClassRank((long)(stats.length - i));
+                    break;
+                }
+            }
+        }
+        response.setData(data);
+        response.setMessage("平均分获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("{id}/get-student-multidimensional-scores")
+    public ResponseEntity<MultidimensionalScoresResponse> getMultidimensionalScores(@PathVariable Long id, @RequestParam Long studentId) {
+        MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
+        Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
+        if(!Objects.equals(clazz.getCreatorId(), id)){
+            response.setMessage("无权限");
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<MultidimensionalScoresResponse.infoData> data = new ArrayList<>();
+        List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
+        List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
+        for(KnowledgePoint knowledgePoint : knowledgePoints) {
+            MultidimensionalScoresResponse.infoData infoData = new MultidimensionalScoresResponse.infoData();
+            infoData.setName(knowledgePoint.getType());
+            infoData.setScore(null);
+            boolean flag = false;
+            for (MultidimensionalScoresResponse.infoData datum : data) {
+                if (datum.getName().equals(knowledgePoint.getType())) {
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                long totalScore = 0L;
+                long score = 0L;
+                for(StatsStudent statsStudent : statsStudents) {
+                    if(knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId()).getType().equals(infoData.getName())){
+                        if(statsStudent.getTotalScore() != null){
+                            totalScore += statsStudent.getTotalScore();
+                        }
+                        if(statsStudent.getScore() != null){
+                            score += statsStudent.getScore();
+                        }
+                    }
+                }
+                if(totalScore != 0){
+                    double scorePercentage = 100 * (double) score / (double) totalScore;
+                    scorePercentage = Double.parseDouble(String.format("%.2f", scorePercentage));
+                    infoData.setScore(scorePercentage);
+                }
+                data.add(infoData);
+            }
+        }
+        response.setData(data);
+        response.setMessage("各项成绩获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/get-student-weakness-scores")
+    public ResponseEntity<WeaknessScoresResponse> getWeaknessScores(@PathVariable Long id, @RequestParam Long studentId) {
+        WeaknessScoresResponse response = new WeaknessScoresResponse();
+        Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
+        if(!Objects.equals(clazz.getCreatorId(), id)){
+            response.setMessage("无权限");
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<WeaknessScoresResponse.infoData> data = new ArrayList<>();
+        List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
+        List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
+        for(KnowledgePoint knowledgePoint : knowledgePoints) {
+            WeaknessScoresResponse.infoData infoData = new WeaknessScoresResponse.infoData();
+            infoData.setType(knowledgePoint.getType());
+            infoData.setWeaknessName(null);
+            infoData.setWeaknessScore(null);
+            boolean flag = false;
+            for (WeaknessScoresResponse.infoData datum : data) {
+                if (datum.getType().equals(knowledgePoint.getType())) {
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                for(StatsStudent statsStudent : statsStudents) {
+                    KnowledgePoint knowledgePointTemp = knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId());
+                    if(knowledgePointTemp.getType().equals(infoData.getType())){
+                        double scoreTemp;
+                        if(statsStudent.getTotalScore() != null && statsStudent.getScore() != null){
+                            scoreTemp = 100 * (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
+                        }
+                        else{
+                            scoreTemp = 0;
+                        }
+                        if(infoData.getWeaknessName() == null || infoData.getWeaknessScore() == null || scoreTemp < infoData.getWeaknessScore()){
+                            infoData.setWeaknessName(knowledgePointTemp.getName());
+                            infoData.setWeaknessScore(scoreTemp);
+                        }
+                    }
+                }
+                data.add(infoData);
+            }
+        }
+        response.setData(data);
+        response.setMessage("短板获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/get-student-historical-homework-scores")
+    public ResponseEntity<HistoryScoresResponse> getHistoryScores(@PathVariable Long id, @RequestParam Long studentId) {
+        HistoryScoresResponse response = new HistoryScoresResponse();
+        Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
+        if(!Objects.equals(clazz.getCreatorId(), id)){
+            response.setMessage("无权限");
+            response.setData(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        List<HistoryScoresResponse.infoData> data = new ArrayList<>();
+        List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(studentId);
+        submissions.sort(Comparator.comparing(AssignmentSubmission::getSubmitTime).reversed());
+        for(int i = 0; i < submissions.size() && i < 10; i++){
+            HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
+            infoData.setDate(submissions.get(i).getSubmitTime().toString());
+            infoData.setScore(null);
+            if(submissions.get(i).getTotalScore() != null){
+                infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
+            }
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("历史成绩获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/search-questions")
+    public ResponseEntity<SearchQuestionsResponse> searchQuestions(@RequestBody SearchQuestionsRequest request) {
+        SearchQuestionsResponse response = searchQuestionService.searchQuestions(request);
+        return ResponseEntity.ok(response);
+
+    }
 }

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.question.SearchQuestionMapper">
+
+    <!-- Result Map for BigQuestionResult -->
+    <resultMap id="BigQuestionResultMap" type="com.example.dto.mapper.BigQuestionResult">
+        <result property="bodyId" column="bodyId"/>
+        <result property="body" column="body"/>
+        <result property="type" column="type"/>
+        <result property="totalScore" column="totalScore"/>
+        <result property="completeCount" column="completeCount"/>
+        <result property="referencedCount" column="referencedCount"/>
+        <result property="uploadTime" column="uploadTime"/>
+    </resultMap>
+
+    <!-- Result Map for QuestionResult -->
+    <resultMap id="QuestionResultMap" type="com.example.dto.mapper.QuestionResult">
+        <result property="questionId" column="questionId"/>
+        <result property="body" column="body"/>
+        <result property="content" column="content"/>
+        <result property="answer" column="answer"/>
+        <result property="type" column="type"/>
+        <result property="totalScore" column="totalScore"/>
+        <result property="completeCount" column="completeCount"/>
+        <result property="referencedCount" column="referencedCount"/>
+        <result property="uploadTime" column="uploadTime"/>
+        <result property="knowledgeName" column="knowledgeName"/>
+    </resultMap>
+
+    <!-- 查询大题 -->
+    <select id="searchBigQuestions" parameterType="map" resultMap="BigQuestionResultMap">
+        SELECT
+        qb.id as bodyId,
+        qb.body,
+        qs.type,
+        qs.totalScore,
+        qs.completeCount,
+        qs.referencedCount,
+        qs.uploadTime
+        FROM
+        question_body qb
+        JOIN
+        question_statistic qs
+        ON qb.id = qs.id AND qs.type = 'big'
+        WHERE
+        1=1
+
+        <if test="knowledgeType != null and knowledgeType != ''">
+            AND qb.type = #{knowledgeType}
+        </if>
+
+        <if test="difficulty != null and difficulty != ''">
+
+            AND (
+            qs.completeCount = 0
+            OR (qs.totalScore / qs.completeCount) BETWEEN
+            <choose>
+                <when test="difficulty == '容易'">0.8 AND 1.0</when>
+                <when test="difficulty == '普通'">0.4 AND 0.8</when>
+                <when test="difficulty == '困难'">0.0 AND 0.4</when>
+                <otherwise>0.0 AND 1.0</otherwise>
+            </choose>
+            )
+        </if>
+
+        <if test="search != null and search != ''">
+
+            AND qb.body LIKE CONCAT('%', #{search}, '%')
+
+        </if>
+
+        <if test="mode == 'latest'">
+            ORDER BY qs.uploadTime
+            <choose>
+                <when test="sortOrder == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+        </if>
+        <if test="mode == 'mostUsed'">
+            ORDER BY qs.referencedCount
+            <choose>
+                <when test="sortOrder == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+        </if>
+        <if test="mode == null or mode == ''">
+            ORDER BY qb.id
+            <choose>
+                <when test="sortOrder == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+        </if>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 统计大题总数 -->
+    <select id="countBigQuestions" parameterType="map" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        question_body qb
+        JOIN
+        question_statistic qs
+        ON qb.id = qs.id AND qs.type = 'big'
+        WHERE
+        1=1
+        <if test="knowledgeType != null and knowledgeType != ''">
+            AND qb.type = #{knowledgeType}
+        </if>
+
+        <if test="difficulty != null and difficulty != ''">
+
+            AND (
+            qs.completeCount = 0
+            OR (qs.totalScore / qs.completeCount) BETWEEN
+            <choose>
+                <when test="difficulty == '容易'">0.8 AND 1.0</when>
+                <when test="difficulty == '普通'">0.4 AND 0.8</when>
+                <when test="difficulty == '困难'">0.0 AND 0.4</when>
+                <otherwise>0.0 AND 1.0</otherwise>
+            </choose>
+            )
+        </if>
+
+        <if test="search != null and search != ''">
+            AND qb.body LIKE CONCAT('%', #{search}, '%')
+        </if>
+    </select>
+
+    <!-- 查询小题 -->
+    <select id="searchSmallQuestions" parameterType="map" resultMap="QuestionResultMap">
+        SELECT
+        q.id as questionId,
+        qb.body,
+        q.content,
+        q.answer,
+        qs.type,
+        qs.totalScore,
+        qs.completeCount,
+        qs.referencedCount,
+        qs.uploadTime,
+        kp.name as knowledgeName
+        FROM
+        question q
+        JOIN
+        question_statistic qs
+        ON q.id = qs.id AND qs.type = 'small'
+        JOIN
+        question_body qb
+        ON q.bodyId = qb.id
+        JOIN
+        knowledge_point kp
+        ON q.knowledgePointId = kp.id
+        WHERE
+        1=1
+
+        <if test="type != null and type != ''">
+
+            AND q.type = #{type}
+        </if>
+        <if test="knowledgeId != null and knowledgeId != ''">
+            AND q.knowledgePointId = #{knowledgeId}
+        </if>
+
+        <if test="difficulty != null and difficulty != ''">
+
+            AND (
+            qs.completeCount = 0
+            OR (qs.totalScore / qs.completeCount) BETWEEN
+            <choose>
+                <when test="difficulty == '容易'">0.8 AND 1.0</when>
+                <when test="difficulty == '普通'">0.4 AND 0.8</when>
+                <when test="difficulty == '困难'">0.0 AND 0.4</when>
+                <otherwise>0.0 AND 1.0</otherwise>
+            </choose>
+            )
+        </if>
+
+        <if test="search != null and search != ''">
+            AND (qb.body LIKE CONCAT('%', #{search}, '%')
+            OR q.content LIKE CONCAT('%', #{search}, '%')
+            OR q.answer LIKE CONCAT('%', #{search}, '%'))
+        </if>
+
+        <if test="mode == 'latest'">
+            ORDER BY qs.uploadTime
+            <choose>
+                <when test="sortOrder == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+        </if>
+        <if test="mode == 'mostUsed'">
+            ORDER BY qs.referencedCount
+            <choose>
+                <when test="sortOrder == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+        </if>
+        <if test="mode == null or mode == ''">
+            ORDER BY q.id
+            <choose>
+                <when test="sortOrder == 'asc'">ASC</when>
+                <otherwise>DESC</otherwise>
+            </choose>
+        </if>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 统计小题总数 -->
+    <select id="countSmallQuestions" parameterType="map" resultType="long">
+        SELECT
+        COUNT(*)
+        FROM
+        question q
+        JOIN
+        question_statistic qs
+        ON q.id = qs.id AND qs.type = 'small'
+        JOIN
+        question_body qb
+        ON q.bodyId = qb.id
+        JOIN
+        knowledge_point kp
+        ON q.knowledgePointId = kp.id
+        WHERE
+        1=1
+
+        <if test="type != null and type != ''">
+
+            AND q.type = #{type}
+        </if>
+        <if test="knowledgeId != null and knowledgeId != ''">
+            AND q.knowledgePointId = #{knowledgeId}
+        </if>
+
+        <if test="difficulty != null and difficulty != ''">
+
+            AND (
+            qs.completeCount = 0
+            OR (qs.totalScore / qs.completeCount) BETWEEN
+            <choose>
+                <when test="difficulty == '容易'">0.8 AND 1.0</when>
+                <when test="difficulty == '普通'">0.4 AND 0.8</when>
+                <when test="difficulty == '困难'">0.0 AND 0.4</when>
+                <otherwise>0.0 AND 1.0</otherwise>
+            </choose>
+            )
+        </if>
+
+        <if test="search != null and search != ''">
+
+            AND (qb.body LIKE CONCAT('%', #{search}, '%')
+            OR q.content LIKE CONCAT('%', #{search}, '%')
+            OR q.answer LIKE CONCAT('%', #{search}, '%'))
+
+        </if>
+    </select>
+
+</mapper>

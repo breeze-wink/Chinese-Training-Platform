@@ -26,4 +26,6 @@ public interface PracticeQuestionMapper {
 
     @Delete("DELETE FROM practice_question WHERE practiceId = #{practiceId}")
     int deletePracticeQuestionByPracticeId(Long practiceId);
+
+    void insertPracticeQuestions(@Param("list") List<PracticeQuestion> practiceQuestions);
 }

@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import com.example.dto.redis.PreAssembledQuestion;
+import com.example.dto.redis.SubQuestion;
 import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
 import com.example.dto.response.student.*;
@@ -16,28 +18,28 @@ import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.impl.ClassStudentServiceImpl;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
-import com.example.service.question.PracticeQuestionService;
-import com.example.service.question.PracticeService;
-import com.example.service.question.QuestionBodyService;
-import com.example.service.question.QuestionService;
-import com.example.service.question.impl.PracticeQuestionServiceImpl;
-import com.example.service.question.impl.PracticeServiceImpl;
-import com.example.service.question.impl.QuestionBodyServiceImpl;
-import com.example.service.question.impl.QuestionServiceImpl;
+import com.example.service.question.*;
+import com.example.service.question.impl.*;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.PracticeAnswerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.submission.impl.PracticeAnswerServiceImpl;
 import com.example.service.user.StatsStudentService;
 import com.example.service.user.impl.StatsStudentServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.springframework.web.bind.annotation.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+
 
 @RestController
 @RequestMapping("/api/student")
@@ -47,6 +49,7 @@ public class StudentBusinessController {
     private final QuestionService questionService;
     private final PracticeQuestionService practiceQuestionService;
     private final PracticeAnswerService practiceAnswerService;
+    private final PreAssembledQuestionService preAssembledQuestionService;
     private final QuestionBodyService questionBodyService;
     private final StatsStudentService statsStudentService;
     private final ClassStudentService classStudentService;
@@ -59,6 +62,7 @@ public class StudentBusinessController {
                                       PracticeQuestionServiceImpl practiceQuestionService,
                                       PracticeAnswerServiceImpl practiceAnswerService,
                                       QuestionBodyServiceImpl questionBodyService,
+                                      PreAssembledQuestionServiceImpl preAssembledQuestionService,
                                       StatsStudentServiceImpl statsStudentService,
                                       ClassStudentServiceImpl classStudentService,
                                       AssignmentSubmissionServiceImpl assignmentSubmissionService
@@ -69,6 +73,7 @@ public class StudentBusinessController {
         this.practiceQuestionService = practiceQuestionService;
         this.practiceAnswerService = practiceAnswerService;
         this.questionBodyService = questionBodyService;
+        this.preAssembledQuestionService = preAssembledQuestionService;
         this.statsStudentService = statsStudentService;
         this.classStudentService = classStudentService;
         this.assignmentSubmissionService = assignmentSubmissionService;
@@ -136,103 +141,172 @@ public class StudentBusinessController {
 
     @PostMapping("/{id}/practice/generate-define")
     public ResponseEntity<GeneratePracticeDefineResponse> generatePracticeDefine(
-        @PathVariable Long id, @RequestBody GeneratePracticeDefineRequest request) {
-
+            @PathVariable Long id, @RequestBody GeneratePracticeDefineRequest request) {
         GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
         Practice practice = new Practice();
         practice.setStudentId(id);
         practice.setName(request.getName());
         practiceService.createPractice(practice);
-        int questionIndex = 1;
+
+        AtomicInteger questionIndex = new AtomicInteger(1);
         List<GeneratePracticeDefineResponse.InfoData> data = new ArrayList<>();
-        if(request.getKnowledgePoints() != null){
-            List<PracticeQuestion> practiceQuestions = new ArrayList<>();
+        List<PracticeQuestion> practiceQuestions = new ArrayList<>();
+
+        // 优化1: 批量获取需要的所有知识点的题目
+        if (request.getKnowledgePoints() != null && !request.getKnowledgePoints().isEmpty()) {
+            List<Long> knowledgePointIds = request.getKnowledgePoints().stream()
+                    .map(GeneratePracticeDefineRequest.KnowledgePoint::getKnowledgePointId)
+                    .collect(Collectors.toList());
+
+            // 假设已实现的批量获取题目方法
+            List<Question> allQuestions = questionService.getQuestionsByKnowledgePointIds(knowledgePointIds);
+
+            // 按知识点 ID 分组
+            Map<Long, List<Question>> questionsByKnowledgePointId = allQuestions.stream()
+                    .collect(Collectors.groupingBy(Question::getKnowledgePointId));
+
+
             for (GeneratePracticeDefineRequest.KnowledgePoint knowledgePoint : request.getKnowledgePoints()) {
-                List<Question> questionsByKnowledgePointTemp = questionService.getQuestionsByKnowledgePointId(knowledgePoint.getKnowledgePointId());
-                for(int i = 0; i < knowledgePoint.getNum(); i++){
-                    int index = (int) (Math.random() * questionsByKnowledgePointTemp.size());
-                    Question question = questionsByKnowledgePointTemp.get(index);
+                List<Question> questions = questionsByKnowledgePointId.getOrDefault(knowledgePoint.getKnowledgePointId(), Collections.emptyList());
+                if (questions.isEmpty()) continue;
+
+                // 高效随机抽取
+                Collections.shuffle(questions);
+                List<Question> selectedQuestions = questions.stream().limit(knowledgePoint.getNum()).toList();
+
+                for (Question question : selectedQuestions) {
                     PracticeQuestion practiceQuestion = new PracticeQuestion();
                     practiceQuestion.setPracticeId(practice.getId());
                     practiceQuestion.setQuestionId(question.getId());
-                    if (Objects.equals(question.getType(), "CHOICE")) {
-                        practiceQuestion.setSequence("1");
-                    }
-                    else if (Objects.equals(question.getType(), "FILL_IN_BLANK")) {
-                        practiceQuestion.setSequence("2");
-                    }
-                    else if (Objects.equals(question.getType(), "SHORT_ANSWER")) {
-                        practiceQuestion.setSequence("3");
-                    }
-                    else if (Objects.equals(question.getType(), "ESSAY")) {
-                        practiceQuestion.setSequence("9");
-                    }
+                    practiceQuestion.setSequence(getSequenceByQuestionType(question.getType()));
                     practiceQuestions.add(practiceQuestion);
                 }
             }
+            //排序
             practiceQuestions.sort(Comparator.comparingInt(pq -> Integer.parseInt(pq.getSequence())));
+
+            // 批量获取 Question 数据
+            List<Long> questionIds = practiceQuestions.stream()
+                    .map(PracticeQuestion::getQuestionId)
+                    .collect(Collectors.toList());
+
+            // 假设已实现的批量获取题目方法（从 Redis 缓存中获取）
+            List<Question> questions = questionService.getQuestionsByIds(questionIds);
+
+            // 批量获取 QuestionBody 数据
+            Set<Long> questionBodyIds = questions.stream()
+                    .map(Question::getBodyId)
+                    .collect(Collectors.toSet());
+
+            // 假设已实现的批量获取 QuestionBody 方法（从 Redis 缓存中获取）
+            List<QuestionBody> questionBodies = questionBodyService.getQuestionBodiesByIds(new ArrayList<>(questionBodyIds));
+            Map<Long, QuestionBody> questionBodyMap = questionBodies.stream()
+                    .collect(Collectors.toMap(QuestionBody::getId, qb -> qb));
+
+            practiceQuestionService.addPracticeQuestions(practiceQuestions);
+            // 组装 InfoData
             for (PracticeQuestion practiceQuestion : practiceQuestions) {
                 GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
-                Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
+                Question question = questions.stream()
+                        .filter(q -> q.getId().equals(practiceQuestion.getQuestionId()))
+                        .findFirst()
+                        .orElse(null);
+
                 infoData.setQuestionBody(null);
-                String questionBody = questionBodyService.getQuestionBodyById(question.getBodyId()).getBody();
-                if(questionBody != null){
-                    infoData.setQuestionBody(questionBody);
-                }
-                infoData.setQuestionContent(question.getContent());
-                infoData.setType(question.getType());
-                if(Objects.equals(infoData.getType(), "CHOICE")){
-                    infoData.setQuestionOptions(getOptionsByQuestion(question));
-                }
-                String sequence = String.valueOf(questionIndex);
-                infoData.setSequence(sequence);
-                practiceQuestion.setSequence(sequence);
-                practiceQuestionService.addPracticeQuestion(practiceQuestion);
-                infoData.setPracticeQuestionId(practiceQuestion.getId());
-                data.add(infoData);
-                questionIndex++;
-            }
-        }
-        if(request.getQuestionBodyTypes() != null){
-            for (GeneratePracticeDefineRequest.QuestionBodyType questionBodyType : request.getQuestionBodyTypes()) {
-                List<QuestionBody> questionsByQuestionBodyTypeTemp = questionBodyService.getQuestionBodiesByType(questionBodyType.getType());
-                if(!questionsByQuestionBodyTypeTemp.isEmpty()){
-                    for(int i = 0; i < questionBodyType.getNum(); i++){
-                        int index = (int) (Math.random() * questionsByQuestionBodyTypeTemp.size());
-                        QuestionBody questionBody = questionsByQuestionBodyTypeTemp.get(index);
-                        List<Question> questionsByQuestionBodyIdTemp = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
-                        int questionKidsIndex = 1;
-                        for(Question question : questionsByQuestionBodyIdTemp){
-                            GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
-                            PracticeQuestion practiceQuestion = new PracticeQuestion();
-                            infoData.setQuestionBody(null);
-                            if(questionKidsIndex == 1){
-                                infoData.setQuestionBody(questionBody.getBody());
-                            }
-                            infoData.setQuestionContent(question.getContent());
-                            infoData.setType(question.getType());
-                            if (Objects.equals(infoData.getType(), "CHOICE")) {
-                                infoData.setQuestionOptions(getOptionsByQuestion(question));
-                            }
-                            infoData.setSequence(questionIndex + "." + questionKidsIndex);
-                            practiceQuestion.setPracticeId(practice.getId());
-                            practiceQuestion.setQuestionId(question.getId());
-                            practiceQuestion.setSequence(infoData.getSequence());
-                            practiceQuestionService.addPracticeQuestion(practiceQuestion);
-                            infoData.setPracticeQuestionId(practiceQuestion.getId());
-                            data.add(infoData);
-                            questionKidsIndex++;
-                        }
-                        questionIndex++;
+                QuestionBody questionBody = null;
+                if (question != null) {
+                    questionBody = questionBodyMap.get(question.getBodyId());
+                    infoData.setPracticeQuestionId(practiceQuestion.getId());
+                    if (questionBody != null) {
+                        infoData.setQuestionBody(questionBody.getBody());
+                    }
+                    infoData.setQuestionContent(question.getContent());
+                    infoData.setType(question.getType());
+                    if (Objects.equals(infoData.getType(), "CHOICE")) {
+                        infoData.setQuestionOptions(drawOptions(question.getOptions()));
                     }
                 }
+
+                String sequence = String.valueOf(questionIndex.getAndIncrement());
+                infoData.setSequence(sequence);
+                practiceQuestion.setSequence(sequence);
+                infoData.setPracticeQuestionId(practiceQuestion.getId());
+                data.add(infoData);
             }
         }
+
+        // 优化5: 使用 Redis 缓存预组装的题目
+        if (request.getQuestionBodyTypes() != null && !request.getQuestionBodyTypes().isEmpty()) {
+            List<String> types = request.getQuestionBodyTypes().stream()
+                    .map(GeneratePracticeDefineRequest.QuestionBodyType::getType)
+                    .collect(Collectors.toList());
+
+            // 从 Redis 获取预组装的题目列表
+            List<PreAssembledQuestion> preassembledQuestions = preAssembledQuestionService.getPreAssembledQuestionsByTypes(types);
+            List<PreAssembledQuestion> finalBigQuestions = new ArrayList<>();
+            for (GeneratePracticeDefineRequest.QuestionBodyType questionBodyType : request.getQuestionBodyTypes()) {
+                //取出当前类型
+                List<PreAssembledQuestion> typeQuestions = preassembledQuestions.stream()
+                        .filter(q -> q.getType().equals(questionBodyType.getType()))
+                        .collect(Collectors.toList());
+
+                if (typeQuestions.isEmpty()) continue;
+
+                // 高效随机抽取
+                Collections.shuffle(typeQuestions);
+                List<PreAssembledQuestion> selectedTypeQuestions = typeQuestions.stream()
+                        .limit(questionBodyType.getNum())
+                        .toList();
+                finalBigQuestions.addAll(selectedTypeQuestions);
+            }
+            for (PreAssembledQuestion preassembledQuestion : finalBigQuestions) {
+                // 组装 InfoData 和 PracticeQuestion
+                // 先创建 PracticeQuestion 实体列表
+
+                String sequence = String.valueOf(questionIndex.getAndIncrement());
+                int index = 1;
+                for (SubQuestion subQ : preassembledQuestion.getSubQuestions()){
+                    PracticeQuestion pq = new PracticeQuestion();
+                    GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
+                    if (index == 1) {
+                        infoData.setQuestionBody(preassembledQuestion.getQuestionBody());
+                    }
+                    pq.setPracticeId(practice.getId());
+                    pq.setQuestionId(subQ.getQuestionId());
+                    pq.setSequence(sequence + "." + index);
+                    infoData.setSequence(sequence + "." + index++);
+
+                    practiceQuestionService.addPracticeQuestion(pq);
+
+                    infoData.setQuestionContent(subQ.getQuestionContent());
+                    infoData.setType(subQ.getType());
+                    infoData.setPracticeQuestionId(pq.getId());
+                    if ("CHOICE".equals(infoData.getType())) {
+                        infoData.setQuestionOptions(drawOptions(subQ.getQuestionOptions()));
+                    }
+                    data.add(infoData);
+                }
+
+            }
+        }
+
         response.setPracticeId(practice.getId());
         response.setData(data);
         response.setMessage("练习生成成功");
         return ResponseEntity.ok(response);
     }
+
+    // 辅助方法：根据题目类型获取序号
+    private String getSequenceByQuestionType(String type) {
+        return switch (type) {
+            case "CHOICE" -> "1";
+            case "FILL_IN_BLANK" -> "2";
+            case "SHORT_ANSWER" -> "3";
+            case "ESSAY" -> "9";
+            default -> "0";
+        };
+    }
+
 
 
 
@@ -340,8 +414,8 @@ public class StudentBusinessController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    private static List<String> getOptionsByQuestion(Question question) {
-        List<String> choices = new ArrayList<>(List.of(question.getOptions().split("\\$\\$")));
+    private static List<String> drawOptions(String optionString) {
+        List<String> choices = new ArrayList<>(List.of(optionString.split("\\$\\$")));
         char choiceOption = 'A';
         for(int j = 0; j < choices.size(); j++){
             String [] test = choices.get(j).split("\\.");
@@ -352,6 +426,7 @@ public class StudentBusinessController {
         }
         return choices;
     }
+
 
 
     @PostMapping("/{id}/practice/save")
@@ -375,7 +450,7 @@ public class StudentBusinessController {
     }
 
     @PostMapping("/{id}/continue-practice")
-    public ResponseEntity<ContinuePracticeResponse> continuePractice(@PathVariable Long id, @RequestBody ContinuePracticeRequest request) {
+    public ResponseEntity<ContinuePracticeResponse> continuePractice(@PathVariable Long id, @RequestBody ContinuePracticeRequest request) throws JsonProcessingException {
         ContinuePracticeResponse response = new ContinuePracticeResponse();
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(request.getPracticeId());
         List<ContinuePracticeResponse.InfoData> data = new ArrayList<>();
@@ -388,7 +463,7 @@ public class StudentBusinessController {
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
                 Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
-                List<String> choices = getOptionsByQuestion(question);
+                List<String> choices = drawOptions(question.getOptions());
                 infoData.getQuestionOptions().addAll(choices);
             }
             infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
@@ -405,7 +480,7 @@ public class StudentBusinessController {
     }
 
     @PostMapping("/{id}/practice/complete")
-    public ResponseEntity<CompletePracticeResponse> completePractice(@PathVariable Long id, @RequestBody CompletePracticeRequest request) {
+    public ResponseEntity<CompletePracticeResponse> completePractice(@PathVariable Long id, @RequestBody CompletePracticeRequest request) throws JsonProcessingException {
         CompletePracticeResponse response = new CompletePracticeResponse();
         PracticeQuestion test = practiceQuestionService.getPracticeQuestionById(request.getData().get(0).getPracticeQuestionId());
         Practice practice = practiceService.getPracticeById(test.getPracticeId());
@@ -455,7 +530,7 @@ public class StudentBusinessController {
     }
 
     @GetMapping("/{id}/practice/get-answer")
-    public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) {
+    public ResponseEntity<GetAnswerResponse> getAnswer(@PathVariable Long id, @RequestParam Long practiceId) throws JsonProcessingException {
         GetAnswerResponse response = new GetAnswerResponse();
         response.setTotalScore(practiceService.getPracticeById(practiceId).getTotalScore().doubleValue());
         List<PracticeQuestion> practiceQuestions = practiceQuestionService.getPracticeQuestionByPracticeId(practiceId);
@@ -469,7 +544,7 @@ public class StudentBusinessController {
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
                 Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
-                List<String> answerArray = getOptionsByQuestion(question);
+                List<String> answerArray = drawOptions(question.getOptions());
                 infoData.setQuestionOptions(answerArray);
                 if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
                     infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
