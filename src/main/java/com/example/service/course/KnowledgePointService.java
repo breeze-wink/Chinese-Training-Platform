@@ -1,8 +1,11 @@
 package com.example.service.course;
 
+import com.example.dto.response.teacher.KnowledgePointsResponse;
+import com.example.dto.response.teacher.ListKnowledgeResponse;
 import com.example.model.course.KnowledgePoint;
 
 import java.util.List;
+import java.util.Map;
 
 public interface KnowledgePointService {
     int addKnowledgePoint(KnowledgePoint point);
@@ -13,5 +16,9 @@ public interface KnowledgePointService {
     String getKnowledgePointNameById(Long id);
     List<KnowledgePoint> getAllKnowledgePoints();
 
-    List<KnowledgePoint> getAllKnowledgePointsOrderByType();
+    Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> getAllKnowledgePointsGroupByType();
+
+    void flushKnowledgePointCache();
+
+    Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> getAllKnowledgePointsWithDescriptionGroupByType();
 }
