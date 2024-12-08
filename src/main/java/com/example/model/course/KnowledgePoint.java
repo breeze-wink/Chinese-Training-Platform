@@ -10,5 +10,5 @@ public class KnowledgePoint {
     private String name;
     private String description;
     private String type;
-
+    private Boolean isHidden;
 }
