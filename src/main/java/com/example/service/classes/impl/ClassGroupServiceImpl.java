@@ -90,4 +90,10 @@ public class ClassGroupServiceImpl implements ClassGroupService {
     public List<ClassGroup> getAllGroups(){
         return classGroupMapper.selectAll();
     }
+
+    @Override
+    @Transactional
+    public List<ClassGroup> selectByClassId(Long classId) {
+        return classGroupMapper.selectByClassId(classId);
+    }
 }
