@@ -137,6 +137,7 @@
         qb.body,
         q.content,
         q.answer,
+        q.options,
         qs.type,
         qs.totalScore,
         qs.completeCount,
