@@ -17,7 +17,7 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    private static final long EXPIRATION_TIME = 3600000;
+    private static final long EXPIRATION_TIME = 3600000 * 3;
 
     // 生成 Token
     public String generateToken(BaseUser user) {

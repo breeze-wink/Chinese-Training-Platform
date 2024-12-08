@@ -2523,8 +2523,10 @@
         "explanation": "解析1",   // 解析
         "type": "选择",           // 题型
         "knowledge": "知识点1"    // 知识点
+        “options" : ["opt"],
         },
-      ], 
+      ],
+      "referencedCount": 1,
       "difficulty": "普通",     // 难度
     }
   ],
@@ -2537,7 +2539,9 @@
     "explanation": "解析1",   // 解析
     "difficulty": "普通",     // 难度
     "type": "选择",           // 题型
-    "knowledge": "知识点1"    // 知识点
+    "knowledge": "知识点1",    // 知识点
+    "options" : ["opt"],
+    "referencedCount": 1
   }
   ],
   "totalCount": 50,    // 总记录数
