@@ -906,7 +906,8 @@
 - **接口说明**：学生用户获取作业列表。
 - **请求说明**
 - 请求头: `Content-Type` : `application/json`
-- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求参数: 
+  - 路径参数（Path Variable）：`id` - 学生的唯一标识符
 - 请求体(`JSON` 格式)：空
   - **响应说明**
     - 响应格式: `JSON`
@@ -947,7 +948,8 @@
 - **接口说明**：学生用户获取作业列表。
 - **请求说明**
 - 请求头: `Content-Type` : `application/json`
-- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求参数:
+  - 路径参数（Path Variable）：`id` - 学生的唯一标识符
 - 请求体(`JSON` 格式)：空
   - **响应说明**
     - 响应格式: `JSON`
@@ -3711,7 +3713,7 @@
           {
             "id": "number", // 对应数据库中的 id 字段
             "name": "string", // 对应数据库中的 name 字段
-            ”description": "string",// 对应数据库中的 description 字段
+            "description": "string",// 对应数据库中的 description 字段
             "inviteCode": "string" // 对应数据库中的 inviteCode 字段
           }
         ]
