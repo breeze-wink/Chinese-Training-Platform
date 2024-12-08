@@ -2435,31 +2435,18 @@
     ```json
     {
       "message": "获取题目成功",
-      "creator": "string",//创建者
-      "knowledgePointType": "string",
-      "body": "string",
-      "bodyId": "long",
-      "data": [
-        {
-          "questionId": "long",
-          "content": "string",
-          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-          "options": ["string", "string", "string", "string"],
-          "answer": "string",
-          "analysis": "string",
-          "knowledgePointName": "string"
-        },
-        {
-          "questionId": "long",
-          "content": "string",
-          "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
-          "options": ["string", "string", "string", "string"],
-          "answer": "string",
-          "analysis": "string",
-          "knowledgePointName": "string"
-        },
-        ...
-      ]
+      "data": {
+        "questions": [
+          {
+            "id": "number", // 对应数据库中的 id 字段
+        "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
+        "knowledgePointId": "number", // 对应数据库中的 knowledgePointId 字段
+        "creatorId": "number", // 对应数据库中的 creatorId 字段
+        "bodyId": "number" 
+          }
+        ]
+      }
+
     }
     ```
   - **失败响应**（400 Bad Request）：
@@ -2566,6 +2553,7 @@
       "message": "获取失败"
     }
     ```
+
 
 
 ## SystemAdmin
@@ -3701,6 +3689,88 @@
       "message" : "修改密码失败"
     }
     ```
+
+### Get All Classes
+
+- **接口路径**：`/api/school/{adminId}/get-classes`
+- **请求方法**：GET
+- **接口说明**：通过学校管理员ID获取此学校所有班级。
+
+- **请求说明**：
+  - **请求参数**：
+    - `adminId`：学校管理员ID，路径参数。
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+    ```json
+    {
+      "message": "获取班级成功",
+      "data": {
+        "classes": [
+          {
+            "id": "number", // 对应数据库中的 id 字段
+            "name": "string", // 对应数据库中的 name 字段
+            ”description": "string",// 对应数据库中的 description 字段
+            "inviteCode": "string" // 对应数据库中的 inviteCode 字段
+          }
+        ]
+      }
+    }
+    ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "班级获取失败",
+      "data": null
+    }
+    ```
+
+### Query Class Details
+
+- **接口路径**：`/api/class/{classId}/details`
+- **请求方法**：GET
+- **接口说明**：获取班级详细信息，包括班级中的小组和成员。
+
+- **请求说明**：
+  - **请求参数**：
+    - `classId`：班级ID，路径参数。
+
+- **响应说明**：
+  - **响应格式**：JSON
+  - **成功响应**（200 OK）：
+    ```json
+    {
+      "message": "获取班级详细信息成功",
+      "data": {
+        "classDetails": {
+          "id": "number", // 对应数据库中的 id 字段
+          "name": "string", // 对应数据库中的 name 字段
+          "groups": [
+            {
+              "id": "number", // 
+              "name": "string", // 
+              "description": "string"// 对应数据库中的 description 字段
+            }
+          ],
+          "students": [
+            {
+              "studentid": "number", // 成员ID
+              "name": "string" // 成员名称
+            }
+          ]
+        }
+      }
+    }
+    ```
+  - **失败响应**（400 Bad Request）：
+    ```json
+    {
+      "message": "班级详细信息获取失败",
+      "data": null
+    }
+    ```
+
 
 
 
