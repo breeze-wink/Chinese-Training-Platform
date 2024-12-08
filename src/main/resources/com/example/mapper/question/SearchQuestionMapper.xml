@@ -130,7 +130,6 @@
         </if>
     </select>
 
-    <!-- 查询小题 -->
     <select id="searchSmallQuestions" parameterType="map" resultMap="QuestionResultMap">
         SELECT
         q.id as questionId,
@@ -146,28 +145,24 @@
         kp.name as knowledgeName
         FROM
         question q
-        JOIN
-        question_statistic qs
-        ON q.id = qs.id AND qs.type = 'small'
-        JOIN
-        question_body qb
-        ON q.bodyId = qb.id
-        JOIN
-        knowledge_point kp
-        ON q.knowledgePointId = kp.id
+        LEFT JOIN
+        question_statistic qs ON q.id = qs.id AND qs.type = 'small'
+        LEFT JOIN
+        question_body qb ON q.bodyId = qb.id
+        LEFT JOIN
+        knowledge_point kp ON q.knowledgePointId = kp.id
         WHERE
         1=1
 
         <if test="type != null and type != ''">
-
             AND q.type = #{type}
         </if>
+
         <if test="knowledgeId != null and knowledgeId != ''">
             AND q.knowledgePointId = #{knowledgeId}
         </if>
 
         <if test="difficulty != null and difficulty != ''">
-
             AND (
             qs.completeCount = 0
             OR (qs.totalScore / qs.completeCount) BETWEEN
@@ -181,9 +176,11 @@
         </if>
 
         <if test="search != null and search != ''">
-            AND (qb.body LIKE CONCAT('%', #{search}, '%')
+            AND (
+            qb.body LIKE CONCAT('%', #{search}, '%')
             OR q.content LIKE CONCAT('%', #{search}, '%')
-            OR q.answer LIKE CONCAT('%', #{search}, '%'))
+            OR q.answer LIKE CONCAT('%', #{search}, '%')
+            )
         </if>
 
         <if test="mode == 'latest'">
@@ -193,6 +190,7 @@
                 <otherwise>DESC</otherwise>
             </choose>
         </if>
+
         <if test="mode == 'mostUsed'">
             ORDER BY qs.referencedCount
             <choose>
@@ -200,6 +198,7 @@
                 <otherwise>DESC</otherwise>
             </choose>
         </if>
+
         <if test="mode == null or mode == ''">
             ORDER BY q.id
             <choose>
@@ -207,37 +206,34 @@
                 <otherwise>DESC</otherwise>
             </choose>
         </if>
+
         LIMIT #{offset}, #{pageSize}
     </select>
 
-    <!-- 统计小题总数 -->
+
     <select id="countSmallQuestions" parameterType="map" resultType="long">
         SELECT
         COUNT(*)
         FROM
         question q
-        JOIN
-        question_statistic qs
-        ON q.id = qs.id AND qs.type = 'small'
-        JOIN
-        question_body qb
-        ON q.bodyId = qb.id
-        JOIN
-        knowledge_point kp
-        ON q.knowledgePointId = kp.id
+        LEFT JOIN
+        question_statistic qs ON q.id = qs.id AND qs.type = 'small'
+        LEFT JOIN
+        question_body qb ON q.bodyId = qb.id
+        LEFT JOIN
+        knowledge_point kp ON q.knowledgePointId = kp.id
         WHERE
         1=1
 
         <if test="type != null and type != ''">
-
             AND q.type = #{type}
         </if>
+
         <if test="knowledgeId != null and knowledgeId != ''">
             AND q.knowledgePointId = #{knowledgeId}
         </if>
 
         <if test="difficulty != null and difficulty != ''">
-
             AND (
             qs.completeCount = 0
             OR (qs.totalScore / qs.completeCount) BETWEEN
@@ -251,12 +247,13 @@
         </if>
 
         <if test="search != null and search != ''">
-
-            AND (qb.body LIKE CONCAT('%', #{search}, '%')
+            AND (
+            qb.body LIKE CONCAT('%', #{search}, '%')
             OR q.content LIKE CONCAT('%', #{search}, '%')
-            OR q.answer LIKE CONCAT('%', #{search}, '%'))
-
+            OR q.answer LIKE CONCAT('%', #{search}, '%')
+            )
         </if>
     </select>
+
 
 </mapper>

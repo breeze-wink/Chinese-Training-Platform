@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import com.example.dto.redis.PreAssembledQuestion;
 import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
 import com.example.dto.response.student.AvgScoreResponse;
@@ -284,21 +283,8 @@ public class TeacherBusinessController {
         KnowledgePointsResponse response = new KnowledgePointsResponse();
 
         try {
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePointsOrderByType();
-
-            // 按 type 分组
-            Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> groupedPoints =
-                    knowledgePoints.stream()
-                            .map(kp -> {
-                                KnowledgePointsResponse.KnowledgePointInfo info = new KnowledgePointsResponse.KnowledgePointInfo();
-                                info.setName(kp.getName());
-                                info.setType(kp.getType());
-                                info.setDescription(kp.getDescription());
-                                return info;
-                            })
-                            .collect(Collectors.groupingBy(KnowledgePointsResponse.KnowledgePointInfo::getType));
+            response.setKnowledgePoints(knowledgePointService.getAllKnowledgePointsWithDescriptionGroupByType());
             response.setMessage("获取成功");
-            response.setKnowledgePoints(groupedPoints);
 
             return ResponseEntity.ok(response);
         }  catch (Exception e) {
@@ -312,27 +298,9 @@ public class TeacherBusinessController {
     public ResponseEntity<ListKnowledgeResponse> getKnowledgePoint(@PathVariable Long id) {
         ListKnowledgeResponse response = new ListKnowledgeResponse();
         try {
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePointsOrderByType();
-
-            // 按 type 分组
-            Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> groupedPoints =
-                    knowledgePoints.stream()
-                            .collect(Collectors.groupingBy(KnowledgePoint::getType))  // 先按 KnowledgePoint 的 type 进行分组
-                            .entrySet().stream()  // 获取分组后的 EntrySet
-                            .collect(Collectors.toMap(
-                                    Map.Entry::getKey,  // 使用 type 作为键
-                                    entry -> entry.getValue().stream()
-                                            .map(kp -> {
-                                                ListKnowledgeResponse.KnowledgePointInfo info = new ListKnowledgeResponse.KnowledgePointInfo();
-                                                info.setName(kp.getName());
-                                                info.setId(kp.getId());
-                                                return info;
-                                            })
-                                            .collect(Collectors.toList())  // 转换为 List<KnowledgePointInfo>
-                            ));
+            response.setKnowledgePoints(knowledgePointService.getAllKnowledgePointsGroupByType());
 
             response.setMessage("获取成功");
-            response.setKnowledgePoints(groupedPoints);
 
             return ResponseEntity.ok(response);
         }  catch (Exception e) {
