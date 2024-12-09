@@ -111,7 +111,6 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
         }
         return objectMapper.convertValue(object, new TypeReference<Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>>>() {});
 
-
     }
 
     @Override
@@ -196,63 +195,5 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
         flushKnowledgePointCache();
 
     }
-
-    @Override
-    public Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> getAllKnowledgePointsWithDescriptionGroupByType() {
-        String cacheKey = "knowledgePointsGroupWithDescriptionByType";
-        Object object = redisTemplate.opsForValue().get(cacheKey);
-        if (object == null) {
-            flushKnowledgePointCache();
-            object = redisTemplate.opsForValue().get(cacheKey);
-
-        }
-        return objectMapper.convertValue(object, new TypeReference<Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>>>() {});
-    }
-
-
-    @Override
-    public void flushKnowledgePointCache() {
-        List<KnowledgePoint> list = knowledgePointMapper.selectAllOrderByType();
-        Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> groupedPoints =
-                list.stream()
-                        .collect(Collectors.groupingBy(KnowledgePoint::getType))  // 先按 KnowledgePoint 的 type 进行分组
-                        .entrySet().stream()  // 获取分组后的 EntrySet
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,  // 使用 type 作为键
-                                entry -> entry.getValue().stream()
-                                        .map(kp -> {
-                                            ListKnowledgeResponse.KnowledgePointInfo info = new ListKnowledgeResponse.KnowledgePointInfo();
-                                            info.setName(kp.getName());
-                                            info.setId(kp.getId());
-                                            return info;
-                                        })
-                                        .collect(Collectors.toList())  // 转换为 List<KnowledgePointInfo>
-                        ));
-
-        // 将结果存入缓存
-        String cacheKey1 = "knowledgePointsGroupByType";
-        redisTemplate.opsForValue().set(cacheKey1, groupedPoints);
-
-        Map<String, List<KnowledgePointsResponse.KnowledgePointInfo>> groupedPointsWithDescription =
-                list.stream()
-                        .collect(Collectors.groupingBy(KnowledgePoint::getType))  // 先按 KnowledgePoint 的 type 进行分组
-                        .entrySet().stream()  // 获取分组后的 EntrySet
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,  // 使用 type 作为键
-                                entry -> entry.getValue().stream()
-                                        .map(kp -> {
-                                            KnowledgePointsResponse.KnowledgePointInfo info = new KnowledgePointsResponse.KnowledgePointInfo();
-                                            info.setName(kp.getName());
-                                            info.setType(kp.getType());
-                                            info.setDescription(kp.getDescription());
-                                            return info;
-                                        })
-                                        .collect(Collectors.toList())  // 转换为 List<KnowledgePointInfo>
-                        ));
-        String cacheKey2 = "knowledgePointsGroupWithDescriptionByType";
-        redisTemplate.opsForValue().set(cacheKey2, groupedPointsWithDescription);
-    }
-
-
 
 }

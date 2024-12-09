@@ -900,14 +900,13 @@
       }
       ```
 
-### Get Unfinished Assignment List `finished`
+### Get Unfinished Assignment List
 - **接口路径**：`/api/student/{id}/get-unfinished-assignment-list`
 - **请求方法**：`GET`
 - **接口说明**：学生用户获取作业列表。
 - **请求说明**
 - 请求头: `Content-Type` : `application/json`
-- 请求参数: 
-  - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
 - 请求体(`JSON` 格式)：空
   - **响应说明**
     - 响应格式: `JSON`
@@ -942,14 +941,13 @@
         ```
 
 
-### Get Finished Assignment List `finished`
+### Get Finished Assignment List
 - **接口路径**：`/api/student/{id}/get-finished-assignment-list`
 - **请求方法**：`GET`
 - **接口说明**：学生用户获取作业列表。
 - **请求说明**
 - 请求头: `Content-Type` : `application/json`
-- 请求参数:
-  - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
 - 请求体(`JSON` 格式)：空
   - **响应说明**
     - 响应格式: `JSON`
@@ -2210,8 +2208,11 @@
 ### Generate Custom Exam Paper 
 
 - **接口路径**：`/api/teacher/{teacherId}/generate-custom-exam`
+
 - **请求方法**：POST
+
 - **接口说明**：教师用户根据自定义的题目设置信息生成试卷，返回题目信息。
+
 - **请求说明**：
   - 请求参数：
     - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
@@ -2234,51 +2235,6 @@
     - `topics`：题目设置信息的 List，每个元素包含：
       - `topic`：考点名称（如“数学”）。
       - `quantity`：该考点需要的题目数量。
-
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "试卷生成成功",
-      "examQuestions": [
-        {
-          "question": "1 + 1 = ?",
-          "type": "单选题",
-          "answer": "2",
-          "options": [
-            "1",
-            "2",
-            "3",
-            "4"
-          ]
-        },
-        {
-          "question": "《西游记》的作者是谁？",
-          "type": "单选题",
-          "answer": "吴承恩",
-          "options": [
-            "李白",
-            "唐婉",
-            "吴承恩",
-            "孔子"
-          ]
-        },
-        {
-          "question": "请简述计算机网络的基本概念。",
-          "type": "简答题",
-          "answer": "计算机网络是指由多台计算机及其连接设备组成的系统，通过通信介质传输数据。"
-        }
-      ]
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "试卷生成失败",
-      "examQuestions": null
-    }
-    ```
 
 
 ### Change Password `finished`
@@ -2440,8 +2396,10 @@
       "creator": "string",//创建者
       "knowledgePointType": "string",
       "body": "string",
+      "bodyId": "long",
       "data": [
         {
+          "questionId": "long",
           "content": "string",
           "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
           "options": ["string", "string", "string", "string"],
@@ -2450,6 +2408,7 @@
           "knowledgePointName": "string"
         },
         {
+          "questionId": "long",
           "content": "string",
           "type": "string", // 对应数据库中的 type 字段，枚举值 'CHOICE' 或 'FILL_IN_BLANK'
           "options": ["string", "string", "string", "string"],
@@ -2477,8 +2436,8 @@
 
 - **请求说明**：
   - **路径参数**：`id`："long"//教师的唯一标识符。
-  - **查询参数**：`deleteId`："long"//题目的唯一标识符。
-                `type`: "string"//"big"OR"small"，判断deleteId的类型。
+  - **查询参数**：`questionId`："long"//题目的唯一标识符。
+                `type`: "string"//"big"OR"small"，判断大题还是小题。
 
 - **响应说明**：
   - **响应格式**：JSON
@@ -2495,7 +2454,7 @@
     }
     ```
 
-### 获取问题（根据筛选条件） `waiting`
+### 获取问题（根据筛选条件） `finished`
 
 - **接口路径**：`/api/teacher/search-questions`
 - **请求方法**：POST
@@ -2535,10 +2494,8 @@
         "explanation": "解析1",   // 解析
         "type": "选择",           // 题型
         "knowledge": "知识点1"    // 知识点
-        “options" : ["opt"],
         },
-      ],
-      "referencedCount": 1,
+      ], 
       "difficulty": "普通",     // 难度
     }
   ],
@@ -2551,9 +2508,7 @@
     "explanation": "解析1",   // 解析
     "difficulty": "普通",     // 难度
     "type": "选择",           // 题型
-    "knowledge": "知识点1",    // 知识点
-    "options" : ["opt"],
-    "referencedCount": 1
+    "knowledge": "知识点1"    // 知识点
   }
   ],
   "totalCount": 50,    // 总记录数
@@ -2564,13 +2519,152 @@
   
   ```
   - **失败响应**（400 Bad Request）：
+    
     ```json
     {
       "message": "获取失败"
     }
     ```
 
+### generate testPaper `finished`
 
+- **接口路径**：`/api/teacher/generate-paper`
+
+- **请求方法**：POST
+
+- **接口说明**：教师查找题目。
+
+- **请求说明**
+
+  - 请求头: `Content-Type` : `application/json`
+
+  - 请求参数:
+
+    - 请求体(`JSON` 格式)：
+
+      ```json
+      "name" : "试卷名字",
+      "creatorId": 12345, // 老师id
+      "totalScore": 100,
+      "difficulty" : "难度",
+      "questions":[
+          {
+              "id" : 12345, //可能是questionId或bodyId，根据type
+              "type": "big" or "small", //题目类型
+              "sequence": 1234, //题目序号
+              "score" : 5
+          },
+      ]
+      ```
+
+- **响应说明**
+
+  - **响应格式**：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message" : "success",
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message" : "错误",
+    }
+    ```
+
+### get papers
+
+- **接口路径**：`/api/teacher/papers/{id}`
+
+- **请求方法**：GET
+
+- **接口说明**：教师用户通过ID 获取自己出过的试卷。
+
+- **请求说明**：
+
+  - 请求参数：
+    - 路径参数（Path Variable）：`id` - 教师的唯一标识符
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "success",
+      "papers": [
+          {
+    		"id": 12345, //试卷id
+            "name": "试卷名称",
+            "createTime": "生成时间",
+            "difficulty": 64.4 //难度
+          }
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Not Found`):
+
+    ```json
+    {
+      "message": "错误",
+    }
+    ```
+
+### Get Paper Detail
+
+- **接口路径**：`/api/teacher/paper`
+
+- **请求方法**：GET
+
+- **接口说明**：教师用户通过ID 获取自己出过的试卷。
+
+- **请求说明**：
+
+  - 请求参数：
+    - `请求`参数（Path Variable）：`id` - paper 的 Id
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "success",
+      "questions": [
+          {
+           	"body": "题干， 单题为空",
+            "subQuestions": [ //大题时不为空
+                {    
+                    "question": "问题内容", 
+                    "answer" : "答案", 
+                    "explanation": "解析", 
+                    "options": ["选项1", "选项2"], 
+                    "type" : "选择、填空、简答、作文",
+                    "knowledge" : "知识点"
+                }
+            ],
+            "question": "问题内容", //小题时不为空
+            "answer" : "答案", //小题时不为空
+            "explanation": "解析", //小题时不为空
+            "options": ["选项1", "选项2"], //小题且为选择时不为空
+            "type" : "选择、填空、简答、作文",//小题时不为空
+            "knowledge" : "知识点",
+          }
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Not Found`):
 
 ## SystemAdmin
 
@@ -3705,103 +3799,6 @@
       "message" : "修改密码失败"
     }
     ```
-
-### Get All Classes `finished`
-
-- **接口路径**：`/api/school-admin/{id}/get-classes`
-- **请求方法**：GET
-- **接口说明**：通过学校管理员ID获取此学校所有班级。
-
-- **请求说明**：
-  - **请求参数**：
-    - **路径参数**: `id`：学校管理员ID，路径参数。
-  - **请求体**: 无
-- **响应说明**：
-  - **响应格式**：JSON
-  - **成功响应**（200 OK）：
-    ```json
-    {
-      "message": "获取班级成功",
-      "data": [
-        {
-          "classId": "number", // 对应数据库中的 id 字段
-          "name": "string", // 对应数据库中的 name 字段
-          "description": "string",// 对应数据库中的 description 字段
-          "inviteCode": "string" // 对应数据库中的 inviteCode 字段
-        },
-        {
-          "classId": "number", // 对应数据库中的 id 字段
-          "name": "string", // 对应数据库中的 name 字段
-          "description": "string",// 对应数据库中的 description 字段
-          "inviteCode": "string" // 对应数据库中的 inviteCode 字段
-        },
-        ...
-      ]
-    }
-    ```
-  - **失败响应**（400 Bad Request）：
-    ```json
-    {
-      "message": "班级获取失败",
-      "data": null
-    }
-    ```
-
-### Query Class Details `finished`
-
-- **接口路径**：`/api/school-admin/{id}/query-class`
-- **请求方法**：GET
-- **接口说明**：获取班级详细信息，包括班级中的小组和成员。
-
-- **请求说明**：
-  - **请求参数**：
-    - **路径参数**: `id`：学校管理员ID，路径参数。
-    - **查询参数**: `classId`：班级ID，查询参数。
-
-- **响应说明**：
-  - **响应格式**：JSON
-  - **成功响应**（200 OK）：
-    ```json
-    {
-      "message": "获取班级详细信息成功",
-      "data": {
-        "className": "string", // 对应数据库中的 name 字段
-        "classDescription": "string",
-        "groups": [
-          {
-            "groupId": "number", // 
-            "groupName": "string", // 
-            "groupDescription": "string"// 对应数据库中的 description 字段
-          },
-          {
-            "groupId": "number", // 
-            "groupName": "string", // 
-            "groupDescription": "string"// 对应数据库中的 description 字段
-          },
-          ...
-        ],
-        "students": [
-          {
-            "studentId": "number", // 成员ID
-            "studentName": "string" // 成员名称
-          },
-          {
-            "studentId": "number", // 成员ID
-            "studentName": "string" // 成员名称
-          },
-          ...
-        ]
-      }
-    }
-    ```
-  - **失败响应**（400 Bad Request）：
-    ```json
-    {
-      "message": "班级详细信息获取失败",
-      "data": null
-    }
-    ```
-
 
 
 

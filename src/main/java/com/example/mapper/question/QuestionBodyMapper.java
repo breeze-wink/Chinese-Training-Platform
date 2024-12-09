@@ -26,12 +26,12 @@ public interface QuestionBodyMapper {
     int update(QuestionBody questionBody);
 
     // 删除记录
-    @Delete("DELETE FROM question_body WHERE id = #{id}")
+    @Update("Update question_body SET isHidden=true WHERE id = #{id}")
     int delete(Long id);
 
-    @Select("SELECT * FROM question_body WHERE type = #{type}")
+    @Select("SELECT * FROM question_body WHERE type = #{type} and isHidden = false")
     List<QuestionBody> getQuestionBodiesByType(String type);
 
-    @Select("SELECT type FROM question_body")
+    @Select("SELECT type FROM question_body where isHidden = false")
     List<String> getAllTypes();
 }
