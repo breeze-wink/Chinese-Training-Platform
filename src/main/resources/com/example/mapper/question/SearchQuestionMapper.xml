@@ -137,7 +137,7 @@
         q.content,
         q.answer,
         q.options,
-        qs.type,
+        q.type,
         qs.totalScore,
         qs.completeCount,
         qs.referencedCount,

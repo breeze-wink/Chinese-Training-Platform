@@ -12,7 +12,7 @@ public interface QuestionMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Question question);
 
-    @Delete("DELETE FROM question WHERE id = #{id}")
+    @Update("UPDATE question SET isHidden=true WHERE id = #{id}")
     int delete(Long id);
 
     @Update("UPDATE question SET content = #{content}, type = #{type}, options = #{options}, answer = #{answer}, knowledgePointId = #{knowledgePointId}, creatorId = #{creatorId}, bodyId = #{bodyId} WHERE id = #{id}")
@@ -24,10 +24,10 @@ public interface QuestionMapper {
     @Select("SELECT * FROM question")
     List<Question> selectAll();
 
-    @Select("SELECT * FROM question WHERE knowledgePointId = #{knowledgePointId}")
+    @Select("SELECT * FROM question WHERE knowledgePointId = #{knowledgePointId} and isHidden=false")
     List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId);
 
-    @Select("SELECT * FROM question WHERE bodyId = #{questionBodyId}")
+    @Select("SELECT * FROM question WHERE bodyId = #{questionBodyId} and isHidden = false")
     List<Question> getQuestionsByQuestionBodyId(Long questionBodyId);
 
 //    List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds);

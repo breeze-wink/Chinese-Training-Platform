@@ -118,8 +118,13 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
                 question.setQuestion(result.getContent());
                 String answers = result.getAnswer();
                 String[] temps = answers.split("\\$\\$");
+
+                if (result.getType().equals("FILL_IN_BLANK")) {
+                    temps[0] = temps[0].replaceAll("##", ";");
+                }
+                question.setAnswer(temps[0]);
+
                 if (temps.length > 1) {
-                    question.setAnswer(temps[0]);
                     question.setExplanation(temps[1]); // 需要根据实际数据填充
                 }
                 if (result.getCompleteCount() == 0) {
@@ -164,6 +169,9 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             String answer = q.getAnswer();
 
             String[] temps = answer.split("\\$\\$");
+            if (q.getType().equals("FILL_IN_BLANK")) {
+                temps[0] = temps[0].replaceAll("##", ";");
+            }
             sub.setAnswer(temps[0]);
             if (temps.length > 1) {
                 sub.setExplanation(temps[1]); // 需要根据实际数据填充

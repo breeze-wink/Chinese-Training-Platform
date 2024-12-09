@@ -10,9 +10,7 @@ import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
-import com.example.model.question.Question;
-import com.example.model.question.QuestionBody;
-import com.example.model.question.QuestionStatistic;
+import com.example.model.question.*;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.user.StatsStudent;
@@ -66,6 +64,8 @@ public class TeacherBusinessController {
 
     private final QuestionStatisticService questionStatisticService;
     private final AssignmentSubmissionService assignmentSubmissionService;
+    private final TestPaperService testPaperService;
+    private final PaperQuestionService paperQuestionService;
     private final TeacherService teacherService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
@@ -83,7 +83,9 @@ public class TeacherBusinessController {
                                      CacheRefreshService cacheRefreshService,
                                      SearchQuestionService searchQuestionService,
                                      QuestionStatisticService questionStatisticService,
-                                     TeacherServiceImpl teacherService
+                                     TeacherServiceImpl teacherService,
+                                     TestPaperService testPaperService,
+                                     PaperQuestionService paperQuestionService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -101,6 +103,8 @@ public class TeacherBusinessController {
         this.searchQuestionService = searchQuestionService;
         this.questionStatisticService = questionStatisticService;
         this.teacherService = teacherService;
+        this.testPaperService = testPaperService;
+        this.paperQuestionService = paperQuestionService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -805,6 +809,41 @@ public class TeacherBusinessController {
     public ResponseEntity<SearchQuestionsResponse> searchQuestions(@RequestBody SearchQuestionsRequest request) {
         SearchQuestionsResponse response = searchQuestionService.searchQuestions(request);
         return ResponseEntity.ok(response);
+    }
 
+    @PostMapping("/generate-paper")
+    public ResponseEntity<Message> generatePaper(@RequestBody GeneratePaperRequest request) {
+        Message message = new Message();
+        TestPaper testPaper = new TestPaper();
+        testPaper.setName(request.getName());
+        testPaper.setTotalScore(request.getTotalScore());
+        testPaper.setCreatorId(request.getCreatorId());
+        testPaper.setDifficulty(request.getDifficulty());
+        try {
+            testPaperService.insert(testPaper);
+            List<PaperQuestion> paperQuestions = getPaperQuestions(request, testPaper);
+            paperQuestionService.batchInsert(paperQuestions);
+            //TODO:引用次数加一
+            message.setMessage("success");
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message.setMessage("Fail:" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        }
+    }
+
+    private static List<PaperQuestion> getPaperQuestions(GeneratePaperRequest request, TestPaper testPaper) {
+        List<PaperQuestion> paperQuestions = new ArrayList<>();
+        for(GeneratePaperRequest.questionInfo questionInfo : request.getQuestions()) {
+            PaperQuestion paperQuestion = new PaperQuestion();
+            paperQuestion.setPaperId(testPaper.getId());
+            paperQuestion.setScore(questionInfo.getScore());
+            paperQuestion.setQuestionId(questionInfo.getId());
+            paperQuestion.setQuestionType(questionInfo.getType());
+            paperQuestion.setSequence(questionInfo.getSequence());
+            paperQuestions.add(paperQuestion);
+        }
+        return paperQuestions;
     }
 }

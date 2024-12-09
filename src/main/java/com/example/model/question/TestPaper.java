@@ -10,7 +10,8 @@ import java.util.Date;
 public class TestPaper {
     private Long id;
     private String name;
-    private String description;
     private Long creatorId;
     private Date createTime;
+    private Double difficulty;
+    private Integer totalScore;
 }
