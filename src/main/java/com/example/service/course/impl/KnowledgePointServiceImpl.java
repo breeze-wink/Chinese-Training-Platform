@@ -111,7 +111,6 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
         }
         return objectMapper.convertValue(object, new TypeReference<Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>>>() {});
 
-
     }
 
     @Override
