@@ -1,5 +1,6 @@
 package com.example.service.question.impl;
 
+import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.model.question.QuestionStatistic;
 import com.example.mapper.question.QuestionStatisticMapper;
 import com.example.service.question.QuestionStatisticService;
@@ -27,6 +28,11 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
     @Override
     public void delete(Long id, String type) {
         questionStatisticMapper.delete(id, type);
+    }
+
+    @Override
+    public void addReferencedCount(List<QuestionStatisticDTO> questionStatisticDTOS) {
+        questionStatisticMapper.addReferencedCount(questionStatisticDTOS);
     }
 
     @Override

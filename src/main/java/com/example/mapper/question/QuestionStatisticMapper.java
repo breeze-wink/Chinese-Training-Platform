@@ -1,5 +1,6 @@
 package com.example.mapper.question;
 
+import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.model.question.QuestionStatistic;
 import org.apache.ibatis.annotations.*;
 
@@ -28,4 +29,6 @@ public interface QuestionStatisticMapper {
 
     @Select("SELECT * FROM question_statistic")
     List<QuestionStatistic> findAll();
+
+    void addReferencedCount(@Param("ids") List<QuestionStatisticDTO> questions);
 }
