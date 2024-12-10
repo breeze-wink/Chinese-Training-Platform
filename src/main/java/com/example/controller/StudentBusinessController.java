@@ -773,6 +773,7 @@ public class StudentBusinessController {
             }
             data.add(infoData);
         }
+        data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
         response.setData(data);
         response.setMessage("历史成绩获取成功");
         return ResponseEntity.ok(response);
