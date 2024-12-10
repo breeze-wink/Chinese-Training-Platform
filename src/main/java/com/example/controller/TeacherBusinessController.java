@@ -843,6 +843,7 @@ public class TeacherBusinessController {
         }
     }
 
+
     private static List<PaperQuestion> getPaperQuestions(GeneratePaperRequest request, TestPaper testPaper) {
         List<PaperQuestion> paperQuestions = new ArrayList<>();
         for(GeneratePaperRequest.questionInfo questionInfo : request.getQuestions()) {

@@ -1124,6 +1124,151 @@
       "data": null
     }
     ```
+    
+
+
+### Get Homework Detail
+
+- **接口路径**：`/api/student/{id}/homework/get-detail`
+- **请求方法**：GET
+- **接口说明**：学生获取作业详情。
+- **请求说明**:
+  - **请求参数**: 
+    - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+    - 查询参数（Query Parameter）： `assignmentId` - 作业的唯一标识符
+  - **请求体**：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+      {
+        "message" : "获取成功",
+        "data" : [
+            {
+              "submissionAnswerId" : "long",
+              "sequence" : "string",
+              "body": "string",
+              "questionContent" : "string",
+              "questionType" : "string",
+              "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+              "answerContent" : "string"
+            },
+            {
+              "submissionAnswerId" : "long",
+              "sequence" : "string",
+              "body": "string",
+              "questionContent" : "string",
+              "questionType" : "string",
+              "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+              "answerContent" : "string"
+            },
+            ...
+        ]
+      }
+      ```
+    - **失败响应** (`400 Bad Request`):
+      ```json
+      {
+        "message": "获取失败",
+        "data" : null
+      }
+      ```
+
+
+
+### Complete Homework
+
+- **接口路径**：`/api/student/{id}/homework/complete`
+- **请求方法**：`POST`
+- **接口说明**：学生用户完成作业，提交答案。
+- **请求说明**
+- 请求头: `Content-Type` : `application/json`
+- 请求参数:- 路径参数（Path Variable）：`id` - 学生的唯一标识符
+- 请求体(`JSON` 格式)：
+  ```json
+  {
+    "data" : [
+    {
+      "submissionAnswerId" : "long",
+      "answerContent" : "string"
+    },
+    {
+      "submissionAnswerId" : "long",
+      "answerContent" : "string"
+    },
+    ...
+  ]
+  }
+  ```
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message": "练习提交成功",
+      "score" : "double"
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message": "练习提交失败",
+      "score": null
+    }
+    ```
+
+
+
+### Get Homework Answer
+
+- **接口路径**：`/api/student/{id}/homework/get-answer`
+- **请求方法**：GET
+- **接口说明**：学生查看完成的作业参考答案和提交的答案。
+- **请求说明**：
+- 请求参数：
+  - 路径参数（Path Variable）：`id` - 学生的唯一标识符
+  - 查询参数（Query Parameter）：`assignmentId` - 作业的唯一标识符
+  - 请求体：无
+- **响应说明**
+  - 响应格式: `JSON`
+  - **成功响应** (`200 OK`):
+    ```json
+    {
+      "message" : "success",
+      "data" : 
+      [
+        {
+          "body": "string",
+          "questionContent" : "string",
+          "questionType" : "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+          "answer" : "string",
+          "analysis" : "string",
+          "studentAnswer" : "string",
+          "score" : "double"
+        },
+        {
+          "body": "string",
+          "questionContent" : "string",
+          "questionType" : "string",
+          "questionOptions": ["string","string","string","string"],//若不是选择题则为空
+          "answer" : "string",
+          "analysis" : "string",
+          "studentAnswer" : "string",
+          "score" : "double"
+        },
+        ...
+      ]
+    }
+    ```
+  - **失败响应** (`400 Bad Request`):
+    ```json
+    {
+      "message" : "答案获取失败",
+      "data" : null
+    }
+    ```
+  
 
 
 ## Teacher
