@@ -1127,7 +1127,7 @@
     
 
 
-### Get Homework Detail
+### Get Homework Detail `finished`
 
 - **接口路径**：`/api/student/{id}/homework/get-detail`
 - **请求方法**：GET
@@ -1176,7 +1176,7 @@
 
 
 
-### Complete Homework
+### Complete Homework `finished`
 
 - **接口路径**：`/api/student/{id}/homework/complete`
 - **请求方法**：`POST`
@@ -1205,15 +1205,13 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message": "练习提交成功",
-      "score" : "double"
+      "message": "提交成功"
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message": "练习提交失败",
-      "score": null
+      "message": "提交失败"
     }
     ```
 
