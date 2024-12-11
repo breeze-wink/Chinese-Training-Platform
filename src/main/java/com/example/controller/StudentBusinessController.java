@@ -12,6 +12,7 @@ import com.example.model.course.KnowledgePoint;
 import com.example.model.question.*;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.submission.PracticeAnswer;
+import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.StatsStudent;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassStudentService;
@@ -25,6 +26,8 @@ import com.example.service.question.*;
 import com.example.service.question.impl.*;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.PracticeAnswerService;
+import com.example.service.submission.SubmissionAnswerService;
+import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.submission.impl.PracticeAnswerServiceImpl;
@@ -60,6 +63,8 @@ public class StudentBusinessController {
     private final GroupStudentService groupStudentService;
     private final AssignmentRecipientService assignmentRecipientService;
     private final AssignmentService assignmentService;
+    private final PaperQuestionService paperQuestionService;
+    private final SubmissionAnswerService submissionAnswerService;
 
     @Autowired
     public StudentBusinessController (PracticeServiceImpl practiceService,
@@ -74,7 +79,9 @@ public class StudentBusinessController {
                                       AssignmentSubmissionServiceImpl assignmentSubmissionService,
                                       GroupStudentServiceImpl groupStudentService,
                                       AssignmentRecipientServiceImpl assignmentRecipientService,
-                                      AssignmentServiceImpl assignmentService
+                                      AssignmentServiceImpl assignmentService,
+                                      PaperQuestionServiceImpl paperQuestionService,
+                                      SubmissionAnswerServiceImpl submissionAnswerService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -89,6 +96,8 @@ public class StudentBusinessController {
         this.groupStudentService = groupStudentService;
         this.assignmentRecipientService = assignmentRecipientService;
         this.assignmentService = assignmentService;
+        this.paperQuestionService = paperQuestionService;
+        this.submissionAnswerService = submissionAnswerService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -470,7 +479,7 @@ public class StudentBusinessController {
             ContinuePracticeResponse.InfoData infoData = new ContinuePracticeResponse.InfoData();
             infoData.setPracticeQuestionId(practiceQuestion.getId());
             infoData.setSequence(practiceQuestion.getSequence());
-            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent().replace("<p>", "").replace("</p>", ""));
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setQuestionOptions(new ArrayList<>());
             if(Objects.equals(infoData.getQuestionType(), "CHOICE")){
@@ -481,8 +490,15 @@ public class StudentBusinessController {
             infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
             String [] sequences = infoData.getSequence().split("\\.");
             infoData.setQuestionBody("");
-            if(sequences.length > 1 && sequences[1].equals("1")){
-                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
+            if(sequences.length > 1){
+                if(sequences[1].equals("1")){
+                    infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                }
+            }
+            else if(sequences.length == 1){
+                if(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId() != null){
+                    infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                }
             }
             data.add(infoData);
         }
@@ -549,7 +565,7 @@ public class StudentBusinessController {
         List<GetAnswerResponse.InfoData> data = new ArrayList<>();
         for(PracticeQuestion practiceQuestion : practiceQuestions){
             GetAnswerResponse.InfoData infoData = new GetAnswerResponse.InfoData();
-            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent().replace("<p>", "").replace("</p>", ""));
+            infoData.setQuestionContent(questionService.getQuestionById(practiceQuestion.getQuestionId()).getContent());
             infoData.setQuestionType(questionService.getQuestionById(practiceQuestion.getQuestionId()).getType());
             infoData.setSequence(practiceQuestion.getSequence());
             infoData.setScore(null);
@@ -572,8 +588,15 @@ public class StudentBusinessController {
             }
             infoData.setQuestionBody("");
             String [] sequenceArray = practiceQuestion.getSequence().split("\\.");
-            if(sequenceArray.length > 1 && Objects.equals(sequenceArray[1], "1")){
-                infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody().replace("<p>", "").replace("</p>", ""));
+            if(sequenceArray.length > 1){
+                if(sequenceArray[1].equals("1")){
+                    infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                }
+            }
+            else if(sequenceArray.length == 1){
+                if(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId() != null){
+                    infoData.setQuestionBody(questionBodyService.getQuestionBodyById(questionService.getQuestionById(practiceQuestion.getQuestionId()).getBodyId()).getBody());
+                }
             }
             data.add(infoData);
         }
@@ -944,6 +967,166 @@ public class StudentBusinessController {
         data.sort(Comparator.comparing(FinishedAssignmentResponse.infoData::getEndTime).reversed());
         response.setData(data);
         response.setMessage("已截止作业获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/homework/get-detail")
+    public ResponseEntity<HomeworkDetailResponse> getHomeworkDetail(@PathVariable Long id, @RequestParam Long assignmentId) throws JsonProcessingException {
+        HomeworkDetailResponse response = new HomeworkDetailResponse();
+        List<HomeworkDetailResponse.infoData> data = new ArrayList<>();
+        AssignmentSubmission oldSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
+        if(oldSubmission == null){
+            Assignment assignment = assignmentService.selectById(assignmentId);
+            if(assignment != null){
+                List<PaperQuestion> paperQuestions = paperQuestionService.selectByPaperId(assignment.getPaperId());
+                if(paperQuestions != null){
+                    AssignmentSubmission submission = new AssignmentSubmission();
+                    submission.setAssignmentId(assignmentId);
+                    submission.setStudentId(id);
+                    assignmentSubmissionService.insert(submission);
+                    for(PaperQuestion paperQuestion : paperQuestions){
+                        if(Objects.equals(paperQuestion.getQuestionType(), "small")){
+                            Question question = questionService.getQuestionById(paperQuestion.getQuestionId());
+                            if(question != null){
+                                SubmissionAnswer submissionAnswer = new SubmissionAnswer();
+                                submissionAnswer.setQuestionId(question.getId());
+                                submissionAnswer.setSubmissionId(submission.getId());
+                                submissionAnswer.setSequence(paperQuestion.getSequence().toString());
+                                submissionAnswerService.insert(submissionAnswer);
+                                HomeworkDetailResponse.infoData infoData = new HomeworkDetailResponse.infoData();
+                                infoData.setSubmissionAnswerId(submissionAnswer.getId());
+                                infoData.setSequence(paperQuestion.getSequence().toString());
+                                if(question.getBodyId() != null){
+                                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                                }
+                                infoData.setQuestionContent(question.getContent());
+                                infoData.setQuestionType(question.getType());
+                                if("CHOICE".equals(question.getType())){
+                                    infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                                }
+                                data.add(infoData);
+                            }
+                        }
+                        else if(Objects.equals(paperQuestion.getQuestionType(), "big")){
+                            List<Question> questions = questionService.getQuestionsByQuestionBodyId(paperQuestion.getQuestionId());
+                            if(questions != null && !questions.isEmpty()){
+                                int indexTemp = 1;
+                                for(Question question : questions){
+                                    SubmissionAnswer submissionAnswer = new SubmissionAnswer();
+                                    submissionAnswer.setQuestionId(question.getId());
+                                    submissionAnswer.setSubmissionId(submission.getId());
+                                    submissionAnswer.setSequence(paperQuestion.getSequence() + "." + indexTemp);
+                                    submissionAnswerService.insert(submissionAnswer);
+                                    HomeworkDetailResponse.infoData infoData = new HomeworkDetailResponse.infoData();
+                                    infoData.setSubmissionAnswerId(submissionAnswer.getId());
+                                    infoData.setSequence(paperQuestion.getSequence() + "." + indexTemp);
+                                    if(indexTemp == 1){
+                                        infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                                    }
+                                    infoData.setQuestionContent(question.getContent());
+                                    infoData.setQuestionType(question.getType());
+                                    if("CHOICE".equals(question.getType())){
+                                        infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                                    }
+                                    data.add(infoData);
+                                    indexTemp++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(oldSubmission.getId());
+            for(SubmissionAnswer submissionAnswer : submissionAnswers){
+                HomeworkDetailResponse.infoData infoData = new HomeworkDetailResponse.infoData();
+                infoData.setSubmissionAnswerId(submissionAnswer.getId());
+                infoData.setSequence(submissionAnswer.getSequence());
+                infoData.setAnswerContent(submissionAnswer.getAnswerContent());
+                Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                if(question != null){
+                    infoData.setQuestionContent(question.getContent());
+                    infoData.setQuestionType(question.getType());
+                    if("CHOICE".equals(question.getType())){
+                        infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                    }
+                    String [] temp = infoData.getSequence().split("\\.");
+                    if(temp.length > 1 && Objects.equals(temp[1], "1")){
+                        infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                    }
+                    else if(temp.length == 1 && question.getBodyId() != null){
+                        infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                    }
+                }
+                data.add(infoData);
+            }
+        }
+        response.setData(data);
+        response.setMessage("success");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @PostMapping("{id}/homework/complete")
+    public ResponseEntity<Message> completeHomework(@PathVariable Long id, @RequestBody CompleteHomeworkRequest request) throws JsonProcessingException{
+        Message response = new Message();
+        for(CompleteHomeworkRequest.infoData infoData : request.getData()){
+            SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
+            submissionAnswer.setAnswerContent(infoData.getAnswerContent());
+            submissionAnswerService.update(submissionAnswer);
+        }
+        CompleteHomeworkRequest.infoData infoData = request.getData().get(0);
+        SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
+        AssignmentSubmission submission = assignmentSubmissionService.selectById(submissionAnswer.getSubmissionId());
+        submission.setSubmitTime(LocalDateTime.now());
+        assignmentSubmissionService.update(submission);
+        response.setMessage("success");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/homework/get-answer")
+    public ResponseEntity<HomeworkAnswerResponse> getHomeworkAnswer(@PathVariable Long id, @RequestParam Long assignmentId) throws JsonProcessingException{
+        HomeworkAnswerResponse response = new HomeworkAnswerResponse();
+        AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
+        List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
+        List<HomeworkAnswerResponse.infoData> data = new ArrayList<>();
+        for(SubmissionAnswer submissionAnswer : submissionAnswers){
+            HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
+            if(submissionAnswer.getScore() != null){
+                infoData.setScore(submissionAnswer.getScore().doubleValue());
+            }
+            infoData.setStudentAnswer(submissionAnswer.getAnswerContent());
+            Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+            if(question != null){
+                infoData.setQuestionContent(question.getContent());
+                infoData.setQuestionType(question.getType());
+                if("CHOICE".equals(question.getType())){
+                    infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                }
+                String [] temp = submissionAnswer.getSequence().split("\\.");
+                if(temp.length > 1 && Objects.equals(temp[1], "1")){
+                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                }
+                else if(temp.length == 1 && question.getBodyId() != null){
+                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                }
+                String [] temp2 = question.getAnswer().split("\\$\\$");
+                String answer = temp2[0].replace("##", ";");
+                infoData.setAnswer(answer);
+                if(temp2.length > 1){
+                    infoData.setAnalysis(temp2[1]);
+                }
+            }
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("success");
         return ResponseEntity.ok(response);
     }
 }

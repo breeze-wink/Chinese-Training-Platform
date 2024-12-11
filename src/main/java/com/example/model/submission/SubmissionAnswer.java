@@ -15,5 +15,6 @@ public class SubmissionAnswer {
     private String answerContent;
     private BigDecimal score;
     private String feedback;
+    private String sequence;
 
 }

@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface SubmissionAnswerMapper {
 
-    @Insert("INSERT INTO submission_answer(submissionId, questionId, answerContent, score, feedback) VALUES(#{submissionId}, #{questionId}, #{answerContent}, #{score}, #{feedback})")
+    @Insert("INSERT INTO submission_answer(submissionId, questionId, answerContent, score, feedback,sequence) VALUES(#{submissionId}, #{questionId}, #{answerContent}, #{score}, #{feedback}, #{sequence})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(SubmissionAnswer answer);
 
     @Delete("DELETE FROM submission_answer WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE submission_answer SET submissionId = #{submissionId}, questionId = #{questionId}, answerContent = #{answerContent}, score = #{score}, feedback = #{feedback} WHERE id = #{id}")
+    @Update("UPDATE submission_answer SET submissionId = #{submissionId}, questionId = #{questionId}, answerContent = #{answerContent}, score = #{score}, feedback = #{feedback}, sequence = #{sequence} WHERE id = #{id}")
     int update(SubmissionAnswer answer);
 
     @Select("SELECT * FROM submission_answer WHERE id = #{id}")
@@ -23,4 +23,7 @@ public interface SubmissionAnswerMapper {
 
     @Select("SELECT * FROM submission_answer")
     List<SubmissionAnswer> selectAll();
+
+    @Select("SELECT * FROM submission_answer WHERE submissionId = #{submissionId}")
+    List<SubmissionAnswer> selectBySubmissionId(Long submissionId);
 }
