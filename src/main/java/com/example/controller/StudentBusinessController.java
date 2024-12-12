@@ -786,11 +786,10 @@ public class StudentBusinessController {
         HistoryScoresResponse response = new HistoryScoresResponse();
         List<HistoryScoresResponse.infoData> data = new ArrayList<>();
         List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(id);
-        submissions.sort(Comparator.comparing(AssignmentSubmission::getSubmitTime).reversed());
         for(int i = 0; i < submissions.size() && i < 10; i++){
             HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-            infoData.setDate(submissions.get(i).getSubmitTime().toString());
-            infoData.setScore(null);
+            Assignment assignment = assignmentService.selectById(submissions.get(i).getAssignmentId());
+            infoData.setDate(assignment.getEndTime().toString());
             if(submissions.get(i).getTotalScore() != null){
                 infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
             }
