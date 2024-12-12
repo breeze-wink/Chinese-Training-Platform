@@ -1093,37 +1093,116 @@ public class StudentBusinessController {
     @GetMapping("{id}/homework/get-answer")
     public ResponseEntity<HomeworkAnswerResponse> getHomeworkAnswer(@PathVariable Long id, @RequestParam Long assignmentId) throws JsonProcessingException{
         HomeworkAnswerResponse response = new HomeworkAnswerResponse();
-        AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
-        List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
         List<HomeworkAnswerResponse.infoData> data = new ArrayList<>();
-        for(SubmissionAnswer submissionAnswer : submissionAnswers){
-            HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
-            if(submissionAnswer.getScore() != null){
-                infoData.setScore(submissionAnswer.getScore().doubleValue());
+        AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
+        if(assignmentSubmission != null){
+            List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
+            for(SubmissionAnswer submissionAnswer : submissionAnswers){
+                HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
+                if(submissionAnswer.getScore() != null){
+                    infoData.setScore(submissionAnswer.getScore().doubleValue());
+                }
+                infoData.setStudentAnswer(submissionAnswer.getAnswerContent());
+                infoData.setSequence(submissionAnswer.getSequence());
+                Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                if(question != null){
+                    infoData.setQuestionContent(question.getContent());
+                    infoData.setQuestionType(question.getType());
+                    if("CHOICE".equals(question.getType())){
+                        infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                    }
+                    String [] temp = submissionAnswer.getSequence().split("\\.");
+                    if(temp.length > 1 && Objects.equals(temp[1], "1")){
+                        infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                    }
+                    else if(temp.length == 1 && question.getBodyId() != null){
+                        infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                    }
+                    String [] temp2 = question.getAnswer().split("\\$\\$");
+                    String answer = temp2[0].replace("##", ";");
+                    infoData.setAnswer(answer);
+                    if(temp2.length > 1){
+                        infoData.setAnalysis(temp2[1]);
+                    }
+                }
+                data.add(infoData);
             }
-            infoData.setStudentAnswer(submissionAnswer.getAnswerContent());
-            Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
-            if(question != null){
-                infoData.setQuestionContent(question.getContent());
-                infoData.setQuestionType(question.getType());
-                if("CHOICE".equals(question.getType())){
-                    infoData.setQuestionOptions(drawOptions(question.getOptions()));
-                }
-                String [] temp = submissionAnswer.getSequence().split("\\.");
-                if(temp.length > 1 && Objects.equals(temp[1], "1")){
-                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
-                }
-                else if(temp.length == 1 && question.getBodyId() != null){
-                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
-                }
-                String [] temp2 = question.getAnswer().split("\\$\\$");
-                String answer = temp2[0].replace("##", ";");
-                infoData.setAnswer(answer);
-                if(temp2.length > 1){
-                    infoData.setAnalysis(temp2[1]);
+        }
+        else{
+            Assignment assignment = assignmentService.selectById(assignmentId);
+            if(assignment != null){
+                List<PaperQuestion> paperQuestions = paperQuestionService.selectByPaperId(assignment.getPaperId());
+                if(paperQuestions != null){
+                    AssignmentSubmission submission = new AssignmentSubmission();
+                    submission.setAssignmentId(assignmentId);
+                    submission.setStudentId(id);
+                    assignmentSubmissionService.insert(submission);
+                    for(PaperQuestion paperQuestion : paperQuestions){
+                        if(Objects.equals(paperQuestion.getQuestionType(), "small")){
+                            Question question = questionService.getQuestionById(paperQuestion.getQuestionId());
+                            if(question != null){
+                                SubmissionAnswer submissionAnswer = new SubmissionAnswer();
+                                submissionAnswer.setQuestionId(question.getId());
+                                submissionAnswer.setSubmissionId(submission.getId());
+                                submissionAnswer.setSequence(paperQuestion.getSequence().toString());
+                                submissionAnswerService.insert(submissionAnswer);
+                                HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
+                                infoData.setSequence(paperQuestion.getSequence().toString());
+                                infoData.setQuestionContent(question.getContent());
+                                infoData.setQuestionType(question.getType());
+                                if("CHOICE".equals(question.getType())){
+                                    infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                                }
+                                String [] temp = submissionAnswer.getSequence().split("\\.");
+                                if(temp.length > 1 && Objects.equals(temp[1], "1")){
+                                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                                }
+                                else if(temp.length == 1 && question.getBodyId() != null){
+                                    infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                                }
+                                String [] temp2 = question.getAnswer().split("\\$\\$");
+                                String answer = temp2[0].replace("##", ";");
+                                infoData.setAnswer(answer);
+                                if(temp2.length > 1){
+                                    infoData.setAnalysis(temp2[1]);
+                                }
+                                data.add(infoData);
+                            }
+                        }
+                        else if(Objects.equals(paperQuestion.getQuestionType(), "big")){
+                            List<Question> questions = questionService.getQuestionsByQuestionBodyId(paperQuestion.getQuestionId());
+                            if(questions != null && !questions.isEmpty()){
+                                int indexTemp = 1;
+                                for(Question question : questions){
+                                    SubmissionAnswer submissionAnswer = new SubmissionAnswer();
+                                    submissionAnswer.setQuestionId(question.getId());
+                                    submissionAnswer.setSubmissionId(submission.getId());
+                                    submissionAnswer.setSequence(paperQuestion.getSequence() + "." + indexTemp);
+                                    submissionAnswerService.insert(submissionAnswer);
+                                    HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
+                                    infoData.setSequence(paperQuestion.getSequence() + "." + indexTemp);
+                                    if(indexTemp == 1){
+                                        infoData.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                                    }
+                                    infoData.setQuestionContent(question.getContent());
+                                    infoData.setQuestionType(question.getType());
+                                    if("CHOICE".equals(question.getType())){
+                                        infoData.setQuestionOptions(drawOptions(question.getOptions()));
+                                    }
+                                    String [] temp2 = question.getAnswer().split("\\$\\$");
+                                    String answer = temp2[0].replace("##", ";");
+                                    infoData.setAnswer(answer);
+                                    if(temp2.length > 1){
+                                        infoData.setAnalysis(temp2[1]);
+                                    }
+                                    data.add(infoData);
+                                    indexTemp++;
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            data.add(infoData);
         }
         response.setData(data);
         response.setMessage("success");

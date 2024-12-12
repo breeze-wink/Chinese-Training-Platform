@@ -14,6 +14,7 @@ public class HomeworkAnswerResponse {
     @Setter
     @Getter
     public static class infoData {
+        private String sequence;
         private String body;
         private String questionContent;
         private String questionType;
