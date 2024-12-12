@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
 import com.example.dto.response.student.AvgScoreResponse;
@@ -819,7 +820,16 @@ public class TeacherBusinessController {
             testPaperService.insert(testPaper);
             List<PaperQuestion> paperQuestions = getPaperQuestions(request, testPaper);
             paperQuestionService.batchInsert(paperQuestions);
-            //TODO:引用次数加一
+
+            List<QuestionStatisticDTO> questionStatisticDTOS = new ArrayList<>();
+            for (PaperQuestion paperQuestion : paperQuestions) {
+                QuestionStatisticDTO dto = new QuestionStatisticDTO();
+                dto.setId(paperQuestion.getQuestionId());
+                dto.setType(paperQuestion.getQuestionType());
+                questionStatisticDTOS.add(dto);
+            }
+            questionStatisticService.addReferencedCount(questionStatisticDTOS);
+
             message.setMessage("success");
             return ResponseEntity.ok(message);
         } catch (Exception e) {
@@ -829,16 +839,24 @@ public class TeacherBusinessController {
         }
     }
 
+
     private static List<PaperQuestion> getPaperQuestions(GeneratePaperRequest request, TestPaper testPaper) {
         List<PaperQuestion> paperQuestions = new ArrayList<>();
         for(GeneratePaperRequest.questionInfo questionInfo : request.getQuestions()) {
             PaperQuestion paperQuestion = new PaperQuestion();
             paperQuestion.setPaperId(testPaper.getId());
-            paperQuestion.setScore(questionInfo.getScore());
+            StringBuilder score = new StringBuilder(questionInfo.getScore());
+            if (questionInfo.getType().equals("big")) {
+                for (String subScore : questionInfo.getSubScores()) {
+                    score.append("#").append(subScore);
+                }
+            }
+            paperQuestion.setScore(score.toString());
             paperQuestion.setQuestionId(questionInfo.getId());
             paperQuestion.setQuestionType(questionInfo.getType());
             paperQuestion.setSequence(questionInfo.getSequence());
             paperQuestions.add(paperQuestion);
+
         }
         return paperQuestions;
     }
