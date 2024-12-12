@@ -845,7 +845,13 @@ public class TeacherBusinessController {
         for(GeneratePaperRequest.questionInfo questionInfo : request.getQuestions()) {
             PaperQuestion paperQuestion = new PaperQuestion();
             paperQuestion.setPaperId(testPaper.getId());
-            paperQuestion.setScore(questionInfo.getScore());
+            StringBuilder score = new StringBuilder(questionInfo.getScore());
+            if (questionInfo.getType().equals("big")) {
+                for (String subScore : questionInfo.getSubScores()) {
+                    score.append("#").append(subScore);
+                }
+            }
+            paperQuestion.setScore(score.toString());
             paperQuestion.setQuestionId(questionInfo.getId());
             paperQuestion.setQuestionType(questionInfo.getType());
             paperQuestion.setSequence(questionInfo.getSequence());

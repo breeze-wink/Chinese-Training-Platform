@@ -19,7 +19,8 @@ public class GeneratePaperRequest {
     public static class questionInfo {
         private Long id;
         private String type;
-        private Integer score;
+        private String score;
         private Integer sequence;
+        private List<String> subScores;
     }
 }

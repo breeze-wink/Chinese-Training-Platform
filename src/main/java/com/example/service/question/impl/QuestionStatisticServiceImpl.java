@@ -4,8 +4,12 @@ import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.model.question.QuestionStatistic;
 import com.example.mapper.question.QuestionStatisticMapper;
 import com.example.service.question.QuestionStatisticService;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,25 +18,37 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
 
     @Autowired
     private QuestionStatisticMapper questionStatisticMapper;
+    @Autowired
+    private SqlSessionFactory sqlSessionFactory;
 
     @Override
+    @Transactional
     public void insert(QuestionStatistic questionStatistic) {
         questionStatisticMapper.insert(questionStatistic);
     }
 
     @Override
+    @Transactional
     public void update(QuestionStatistic questionStatistic) {
         questionStatisticMapper.update(questionStatistic);
     }
 
     @Override
+    @Transactional
     public void delete(Long id, String type) {
         questionStatisticMapper.delete(id, type);
     }
 
+    @Transactional
     @Override
     public void addReferencedCount(List<QuestionStatisticDTO> questionStatisticDTOS) {
-        questionStatisticMapper.addReferencedCount(questionStatisticDTOS);
+        try (SqlSession session = sqlSessionFactory.openSession(ExecutorType.BATCH)) {
+            QuestionStatisticMapper mapper = session.getMapper(QuestionStatisticMapper.class);
+            for (QuestionStatisticDTO question : questionStatisticDTOS) {
+                mapper.addReferencedCount(question);
+            }
+            session.commit();
+        }
     }
 
     @Override

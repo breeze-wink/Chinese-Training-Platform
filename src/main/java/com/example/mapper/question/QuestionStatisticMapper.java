@@ -30,5 +30,5 @@ public interface QuestionStatisticMapper {
     @Select("SELECT * FROM question_statistic")
     List<QuestionStatistic> findAll();
 
-    void addReferencedCount(@Param("ids") List<QuestionStatisticDTO> questions);
+    void addReferencedCount(@Param("question") QuestionStatisticDTO question);
 }
