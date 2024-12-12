@@ -21,6 +21,7 @@ import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.question.*;
+import com.example.service.question.impl.AssignmentServiceImpl;
 import com.example.service.question.impl.QuestionBodyServiceImpl;
 import com.example.service.question.impl.QuestionServiceImpl;
 import com.example.service.submission.AssignmentSubmissionService;
@@ -55,18 +56,17 @@ public class TeacherBusinessController {
     private final GroupStudentService groupStudentService;
     private final KnowledgePointService knowledgePointService;
     private final CacheRefreshService cacheRefreshService;
-
     private final QuestionService questionService;
     private final QuestionBodyService questionBodyService;
     private final JoinClassService joinClassService;
     private final StatsStudentService statsStudentService;
     private final SearchQuestionService searchQuestionService;
-
     private final QuestionStatisticService questionStatisticService;
     private final AssignmentSubmissionService assignmentSubmissionService;
     private final TestPaperService testPaperService;
     private final PaperQuestionService paperQuestionService;
     private final TeacherService teacherService;
+    private final AssignmentService assignmentService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -85,7 +85,8 @@ public class TeacherBusinessController {
                                      QuestionStatisticService questionStatisticService,
                                      TeacherServiceImpl teacherService,
                                      TestPaperService testPaperService,
-                                     PaperQuestionService paperQuestionService
+                                     PaperQuestionService paperQuestionService,
+                                     AssignmentServiceImpl assignmentService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -105,6 +106,7 @@ public class TeacherBusinessController {
         this.teacherService = teacherService;
         this.testPaperService = testPaperService;
         this.paperQuestionService = paperQuestionService;
+        this.assignmentService = assignmentService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -782,24 +784,18 @@ public class TeacherBusinessController {
     @GetMapping("{id}/get-student-historical-homework-scores")
     public ResponseEntity<HistoryScoresResponse> getHistoryScores(@PathVariable Long id, @RequestParam Long studentId) {
         HistoryScoresResponse response = new HistoryScoresResponse();
-        Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
-        if(!Objects.equals(clazz.getCreatorId(), id)){
-            response.setMessage("无权限");
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
         List<HistoryScoresResponse.infoData> data = new ArrayList<>();
         List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(studentId);
-        submissions.sort(Comparator.comparing(AssignmentSubmission::getSubmitTime).reversed());
         for(int i = 0; i < submissions.size() && i < 10; i++){
             HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-            infoData.setDate(submissions.get(i).getSubmitTime().toString());
-            infoData.setScore(null);
+            Assignment assignment = assignmentService.selectById(submissions.get(i).getAssignmentId());
+            infoData.setDate(assignment.getEndTime().toString());
             if(submissions.get(i).getTotalScore() != null){
                 infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
             }
             data.add(infoData);
         }
+        data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
         response.setData(data);
         response.setMessage("历史成绩获取成功");
         return ResponseEntity.ok(response);
