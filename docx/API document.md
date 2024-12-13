@@ -1217,7 +1217,7 @@
 
 
 
-### Get Homework Answer
+### Get Homework Answer `finished`
 
 - **接口路径**：`/api/student/{id}/homework/get-answer`
 - **请求方法**：GET
@@ -1244,7 +1244,8 @@
           "answer" : "string",
           "analysis" : "string",
           "studentAnswer" : "string",
-          "score" : "double"
+          "score" : "double",
+          "feedback" : "string"
         },
         {
           "sequence": "string",
@@ -1255,7 +1256,8 @@
           "answer" : "string",
           "analysis" : "string",
           "studentAnswer" : "string",
-          "score" : "double"
+          "score" : "double",
+          "feedback" : "string"
         },
         ...
       ]

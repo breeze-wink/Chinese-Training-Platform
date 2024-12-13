@@ -23,5 +23,6 @@ public class HomeworkAnswerResponse {
         private String analysis;
         private String studentAnswer;
         private Double score;
+        private String feedback;
     }
 }
