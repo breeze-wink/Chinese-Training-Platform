@@ -1103,6 +1103,7 @@ public class StudentBusinessController {
                 }
                 infoData.setStudentAnswer(submissionAnswer.getAnswerContent());
                 infoData.setSequence(submissionAnswer.getSequence());
+                infoData.setFeedback(submissionAnswer.getFeedback());
                 Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
                 if(question != null){
                     infoData.setQuestionContent(question.getContent());
