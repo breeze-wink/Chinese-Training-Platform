@@ -34,6 +34,7 @@ import com.example.service.user.impl.StatsStudentServiceImpl;
 import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -43,6 +44,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -859,5 +861,126 @@ public class TeacherBusinessController {
 
         }
         return paperQuestions;
+    }
+
+    @GetMapping("/papers/{id}")
+    public ResponseEntity<GetPapersResponse> getPapers(@PathVariable Long id)
+    {
+        GetPapersResponse response = new GetPapersResponse();
+        List<GetPapersResponse.PaperInfo> infos = new ArrayList<>();
+        try {
+            List<TestPaper> papers = testPaperService.selectByCreatorId(id);
+            for (TestPaper paper : papers) {
+                GetPapersResponse.PaperInfo info = new GetPapersResponse.PaperInfo();
+                info.setId(paper.getId());
+                info.setName(paper.getName());
+                info.setDifficulty(paper.getDifficulty());
+                Date createTime = paper.getCreateTime();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = sdf.format(createTime);
+                info.setCreateTime(formattedDate);
+                infos.add(info);
+            }
+            response.setPapers(infos);
+            response.setMessage("success");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("错误:" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+    @GetMapping("/paper")
+    public ResponseEntity<GetPaperDetailResponse> getPaper(@RequestParam Long id) throws JsonProcessingException {
+        GetPaperDetailResponse response = new GetPaperDetailResponse();
+        TestPaper paper = testPaperService.selectById(id);
+        response.setTotalScore(paper.getTotalScore());
+        List<PaperQuestion> paperQuestions = paperQuestionService.selectByPaperId(id);
+        if (paperQuestions == null) {
+            response.setMessage("试卷不存在");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        List<GetPaperDetailResponse.QuestionInfo> infos = new ArrayList<>();
+        for (PaperQuestion paperQuestion : paperQuestions) {
+            GetPaperDetailResponse.QuestionInfo info = new GetPaperDetailResponse.QuestionInfo();
+            info.setSequence(paperQuestion.getSequence());
+            if (paperQuestion.getQuestionType().equals("big")) {
+                QuestionBody questionBody = questionBodyService.getQuestionBodyById(paperQuestion.getQuestionId());
+                info.setBody(questionBody.getBody());
+
+                String[] scores = paperQuestion.getScore().split("#");
+                int scoreIndex = 0;
+                info.setScore(scores[scoreIndex ++]);
+                List<GetPaperDetailResponse.QuestionInfo.SubQuestion> subQuestions = new ArrayList<>();
+                List<Question> questions = questionService.getQuestionsByQuestionBodyId(paperQuestion.getQuestionId());
+                for (Question question : questions) {
+                    GetPaperDetailResponse.QuestionInfo.SubQuestion subQuestion = new GetPaperDetailResponse.QuestionInfo.SubQuestion();
+                    subQuestion.setQuestion(question.getContent());
+                    subQuestion.setType(question.getType());
+
+                    // 选项
+                    if ("CHOICE".equals(question.getType())) {
+                        String[] choices = question.getOptions().split("\\$\\$");
+                        subQuestion.setOptions(Arrays.stream(choices).toList());
+                    }
+
+                    // 答案和解析
+                    String[] temps = question.getAnswer().split("\\$\\$");
+                    String answer = temps[0];
+                    if (question.getType().equals("FILL_IN_BLANK")) {
+                        answer = answer.replaceAll("##", ";");
+                    }
+                    subQuestion.setAnswer(question.getAnswer());
+                    if (temps.length > 1) {
+                        String explanation = temps[1];
+                        subQuestion.setExplanation(explanation);
+                    }
+
+                    //分数
+                    subQuestion.setScore(scores[scoreIndex ++]);
+
+                    //知识点
+                    subQuestion.setKnowledge(knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId()));
+                    subQuestions.add(subQuestion);
+                }
+                info.setSubQuestions(subQuestions);
+            }
+            //小题
+            else {
+                Question question = questionService.getQuestionById(paperQuestion.getQuestionId());
+                if (question.getBodyId() != null) {
+                    QuestionBody questionBody = questionBodyService.getQuestionBodyById(question.getBodyId());
+                    info.setBody(questionBody.getBody());
+                }
+                info.setQuestion(question.getContent());
+                info.setScore(paperQuestion.getScore());
+                info.setType(question.getType());
+
+                //选项
+                if ("CHOICE".equals(question.getType())) {
+                    String[] choices = question.getOptions().split("\\$\\$");
+                    info.setOptions(Arrays.stream(choices).toList());
+                }
+
+                //答案和解析
+                String[] temps = question.getAnswer().split("\\$\\$");
+                String answer = temps[0];
+                if (question.getType().equals("FILL_IN_BLANK")) {
+                    answer = answer.replaceAll("##", ";");
+                }
+                info.setAnswer(question.getAnswer());
+                if (temps.length > 1) {
+                    String explanation = temps[1];
+                    info.setExplanation(explanation);
+                }
+
+                info.setKnowledge(knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId()));
+            }
+            infos.add(info);
+            response.setQuestions(infos);
+            response.setMessage("success");
+        }
+        return ResponseEntity.ok(response);
     }
 }
