@@ -2,6 +2,7 @@ package com.example.service.question;
 
 import com.example.dto.redis.PreAssembledQuestion;
 import com.example.model.question.QuestionBody;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public interface QuestionBodyService {
     int updateQuestionBody(QuestionBody questionBody);
 
     // 删除题目记录
-    int deleteQuestionBody(Long id);
+    int deleteQuestionBody(Long id) throws JsonProcessingException;
     List<QuestionBody> getQuestionBodiesByType(String type);
 
     List<String> getAllTypes();

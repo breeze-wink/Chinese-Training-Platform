@@ -4,6 +4,7 @@ import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.model.question.QuestionStatistic;
 import org.apache.ibatis.annotations.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -31,4 +32,7 @@ public interface QuestionStatisticMapper {
     List<QuestionStatistic> findAll();
 
     void addReferencedCount(@Param("question") QuestionStatisticDTO question);
+
+    @Select("SELECT uploadTime from question_statistic where id = #{id} and type = #{type}")
+    Date selectUploadTime(Long id, String type);
 }

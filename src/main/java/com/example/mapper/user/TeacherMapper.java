@@ -13,7 +13,7 @@ public interface TeacherMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(Teacher teacher);
 
-    @Delete("DELETE FROM teacher WHERE id = #{id}")
+    @Update("UPDATE teacher SET status = 0 WHERE id = #{id}")
     int delete(Long id);
 
     @Update("UPDATE teacher SET name = #{name}, username = #{username}, email = #{email}, password = #{password}, phoneNumber = #{phoneNumber}, schoolId = #{schoolId}, permission = #{permission} WHERE id = #{id}")
@@ -22,13 +22,13 @@ public interface TeacherMapper {
     @Select("SELECT * FROM teacher WHERE id = #{id}")
     Teacher selectById(Long id);
 
-    @Select("SELECT * FROM teacher WHERE email = #{email} or username = #{account}")
+    @Select("SELECT * FROM teacher WHERE (email = #{email} or username = #{account}) and status = 1")
     List<Teacher> findByAccount(String account);
 
-    @Select("SELECT * FROM teacher WHERE email = #{email}")
+    @Select("SELECT * FROM teacher WHERE email = #{email} and status = 1")
     Teacher findByEmail(String email);
 
-    @Select("SELECT * FROM teacher")
+    @Select("SELECT * FROM teacher where status = 1")
     List<Teacher> selectAll();
 
     @Select("SELECT * FROM teacher where username = #{username}")

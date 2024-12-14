@@ -1295,7 +1295,9 @@
     ```json
     {
       "message" : "success",
-      "id" : 12345
+      "role" : 0 or 1 // 0 是正常老师
+      "id" : 12345,
+      "token" : token
     }
     ```
   - **失败响应** (`401 Unauthorized`):
@@ -1890,7 +1892,7 @@
   - 请求体(`JSON` 格式)：
     ```json
     {
-      "questionType": "string", // '单题', '文言文阅读', '记叙文阅读', '非连续性文本阅读', '古诗词曲鉴赏', '名著阅读'
+      "questionType": "string", // '单题为null', '文言文阅读', '记叙文阅读', '非连续性文本阅读', '古诗词曲鉴赏', '名著阅读'
       "body": "string", // 题目内容
       "questions": [
         {
@@ -2351,37 +2353,6 @@
     }
     ```
 
-### Generate Custom Exam Paper 
-
-- **接口路径**：`/api/teacher/{teacherId}/generate-custom-exam`
-
-- **请求方法**：POST
-
-- **接口说明**：教师用户根据自定义的题目设置信息生成试卷，返回题目信息。
-
-- **请求说明**：
-  - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "topics": [
-        {
-          "topic": "数学",
-          "quantity": 5
-        },
-        {
-          "topic": "语文",
-          "quantity": 3
-        }
-      ]
-    }
-    ```
-
-    - `topics`：题目设置信息的 List，每个元素包含：
-      - `topic`：考点名称（如“数学”）。
-      - `quantity`：该考点需要的题目数量。
-
 
 ### Change Password `finished`
 
@@ -2678,7 +2649,7 @@
 
 - **请求方法**：POST
 
-- **接口说明**：教师查找题目。
+- **接口说明**：教师生成试卷题目。
 
 - **请求说明**
 
@@ -2770,7 +2741,7 @@
 
 - **请求方法**：GET
 
-- **接口说明**：教师用户通过ID 获取自己出过的试卷。
+- **接口说明**：教师用户通过试卷ID获取试卷详情。
 
 - **请求说明**：
 
@@ -2816,6 +2787,48 @@
     ```
   
   - **失败响应** (`400 Not Found`):
+
+### Get uploaded questions `finished`
+
+- **接口路径**：`/api/teacher/uploaded-questions`
+
+- **请求方法**：GET
+
+- **接口说明**：教师用户通过试卷ID获取试卷详情。
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "success",
+      "uploadedQuestions": [
+        {
+          "uploadTime": "2024-12-15 10:00:00",
+          "body": "题干， 单题为空",
+          "subQuestions": {
+            "content": "问题内容",
+            "answer": "答案",
+            "explanation": "解析",
+            "options": ["选项1", "选项2"],
+            "type": "选择",
+            "knowledgePoint": "知识点"
+          },
+          "content": "问题内容",
+          "answer": "答案",
+          "explanation": "解析",
+          "options": ["选项1", "选项2"],
+          "type": "选择",
+          "knowledgePoint": "知识点"
+        }
+      ]
+    }
+    ```
+
+    
 
 ## SystemAdmin
 

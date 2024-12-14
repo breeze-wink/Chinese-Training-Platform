@@ -3,6 +3,7 @@ package com.example.service.question;
 import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.model.question.QuestionStatistic;
 
+import java.util.Date;
 import java.util.List;
 
 public interface QuestionStatisticService {
@@ -12,5 +13,6 @@ public interface QuestionStatisticService {
 
     void addReferencedCount(List<QuestionStatisticDTO> questionStatisticDTOS);
     QuestionStatistic findByIdAndType(Long id, String type);
+    Date getUploadTime(Long id, String type);
     List<QuestionStatistic> findAll();
 }

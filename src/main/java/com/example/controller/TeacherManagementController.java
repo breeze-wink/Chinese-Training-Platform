@@ -57,6 +57,7 @@ public class TeacherManagementController {
             String jwt = jwtTokenUtil.generateToken(teacher);
             response.setToken(jwt);
             response.setMessage("success");
+            response.setRole(teacher.getPermission());
             response.setId(teacher.getId());
             return ResponseEntity.ok(response);
         }

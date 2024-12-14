@@ -6,6 +6,7 @@ import com.example.model.question.QuestionBody;
 import com.example.service.question.QuestionBodyService;
 import com.example.service.question.QuestionService;
 import com.example.service.rabbitmq.RabbitMQProducer;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -93,13 +94,14 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
 
     @Override
     @Transactional
-    public int deleteQuestionBody(Long id) {
+    public int deleteQuestionBody(Long id) throws JsonProcessingException {
         QuestionBody questionBody = getQuestionBodyById(id);
         List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(id);
         int result = questionBodyMapper.delete(id);
         if (questionBody != null) {
             for (Question subQuestion : subQuestions)
             {
+                questionService.deleteQuestion(subQuestion.getId());
                 rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
             }
             rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.DELETE_OPERATION);
