@@ -12,6 +12,7 @@ import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.*;
+import com.example.model.user.BaseUser;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.user.StatsStudent;
@@ -25,6 +26,7 @@ import com.example.service.question.*;
 import com.example.service.question.impl.AssignmentServiceImpl;
 import com.example.service.question.impl.QuestionBodyServiceImpl;
 import com.example.service.question.impl.QuestionServiceImpl;
+import com.example.service.question.impl.UploadQuestionServiceImpl;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.user.StatsStudentService;
@@ -41,6 +43,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -66,6 +69,7 @@ public class TeacherBusinessController {
     private final SearchQuestionService searchQuestionService;
     private final QuestionStatisticService questionStatisticService;
     private final AssignmentSubmissionService assignmentSubmissionService;
+    private final UploadQuestionService uploadQuestionService;
     private final TestPaperService testPaperService;
     private final PaperQuestionService paperQuestionService;
     private final TeacherService teacherService;
@@ -89,7 +93,8 @@ public class TeacherBusinessController {
                                      TeacherServiceImpl teacherService,
                                      TestPaperService testPaperService,
                                      PaperQuestionService paperQuestionService,
-                                     AssignmentServiceImpl assignmentService
+                                     AssignmentServiceImpl assignmentService,
+                                     UploadQuestionServiceImpl uploadQuestionService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -110,6 +115,7 @@ public class TeacherBusinessController {
         this.testPaperService = testPaperService;
         this.paperQuestionService = paperQuestionService;
         this.assignmentService = assignmentService;
+        this.uploadQuestionService = uploadQuestionService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -330,23 +336,42 @@ public class TeacherBusinessController {
 
             List<UploadQuestionRequest.QuestionInfo> questions = request.getQuestions();
 
-            if (questionBody.getBody() != null) {
+            if (questionBody.getBody() != null && !questionBody.getBody().isEmpty()) {
                 questionBodyService.createQuestionBody(questionBody);
                 QuestionStatistic questionStatistic = new QuestionStatistic();
                 questionStatistic.setId(questionBody.getId());
                 questionStatistic.setType("big");
                 questionStatisticService.insert(questionStatistic);
+                // 上传信息
+                UploadQuestion uploadQuestion = new UploadQuestion();
+                uploadQuestion.setTeacherId(id);
+                uploadQuestion.setQuestionId(questionBody.getId());
+                uploadQuestion.setType("big");
+                uploadQuestionService.create(uploadQuestion);
             }
+
             for (UploadQuestionRequest.QuestionInfo questionInfo : questions) {
-                Question question = getQuestion(id, questionInfo, questionBody);
+                Question question = getQuestion(questionInfo, questionBody);
                 questionService.createQuestion(question);
+
+                //上传信息
+                if (questions.size() == 1) {
+                    UploadQuestion uploadQuestion = new UploadQuestion();
+                    uploadQuestion.setTeacherId(id);
+                    uploadQuestion.setQuestionId(question.getId());
+                    uploadQuestion.setType("small");
+                    uploadQuestionService.create(uploadQuestion);
+                }
+
                 QuestionStatistic questionStatistic = new QuestionStatistic();
                 questionStatistic.setId(question.getId());
                 questionStatistic.setType("small");
                 questionStatisticService.insert(questionStatistic);
                 cacheRefreshService.markKnowledgeCacheOutOfDate(question.getKnowledgePointId());
             }
-            cacheRefreshService.markTypeCacheOutOfDate(request.getQuestionType());
+            if (questionBody.getBody() != null && !questionBody.getBody().isEmpty()) {
+                cacheRefreshService.markTypeCacheOutOfDate(request.getQuestionType());
+            }
             return ResponseEntity.ok(new Message("上传成功"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -355,19 +380,18 @@ public class TeacherBusinessController {
         }
     }
 
-    private static Question getQuestion(Long id, UploadQuestionRequest.QuestionInfo questionInfo, QuestionBody questionBody) {
+    private static Question getQuestion(UploadQuestionRequest.QuestionInfo questionInfo, QuestionBody questionBody) {
         Question question = new Question();
         question.setBodyId(questionBody.getBody() == null ? null : questionBody.getId());
         question.setType(questionInfo.getType());
         question.setContent(questionInfo.getProblem());
         question.setKnowledgePointId(questionInfo.getKnowledgePointId());
-        question.setCreatorId(id);
 
         StringBuilder resAnswer = new StringBuilder();
         if(questionInfo.getAnswer() != null && (!questionInfo.getAnswer().isEmpty())){
             for (int i = 0; i < questionInfo.getAnswer().size(); i ++) {
                 if(questionInfo.getAnswer().get(i) == null || questionInfo.getAnswer().get(i).isEmpty()){
-                    resAnswer.append(" ");
+                    resAnswer.append("略");
                 }
                 else{
                     resAnswer.append(questionInfo.getAnswer().get(i));
@@ -501,24 +525,8 @@ public class TeacherBusinessController {
 
     @GetMapping("{id}/get-all-questions")
     public ResponseEntity<GetAllQuestionsResponse> getAllQuestions(@PathVariable Long id) {
+        //TODO:
         GetAllQuestionsResponse response = new GetAllQuestionsResponse();
-        List<GetAllQuestionsResponse.infoData> data = new ArrayList<>();
-        List<Question> questions = questionService.getAllQuestions();
-        for (Question question : questions) {
-            GetAllQuestionsResponse.infoData infoData = new GetAllQuestionsResponse.infoData();
-            infoData.setId(question.getId());
-            infoData.setType(question.getType());
-            KnowledgePoint knowledgePoint = knowledgePointService.getKnowledgePointById(question.getKnowledgePointId());
-            if(knowledgePoint != null && knowledgePoint.getName() != null){
-                infoData.setKnowledgePoint(knowledgePoint.getName());
-            }
-            QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-            if(questionStatistic != null && questionStatistic.getUploadTime() != null){
-                infoData.setUploadTime(String.valueOf(questionStatistic.getUploadTime()));
-            }
-            data.add(infoData);
-        }
-        response.setData(data);
         response.setMessage("获取成功");
         return ResponseEntity.ok(response);
     }
@@ -535,9 +543,6 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         response.setCreator(null);
-        if(question.getCreatorId() != null){
-            response.setCreator(teacherService.getTeacherById(question.getCreatorId()).getUsername());
-        }
         response.setKnowledgePointType(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getType());
         response.setBody(null);
         response.setBodyId(null);
@@ -546,9 +551,13 @@ public class TeacherBusinessController {
             response.setBodyId(question.getBodyId());
             questions = questionService.getQuestionsByQuestionBodyId(question.getBodyId());
             response.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+            Long creatorId = uploadQuestionService.findTeacherIdByQuestionIdAndType(question.getId(), "small");
+            response.setCreator(teacherService.getTeacherById(creatorId).getName());
         }
         else{
             questions.add(question);
+            Long creatorId = uploadQuestionService.findTeacherIdByQuestionIdAndType(question.getId(), "big");
+            response.setCreator(teacherService.getTeacherById(creatorId).getName());
         }
         for(Question q : questions){
             GetQuestionResponse.infoData infoData = new GetQuestionResponse.infoData();
@@ -981,6 +990,98 @@ public class TeacherBusinessController {
             response.setQuestions(infos);
             response.setMessage("success");
         }
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/uploaded-questions")
+    public ResponseEntity<GetUploadedQuestionResponse> getUploadedQuestions(@AuthenticationPrincipal BaseUser user) {
+        GetUploadedQuestionResponse response = new GetUploadedQuestionResponse();
+        Long teacherId = user.getId();
+        System.out.println(teacherId);
+        List<UploadQuestion> uploadQuestions = uploadQuestionService.findByTeacherId(teacherId);
+        List<Long> smallIds = new ArrayList<>();
+        ArrayList<Long> bigIds = new ArrayList<>();
+
+        for (UploadQuestion uploadQuestion : uploadQuestions) {
+            if (uploadQuestion.getType().equals("big")) {
+                bigIds.add(uploadQuestion.getQuestionId());
+            }
+            else {
+                smallIds.add(uploadQuestion.getQuestionId());
+            }
+        }
+
+        List<Question> smallQuestions = questionService.getQuestionsByIds(smallIds);
+        List<QuestionBody> bigQuestions = questionBodyService.getQuestionBodiesByIds(bigIds);
+        List<GetUploadedQuestionResponse.UploadQuestionInfo> infos = new ArrayList<>();
+
+        for (Question question : smallQuestions) {
+            GetUploadedQuestionResponse.UploadQuestionInfo info = new GetUploadedQuestionResponse.UploadQuestionInfo();
+            if (question.getBodyId() != null) {
+                info.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+            }
+            info.setContent(question.getContent());
+            Date uploadTime = questionStatisticService.getUploadTime(question.getId(), "small");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            info.setUploadTime(sdf.format(uploadTime));
+            info.setType(question.getType());
+
+            if (question.getType().equals("CHOICE")) {
+                String[] choices = question.getOptions().split("\\$\\$");
+                info.setOptions(Arrays.stream(choices).toList());
+            }
+
+            String [] temps = question.getAnswer().split("\\$\\$");
+            String answer = temps[0];
+            if (question.getType().equals("FILL_IN_BLANK")) {
+                answer = answer.replaceAll("##", ";");
+            }
+            info.setAnswer(answer);
+            if (temps.length > 1) {
+                String explanation = temps[1];
+                info.setExplanation(explanation);
+            }
+            info.setKnowledgePoint(knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId()));
+
+            infos.add(info);
+        }
+
+        for (QuestionBody body : bigQuestions) {
+            GetUploadedQuestionResponse.UploadQuestionInfo info = new GetUploadedQuestionResponse.UploadQuestionInfo();
+            info.setBody(body.getBody());
+            Date uploadTime = questionStatisticService.getUploadTime(body.getId(), "big");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            info.setUploadTime(sdf.format(uploadTime));
+
+            List<GetUploadedQuestionResponse.subQuestion> subQuestions = new ArrayList<>();
+            List<Question> questions = questionService.getQuestionsByQuestionBodyId(body.getId());
+            for (Question question : questions) {
+                GetUploadedQuestionResponse.subQuestion subInfo = new GetUploadedQuestionResponse.subQuestion();
+                subInfo.setContent(question.getContent());
+                subInfo.setType(question.getType());
+                if (question.getType().equals("CHOICE")) {
+                    String[] choices = question.getOptions().split("\\$\\$");
+                    subInfo.setOptions(Arrays.stream(choices).toList());
+                }
+
+                String [] temps = question.getAnswer().split("\\$\\$");
+                String answer = temps[0];
+                if (question.getType().equals("FILL_IN_BLANK")) {
+                    answer = answer.replaceAll("##", ";");
+                }
+                subInfo.setAnswer(answer);
+                if (temps.length > 1) {
+                    String explanation = temps[1];
+                    subInfo.setExplanation(explanation);
+                }
+                subInfo.setKnowledgePoint(knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId()));
+                subQuestions.add(subInfo);
+            }
+            info.setSubQuestions(subQuestions);
+            infos.add(info);
+        }
+        response.setMessage("success");
+        response.setUploadedQuestions(infos);
         return ResponseEntity.ok(response);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -54,6 +55,11 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
     @Override
     public QuestionStatistic findByIdAndType(Long id, String type) {
         return questionStatisticMapper.findByIdAndType(id, type);
+    }
+
+    @Override
+    public Date getUploadTime(Long id, String type) {
+        return questionStatisticMapper.selectUploadTime(id, type);
     }
 
     @Override

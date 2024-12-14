@@ -33,7 +33,6 @@ public class CacheRefreshService {
     public void markTypeCacheOutOfDate(String type) {
         typeCacheOutOfDate.put(type, true);
     }
-    //TODO:
 
     @Scheduled(fixedRate = 1000 * 10)
     public void refreshKnowledgePointCache() {

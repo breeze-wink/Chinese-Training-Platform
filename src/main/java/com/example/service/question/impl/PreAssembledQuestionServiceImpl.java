@@ -72,6 +72,7 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
     @Transactional
     @Override
     public void flushPreAssembledQuestions() {
+
         List<String> allTypes = questionBodyService.getAllTypes();
         for (String type : allTypes) {
             flushPreAssembledQuestionsByType(type);
@@ -85,7 +86,6 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
         String cacheKey = "preassembled_questions:" + type;
         List<PreAssembledQuestion> preassembledQuestions = assembleQuestionsByType(type);
         if (preassembledQuestions != null && !preassembledQuestions.isEmpty()) {
-            // 将预组装的题目列表存入 Redis，设置过期时间，例如 1 小时
             redisTemplate.opsForValue().set(cacheKey, preassembledQuestions, 1, TimeUnit.HOURS);
         } else {
             // 如果没有题目，删除缓存

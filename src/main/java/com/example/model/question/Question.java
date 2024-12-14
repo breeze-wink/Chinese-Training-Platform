@@ -22,7 +22,6 @@ public class Question implements Serializable {
     private String options; // 选项，JSON格式
     private String answer;
     private Long knowledgePointId; // 外键，关联KnowledgePoint表的id
-    private Long creatorId; // 外键，关联Teacher表的id
     private Long bodyId;
     private Integer status;
 }
