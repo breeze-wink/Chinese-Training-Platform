@@ -884,6 +884,7 @@ public class TeacherBusinessController {
                 info.setId(paper.getId());
                 info.setName(paper.getName());
                 info.setDifficulty(paper.getDifficulty());
+                info.setTotalScore(paper.getTotalScore());
                 Date createTime = paper.getCreateTime();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String formattedDate = sdf.format(createTime);
