@@ -8,6 +8,7 @@
 - **请求方法**：POST
 - **接口说明**：学生用户通过账号和密码进行登录。
 - **请求说明**
+  
   - 请求头: `Content-Type` : `application/json`
   - 请求参数:
     - 请求体(`JSON` 格式)：
@@ -1165,7 +1166,7 @@
             ...
         ]
       }
-      ```
+    ```
     - **失败响应** (`400 Bad Request`):
       ```json
       {
@@ -2722,7 +2723,7 @@
     }
     ```
 
-### get papers
+### get papers `finished`
 
 - **接口路径**：`/api/teacher/papers/{id}`
 
@@ -2730,7 +2731,7 @@
 
 - **接口说明**：教师用户通过ID 获取自己出过的试卷。
 
-- **请求说明**：
+- **请求说明**
 
   - 请求参数：
     - 路径参数（Path Variable）：`id` - 教师的唯一标识符
@@ -2763,7 +2764,7 @@
     }
     ```
 
-### Get Paper Detail
+### Get Paper Detail `finished`
 
 - **接口路径**：`/api/teacher/paper`
 
@@ -2785,9 +2786,13 @@
     ```json
     {
       "message": "success",
+      "totalScore": 100 // 总分
       "questions": [
           {
            	"body": "题干， 单题为空",
+            "sequence": 12345 //题号
+        	"score": 4 //分数
+        	
             "subQuestions": [ //大题时不为空
                 {    
                     "question": "问题内容", 
@@ -2795,7 +2800,8 @@
                     "explanation": "解析", 
                     "options": ["选项1", "选项2"], 
                     "type" : "选择、填空、简答、作文",
-                    "knowledge" : "知识点"
+                    "knowledge" : "知识点",
+    				"subScores" : [1,1,1] //小题分数
                 }
             ],
             "question": "问题内容", //小题时不为空
@@ -2808,7 +2814,7 @@
       ]
     }
     ```
-
+  
   - **失败响应** (`400 Not Found`):
 
 ## SystemAdmin

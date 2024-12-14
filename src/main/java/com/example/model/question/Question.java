@@ -12,6 +12,9 @@ public class Question implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+    public static final Integer STATUS_NOT_ACCESS = 0;
+    public static final Integer STATUS_ACCESS = 1;
+    public static final Integer STATUS_DELETE = 2;
 
     private Long id;
     private String content;
@@ -21,5 +24,5 @@ public class Question implements Serializable {
     private Long knowledgePointId; // 外键，关联KnowledgePoint表的id
     private Long creatorId; // 外键，关联Teacher表的id
     private Long bodyId;
-    private Boolean isHidden;
+    private Integer status;
 }
