@@ -2721,14 +2721,15 @@
     		"id": 12345, //试卷id
             "name": "试卷名称",
             "createTime": "生成时间",
+            "totalSc"
             "difficulty": 64.4 //难度
           }
       ]
     }
     ```
-
+  
   - **失败响应** (`400 Not Found`):
-
+  
     ```json
     {
       "message": "错误",

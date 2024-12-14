@@ -16,6 +16,7 @@ public class GetPapersResponse {
     public static class PaperInfo {
         private Long id;
         private String name;
+        private Integer totalScore;
         private String createTime;
         private Double difficulty;
     }
