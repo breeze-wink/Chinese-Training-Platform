@@ -22,6 +22,9 @@ public interface AssignmentMapper {
     @Select("SELECT * FROM assignment WHERE id = #{id}")
     Assignment selectById(Long id);
 
+    @Select("SELECT * FROM assignment WHERE paperId = #{id}")
+    List<Assignment> selectByPaperId(Long id);
+
     @Select("SELECT * FROM assignment")
     List<Assignment> selectAll();
 }

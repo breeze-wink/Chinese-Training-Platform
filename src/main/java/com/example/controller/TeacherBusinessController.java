@@ -1177,6 +1177,18 @@ public class TeacherBusinessController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("发布失败"));
         }
+    }
 
+    @DeleteMapping("/delete-paper/{id}")
+    public ResponseEntity<Message> deletePaper(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) throws JsonProcessingException {
+        TestPaper testPaper = testPaperService.selectById(id);
+        if (testPaper == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Message("试卷不存在"));
+        }
+        if (!testPaper.getCreatorId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message("无权限删除试卷"));
+        }
+        testPaperService.delete(id);
+        return ResponseEntity.ok(new Message("success"));
     }
 }

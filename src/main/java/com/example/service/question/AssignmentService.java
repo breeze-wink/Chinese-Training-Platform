@@ -13,4 +13,6 @@ public interface AssignmentService {
     int updateAssignment(Assignment assignment);
 
     List<Assignment> getAllAssignments();
+
+    boolean checkPaperUsed(Long id);
 }

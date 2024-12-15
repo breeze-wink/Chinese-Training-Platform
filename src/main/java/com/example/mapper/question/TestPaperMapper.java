@@ -16,6 +16,9 @@ public interface TestPaperMapper {
     @Update("UPDATE test_paper SET isHidden=true WHERE id = #{id}")
     int delete(Long id);
 
+    @Delete("DELETE FROM test_paper WHERE id = #{id}")
+    int realDelete(Long id);
+
     @Update("UPDATE test_paper SET name = #{name}, difficulty = #{difficulty}," +
             "creatorId = #{creatorId}, createTime = #{createTime}, totalScore = #{totalScore}," +
             "isHidden=#{isHidden} WHERE id = #{id}")

@@ -52,4 +52,9 @@ public class AssignmentServiceImpl implements AssignmentService {
         // 获取所有作业
         return assignmentMapper.selectAll();
     }
+
+    @Override
+    public boolean checkPaperUsed(Long id) {
+        return assignmentMapper.selectByPaperId(id) != null && !assignmentMapper.selectByPaperId(id).isEmpty();
+    }
 }
