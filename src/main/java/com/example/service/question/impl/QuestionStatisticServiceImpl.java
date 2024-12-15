@@ -1,6 +1,10 @@
 package com.example.service.question.impl;
 
 import com.example.dto.mapper.QuestionStatisticDTO;
+import com.example.mapper.question.QuestionBodyMapper;
+import com.example.mapper.question.QuestionMapper;
+import com.example.model.question.Question;
+import com.example.model.question.QuestionBody;
 import com.example.model.question.QuestionStatistic;
 import com.example.mapper.question.QuestionStatisticMapper;
 import com.example.service.question.QuestionStatisticService;
@@ -21,6 +25,10 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
     private QuestionStatisticMapper questionStatisticMapper;
     @Autowired
     private SqlSessionFactory sqlSessionFactory;
+    @Autowired
+    private QuestionMapper questionMapper;
+    @Autowired
+    private QuestionBodyMapper questionBodyMapper;
 
     @Override
     @Transactional
@@ -65,5 +73,17 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
     @Override
     public List<QuestionStatistic> findAll() {
         return questionStatisticMapper.findAll();
+    }
+
+    @Override
+    public boolean checkQuestionPassed(Long questionId, String type) {
+        if (type.equals("small")) {
+            int status = questionMapper.getStatus(questionId);
+            return status == Question.STATUS_ACCESS || status == Question.STATUS_DELETE;
+        }
+        else {
+            int status = questionBodyMapper.getStatus(questionId);
+            return status == QuestionBody.STATUS_ACCESS || status == QuestionBody.STATUS_DELETE;
+        }
     }
 }

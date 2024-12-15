@@ -33,5 +33,8 @@ public interface QuestionMapper {
     @Select("SELECT * FROM question WHERE bodyId = #{questionBodyId} and status = 1")
     List<Question> getQuestionsByQuestionBodyId(Long questionBodyId);
 
+    @Select("SELECT status FROM question WHERE id = #{questionId}")
+    int getStatus(Long questionId);
+
 //    List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds);
 }
