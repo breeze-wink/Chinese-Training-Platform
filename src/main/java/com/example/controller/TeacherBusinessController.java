@@ -534,6 +534,10 @@ public class TeacherBusinessController {
         try {
             List<UploadQuestion> uploadQuestions = uploadQuestionService.getInSchoolQuestions(teacher.getSchoolId());
             for (UploadQuestion uploadQuestion : uploadQuestions) {
+                if (questionStatisticService.checkQuestionPassed(uploadQuestion.getQuestionId(), uploadQuestion.getType())) {
+                    continue;
+                }
+
                 GetAllQuestionsResponse.infoData infoData = new GetAllQuestionsResponse.infoData();
                 Long questionId = uploadQuestion.getQuestionId();
                 Long teacherId = uploadQuestion.getTeacherId();

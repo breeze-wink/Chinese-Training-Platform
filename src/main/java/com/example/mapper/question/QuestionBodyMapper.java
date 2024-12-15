@@ -37,4 +37,7 @@ public interface QuestionBodyMapper {
 
     @Select("SELECT type FROM question_body where status=1")
     List<String> getAllTypes();
+
+    @Select("SELECT status FROM question_body WHERE id = #{questionId}")
+    int getStatus(Long questionId);
 }

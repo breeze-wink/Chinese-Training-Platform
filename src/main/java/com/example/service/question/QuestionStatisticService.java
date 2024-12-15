@@ -15,4 +15,6 @@ public interface QuestionStatisticService {
     QuestionStatistic findByIdAndType(Long id, String type);
     Date getUploadTime(Long id, String type);
     List<QuestionStatistic> findAll();
+
+    boolean checkQuestionPassed(Long questionId, String type);
 }
