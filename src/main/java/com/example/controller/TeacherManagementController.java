@@ -77,7 +77,10 @@ public class TeacherManagementController {
             response.setMessage("授权码不可用");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        if (teacherService.existTeacher(email)) {
+        Teacher teacher = new Teacher();
+        teacher.setEmail(email);
+        teacher.setPermission(0);
+        if (teacherService.existTeacher(teacher)) {
             response.setMessage("邮箱已注册");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }

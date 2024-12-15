@@ -2493,9 +2493,10 @@
       "data": null
     }
     ```
-###  Get  Question `finished`
 
-- **接口路径**：`/api/teacher/{id}/get-question` `problem`
+###  Get  Question `problem`
+
+- **接口路径**：`/api/teacher/{id}/get-question`
 - **请求方法**：GET
 - **接口说明**：教师获取题目信息。
 - **请求说明**：
@@ -2719,7 +2720,7 @@
     		"id": 12345, //试卷id
             "name": "试卷名称",
             "createTime": "生成时间",
-            "totalSc"
+            "totalScore": 100,
             "difficulty": 64.4 //难度
           }
       ]
@@ -2793,7 +2794,7 @@
 
 - **请求方法**：GET
 
-- **接口说明**：教师用户通过试卷ID获取试卷详情。
+- **接口说明**：教师用户查看自己上传的题目。
 
 - **响应说明**：
 
@@ -3501,41 +3502,6 @@
     }
     ```
 
-### Update Teacher
-
-- **接口路径**：`/api/school-admin/update-teacher/{id}`
-- **请求方法**：PUT
-- **接口说明**：学校管理员更新指定的老师账号信息。
-- **请求说明**：
-  - 请求参数：
-    - 路径参数（Path Variable）：`id` - 老师账号的唯一标识符
-  - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "name": "string", // 更新后的老师姓名
-      "email": "string", // 更新后的老师邮箱
-      "password": "string", // 更新后的老师密码
-      "phone_number": "string", // 更新后的老师手机号
-      "school_id": "bigint" // 更新后的学校ID
-    }
-    ```
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "老师账号更新成功",
-      "data": null
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "老师账号更新失败",
-      "data": null
-    }
-    ```
-
 ### Query Teacher `finished`
 
 - **接口路径**：`/api/school-admin/{id}/query-teacher/{teacherId}`
@@ -3626,42 +3592,6 @@
     ```json
     {
       "message": "学生账号删除失败"
-    }
-    ```
-
-### Update Student
-
-- **接口路径**：`/api/school-admin/update-student/{id}`
-- **请求方法**：PUT
-- **接口说明**：学校管理员更新指定的学生账号信息。
-- **请求说明**：
-  - 请求参数：
-    - 路径参数（Path Variable）：`id` - 学生账号的唯一标识符
-  - 请求体(`JSON` 格式)：
-    ```json
-    {
-      "username": "string", // 更新后的学生用户名
-      "email": "string", // 更新后的学生邮箱
-      "password": "string", // 更新后的学生密码
-      "name": "string", // 更新后的学生姓名
-      "grade": "int", // 更新后的学生年级
-      "school_id": "bigint" // 更新后的学校ID
-    }
-    ```
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "学生账号更新成功",
-      "data": null
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "学生账号更新失败",
-      "data": null
     }
     ```
 
@@ -4059,7 +3989,49 @@
     }
     ```
 
+### Create Manager `finished`
 
+- **接口路径**：`/api/school-admin/create-manager`
+
+- **请求方法**：POST
+
+- **接口说明**：学校管理员用邮箱和密码给审核老师创建账号。
+
+- **请求说明**
+
+  - 请求头: `Content-Type` : `application/json`
+
+  - 请求参数:
+
+    - 请求体(`JSON` 格式)：
+
+    ```json
+    {
+      "username" : "string",
+      "email" : "string", // 
+      "password" : "string"
+    }
+    ```
+
+- **响应说明**
+
+  - 响应格式: `JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message" : "创建成功"
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message" : "邮箱已注册" or  "用户名已存在"
+    }
+    ```
 
 
 ## Image
