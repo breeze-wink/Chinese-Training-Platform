@@ -1,14 +1,12 @@
 package com.example.controller;
 
+import com.example.dto.request.school.CreateManagerRequest;
 import com.example.dto.response.*;
 import com.example.dto.response.school.*;
 import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
-import com.example.model.user.AuthorizationCode;
-import com.example.model.user.SchoolAdmin;
-import com.example.model.user.Student;
-import com.example.model.user.Teacher;
+import com.example.model.user.*;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
 import com.example.service.classes.ClassStudentService;
@@ -23,6 +21,8 @@ import com.example.service.user.impl.TeacherServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -298,6 +298,26 @@ public class SchoolAdminBusinessController {
         response.setData(data);
         response.setMessage("班级详情获取成功");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/create-manager")
+    public ResponseEntity<Message> createManager(@AuthenticationPrincipal BaseUser user, @RequestBody CreateManagerRequest request) {
+        String email = request.getEmail();
+        String password = request.getPassword();
+        Teacher teacher = new Teacher();
+        teacher.setPermission(1);
+        teacher.setEmail(email);
+        if (teacherService.existTeacher(teacher)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("邮箱已存在"));
+        }
+
+        Long schoolAdminId = user.getId();
+        teacher.setSchoolId(schoolAdminService.getSchoolAdminById(schoolAdminId).getSchoolId());
+        teacher.setPassword(password);
+
+        teacherService.addTeacher(teacher);
+
+        return ResponseEntity.ok(new Message("创建成功"));
     }
 }
 

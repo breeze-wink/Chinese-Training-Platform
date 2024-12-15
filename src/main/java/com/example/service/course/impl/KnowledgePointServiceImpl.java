@@ -74,6 +74,7 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
             knowledgePoint = knowledgePointMapper.selectById(id);
             if (knowledgePoint != null) {
                 redisTemplate.opsForValue().set(cacheKey, knowledgePoint);
+                return knowledgePoint;
             }
         }
         knowledgePoint = objectMapper.convertValue(object, KnowledgePoint.class);

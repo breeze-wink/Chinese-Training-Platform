@@ -13,6 +13,7 @@ import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.*;
 import com.example.model.user.BaseUser;
+import com.example.model.user.Teacher;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.user.StatsStudent;
@@ -523,60 +524,107 @@ public class TeacherBusinessController {
 
 
 
-    @GetMapping("{id}/get-all-questions")
-    public ResponseEntity<GetAllQuestionsResponse> getAllQuestions(@PathVariable Long id) {
-        //TODO:
+    @GetMapping("/get-all-questions")
+    public ResponseEntity<GetAllQuestionsResponse> getAllQuestions(@AuthenticationPrincipal BaseUser user) {
         GetAllQuestionsResponse response = new GetAllQuestionsResponse();
-        response.setMessage("获取成功");
-        return ResponseEntity.ok(response);
+        List<GetAllQuestionsResponse.infoData> questions = new ArrayList<>();
+
+        Teacher teacher = teacherService.getTeacherById(user.getId());
+
+        try {
+            List<UploadQuestion> uploadQuestions = uploadQuestionService.getInSchoolQuestions(teacher.getSchoolId());
+            for (UploadQuestion uploadQuestion : uploadQuestions) {
+                GetAllQuestionsResponse.infoData infoData = new GetAllQuestionsResponse.infoData();
+                Long questionId = uploadQuestion.getQuestionId();
+                Long teacherId = uploadQuestion.getTeacherId();
+                String type = uploadQuestion.getType();
+                infoData.setId(questionId);
+                infoData.setType(type);
+                Date uploadTime = questionStatisticService.getUploadTime(questionId, type);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = sdf.format(uploadTime);
+                infoData.setUploadTime(formattedDate);
+                infoData.setUploadTeacher(teacherService.getTeacherNameById(teacherId));
+                questions.add(infoData);
+            }
+            response.setMessage("获取题目成功");
+            response.setQuestions(questions);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("获取题目失败：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
 
 
-    @GetMapping("{id}/get-question")
-    public ResponseEntity<GetQuestionResponse> getQuestion(@PathVariable Long id, @RequestParam Long questionId) throws JsonProcessingException {
+    @GetMapping("/get-question")
+    public ResponseEntity<GetQuestionResponse> getQuestion(@AuthenticationPrincipal BaseUser user,
+                                                           @RequestParam Long questionId,
+                                                           @RequestParam String type) throws JsonProcessingException {
         GetQuestionResponse response = new GetQuestionResponse();
-        List<GetQuestionResponse.infoData> data = new ArrayList<>();
-        Question question = questionService.getQuestionById(questionId);
-        if(question == null){
-            response.setMessage("问题不存在");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        response.setCreator(null);
-        response.setKnowledgePointType(knowledgePointService.getKnowledgePointById(question.getKnowledgePointId()).getType());
-        response.setBody(null);
-        response.setBodyId(null);
-        List<Question> questions = new ArrayList<>();
-        if(question.getBodyId() != null){
-            response.setBodyId(question.getBodyId());
-            questions = questionService.getQuestionsByQuestionBodyId(question.getBodyId());
-            response.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
-            Long creatorId = uploadQuestionService.findTeacherIdByQuestionIdAndType(question.getId(), "small");
-            response.setCreator(teacherService.getTeacherById(creatorId).getName());
-        }
-        else{
-            questions.add(question);
-            Long creatorId = uploadQuestionService.findTeacherIdByQuestionIdAndType(question.getId(), "big");
-            response.setCreator(teacherService.getTeacherById(creatorId).getName());
-        }
-        for(Question q : questions){
-            GetQuestionResponse.infoData infoData = new GetQuestionResponse.infoData();
-            infoData.setQuestionId(q.getId());
-            infoData.setContent(q.getContent());
-            infoData.setType(q.getType());
-            if(Objects.equals(q.getType(), "CHOICE") && q.getOptions() != null){
-                infoData.setOptions(drawOptions(q.getOptions()));
+
+        if (type.equals("small")) {
+            Question question = questionService.getQuestionById(questionId);
+            if (question.getBodyId() != null) {
+                QuestionBody questionBody = questionBodyService.getQuestionBodyById(question.getBodyId());
+                String body = questionBody.getBody();
+                response.setBody(body);
             }
-            String [] temp = q.getAnswer().split("\\$\\$");
-            infoData.setAnswer(temp[0]);
-            infoData.setAnalysis(null);
-            if(temp.length > 1){
-                infoData.setAnalysis(temp[1]);
+            response.setType(question.getType());
+            String content = question.getContent();
+            response.setContent(content);
+
+            if (question.getType().equals("CHOICE")) {
+                List<String> options = Arrays.asList(question.getOptions().split("\\$\\$"));
+                response.setOptions(options);
             }
-            infoData.setKnowledgePointName(knowledgePointService.getKnowledgePointById(q.getKnowledgePointId()).getName());
-            data.add(infoData);
+            String[] temps = question.getAnswer().split("\\$\\$");
+            String answer = temps[0];
+            if (question.getType().equals("FILL_IN_BLANK")) {
+                answer = answer.replaceAll("##", ";");
+            }
+            response.setAnswer(answer);
+            if (temps.length > 1){
+                response.setExplanation(temps[1]);
+            }
+
+            String knowledgePoint = knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId());
+            response.setKnowledgePoint(knowledgePoint);
         }
-        response.setData(data);
+        else {
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(questionId);
+            String body = questionBody.getBody();
+            response.setBody(body);
+            List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(questionId);
+
+            List<GetQuestionResponse.subQuestion> subQuestionList = new ArrayList<>();
+            for (Question subQ : subQuestions) {
+                GetQuestionResponse.subQuestion subQuestion = new GetQuestionResponse.subQuestion();
+                subQuestion.setContent(subQ.getContent());
+                subQuestion.setType(subQ.getType());
+                if ("CHOICE".equals(subQ.getType())) {
+                    subQuestion.setOptions(Arrays.asList(subQ.getOptions().split("\\$\\$")));
+                }
+
+                String[] temps = subQ.getAnswer().split("\\$\\$");
+                String answer = temps[0];
+                if ("FILL_IN_BLANK".equals(subQ.getType())) {
+                    answer = answer.replaceAll("##", ";");
+                }
+                subQuestion.setAnswer(answer);
+                if (temps.length > 1) {
+                    subQuestion.setExplanation(temps[1]);
+                }
+
+                String knowledgePoint = knowledgePointService.getKnowledgePointNameById(subQ.getKnowledgePointId());
+                subQuestion.setKnowledgePoint(knowledgePoint);
+                subQuestionList.add(subQuestion);
+            }
+            response.setSubQuestions(subQuestionList);
+        }
+
         response.setMessage("获取问题成功");
         return ResponseEntity.ok(response);
     }
