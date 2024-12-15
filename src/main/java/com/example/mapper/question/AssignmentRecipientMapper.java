@@ -34,4 +34,6 @@ public interface AssignmentRecipientMapper {
             "AND recipientId = #{recipientId}")
     List<AssignmentRecipient> selectByRecipient(@Param("recipientType") String recipientType,
                                                 @Param("recipientId") Long recipientId);
+
+    void batchInsert(List<AssignmentRecipient> assignmentRecipientList);
 }

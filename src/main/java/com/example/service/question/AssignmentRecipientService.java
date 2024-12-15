@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface AssignmentRecipientService {
     List<AssignmentRecipient> selectByRecipient(String type, Long recipientId);
+
+    void batchInsert(List<AssignmentRecipient> assignmentRecipientList);
 }

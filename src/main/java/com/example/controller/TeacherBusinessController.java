@@ -75,6 +75,7 @@ public class TeacherBusinessController {
     private final PaperQuestionService paperQuestionService;
     private final TeacherService teacherService;
     private final AssignmentService assignmentService;
+    private final AssignmentRecipientService assignmentRecipientService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -95,7 +96,8 @@ public class TeacherBusinessController {
                                      TestPaperService testPaperService,
                                      PaperQuestionService paperQuestionService,
                                      AssignmentServiceImpl assignmentService,
-                                     UploadQuestionServiceImpl uploadQuestionService
+                                     UploadQuestionServiceImpl uploadQuestionService,
+                                     AssignmentRecipientService assignmentRecipientService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -117,6 +119,7 @@ public class TeacherBusinessController {
         this.paperQuestionService = paperQuestionService;
         this.assignmentService = assignmentService;
         this.uploadQuestionService = uploadQuestionService;
+        this.assignmentRecipientService = assignmentRecipientService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -1137,5 +1140,43 @@ public class TeacherBusinessController {
         response.setMessage("success");
         response.setUploadedQuestions(infos);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/homework/publish")
+    public ResponseEntity<Message> publishHomework(@RequestBody PublishHomeworkRequest request, @AuthenticationPrincipal BaseUser user) throws JsonProcessingException {
+        Teacher teacher = teacherService.getTeacherById(user.getId());
+        Assignment assignment = new Assignment();
+        assignment.setTitle(request.getName());
+        assignment.setPaperId(request.getReferencedPaperId());
+        assignment.setDescription(request.getDescription());
+        assignment.setCreatorId(teacher.getId());
+        assignment.setEndTime(request.getDueTime());
+        assignment.setStartTime(request.getPublishTime());
+        try {
+            assignmentService.createAssignment(assignment);
+
+            String type = request.getTargetType();
+            List<AssignmentRecipient> assignmentRecipientList = new ArrayList<>();
+            for (Long targetId : request.getTargetIds()) {
+                AssignmentRecipient assignmentRecipient = new AssignmentRecipient();
+                assignmentRecipient.setAssignmentId(assignment.getId());
+                assignmentRecipient.setRecipientId(targetId);
+                if (type.equals("班级")) {
+                    assignmentRecipient.setRecipientType("CLASS");
+                }
+                else if (type.equals("小组")) {
+                    assignmentRecipient.setRecipientType("GROUP");
+                }
+                else {
+                    assignmentRecipient.setRecipientType("STUDENT");
+                }
+                assignmentRecipientList.add(assignmentRecipient);
+            }
+            assignmentRecipientService.batchInsert(assignmentRecipientList);
+            return ResponseEntity.ok(new Message("success"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("发布失败"));
+        }
+
     }
 }
