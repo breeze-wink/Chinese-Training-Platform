@@ -658,7 +658,7 @@ public class TeacherBusinessController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
-                questionService.deleteQuestion(deleteId);
+                questionService.deleteQuestion(question);
             }
             else{
                 questionBodyService.deleteQuestionBody(question.getBodyId());
@@ -672,6 +672,7 @@ public class TeacherBusinessController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             questionBodyService.deleteQuestionBody(deleteId);
+            cacheRefreshService.markTypeCacheOutOfDate(questionBody.getType());
         }
         response.setMessage("删除成功");
         return ResponseEntity.ok(response);

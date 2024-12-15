@@ -5,6 +5,8 @@ import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
 import com.example.service.question.QuestionBodyService;
 import com.example.service.question.QuestionService;
+import com.example.service.question.QuestionStatisticService;
+import com.example.service.question.UploadQuestionService;
 import com.example.service.rabbitmq.RabbitMQProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,11 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.dto.redis.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 public class QuestionBodyServiceImpl implements QuestionBodyService {
@@ -25,25 +26,37 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final RabbitMQProducer rabbitMQProducer;
     private final QuestionService questionService;
+    private final UploadQuestionService uploadQuestionService;
+    private final QuestionStatisticService questionStatisticService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public QuestionBodyServiceImpl(QuestionBodyMapper questionBodyMapper,
                                    RedisTemplate<String, Object> redisTemplate,
                                    RabbitMQProducer rabbitMQProducer,
-                                   QuestionService questionService) {
+                                   QuestionService questionService,
+                                   UploadQuestionService uploadQuestionService,
+                                   QuestionStatisticService questionStatisticService) {
         this.questionBodyMapper = questionBodyMapper;
         this.redisTemplate = redisTemplate;
         this.rabbitMQProducer = rabbitMQProducer;
         this.questionService = questionService;
+        this.uploadQuestionService = uploadQuestionService;
+        this.questionStatisticService = questionStatisticService;
     }
 
     @Override
     @Transactional
     public int createQuestionBody(QuestionBody questionBody) {
-        int result = questionBodyMapper.insert(questionBody);
+        return questionBodyMapper.insert(questionBody);
+    }
+
+    @Override
+    @Transactional
+    public void access(QuestionBody questionBody) {
+        questionBodyMapper.access(questionBody.getId());
         rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.CREATE_OPERATION);
-        return result;
+
     }
 
     @Override
@@ -97,15 +110,20 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     public int deleteQuestionBody(Long id) throws JsonProcessingException {
         QuestionBody questionBody = getQuestionBodyById(id);
         List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(id);
-        int result = questionBodyMapper.delete(id);
-        if (questionBody != null) {
-            for (Question subQuestion : subQuestions)
-            {
-                questionService.deleteQuestion(subQuestion.getId());
-                rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
-            }
-            rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.DELETE_OPERATION);
+        int result;
+        if (Objects.equals(questionBody.getStatus(), QuestionBody.STATUS_NOT_ACCESS)) {
+            uploadQuestionService.delete(id, "big");
+            questionStatisticService.delete(id, "big");
+            result =  questionBodyMapper.reallyDelete(id);
         }
+        else {
+            result = questionBodyMapper.delete(id);
+        }
+        for (Question subQuestion : subQuestions) {
+            questionService.deleteQuestion(subQuestion);
+            rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
+        }
+        rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.DELETE_OPERATION);
         String cacheKey = "questions:questionBody:" + id;
         redisTemplate.delete(cacheKey);
         return result;

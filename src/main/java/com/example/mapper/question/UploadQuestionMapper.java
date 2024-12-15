@@ -14,8 +14,8 @@ public interface UploadQuestionMapper {
     @Update("UPDATE upload_question SET teacherId = #{teacherId}, questionId = #{questionId}, type = #{type} WHERE id = #{id}")
     void update(UploadQuestion uploadQuestion);
 
-    @Delete("DELETE FROM upload_question WHERE id = #{id}")
-    void deleteById(Long id);
+    @Delete("DELETE FROM upload_question WHERE questionId = #{questionId} and type = #{type}")
+    void delete(Long questionId, String type);
 
     @Select("SELECT * FROM upload_question WHERE id = #{id}")
     UploadQuestion findById(Long id);

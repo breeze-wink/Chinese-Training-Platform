@@ -3,8 +3,9 @@ package com.example.service.question.impl;
 import com.example.mapper.question.QuestionMapper;
 import com.example.model.question.Question;
 import com.example.service.question.QuestionService;
+import com.example.service.question.QuestionStatisticService;
+import com.example.service.question.UploadQuestionService;
 import com.example.service.rabbitmq.RabbitMQProducer;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,10 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -26,37 +26,51 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final RedisTemplate<String, Object> redisTemplate;
     private final RabbitMQProducer rabbitMQProducer;
+    private final QuestionStatisticService questionStatisticService;
+    private final UploadQuestionService uploadQuestionService;
 
     @Autowired
     public QuestionServiceImpl(QuestionMapper questionMapper,
                                RedisTemplate<String, Object> redisTemplate,
-                               RabbitMQProducer rabbitMQProducer) {
+                               RabbitMQProducer rabbitMQProducer,
+                               QuestionStatisticService questionStatisticService,
+                               UploadQuestionService uploadQuestionService) {
         this.questionMapper = questionMapper;
         this.redisTemplate = redisTemplate;
         this.rabbitMQProducer = rabbitMQProducer;
+        this.questionStatisticService = questionStatisticService;
+        this.uploadQuestionService = uploadQuestionService;
     }
 
     @Override
     @Transactional
     public int createQuestion(Question question) {
-        int result = questionMapper.insert(question);
-        // 发送同步消息
-        rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.CREATE_OPERATION);
-        return result;
+        return questionMapper.insert(question);
     }
 
     @Override
     @Transactional
-    public int deleteQuestion(Long id) {
-        Question question = getQuestionById(id);
+    public void access(Question question) {
+        questionMapper.access(question.getId());
+        // 发送同步消息
+        rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.CREATE_OPERATION);
+    }
+    @Override
+    @Transactional
+    public int deleteQuestion(Question question) {
+        Long id = question.getId();
+        if (Objects.equals(question.getStatus(), Question.STATUS_NOT_ACCESS)) {
+            questionStatisticService.delete(id, "small");
+            uploadQuestionService.delete(id, "small");
+            rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
+            return questionMapper.reallyDelete(id);
+        }
         int result = questionMapper.delete(id);
         // 发送同步消息
-        if (question != null) {
-            rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
-            if (question.getBodyId() != null) {
-                String cacheKey = "questions:questionBody:" + question.getBodyId();
-                redisTemplate.delete(cacheKey);
-            }
+        rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
+        if (question.getBodyId() != null) {
+            String cacheKey = "questions:questionBody:" + question.getBodyId();
+            redisTemplate.delete(cacheKey);
         }
         return result;
     }

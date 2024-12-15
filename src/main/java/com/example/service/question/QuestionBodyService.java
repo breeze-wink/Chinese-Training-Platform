@@ -3,6 +3,7 @@ package com.example.service.question;
 import com.example.dto.redis.PreAssembledQuestion;
 import com.example.model.question.QuestionBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,9 @@ public interface QuestionBodyService {
 
     // 插入一条题目记录
     int createQuestionBody(QuestionBody questionBody);
+
+    @Transactional
+    void access(QuestionBody questionBody);
 
     // 根据ID查询题目
     QuestionBody getQuestionBodyById(Long id);

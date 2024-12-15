@@ -2781,7 +2781,7 @@
 
 ###  Get  Question `finished`
 
-- **接口路径**：`/api/teacher/{id}/get-question`
+- **接口路径**：`/api/teacher/get-question`
 
 - **请求方法**：GET
 

@@ -2,12 +2,17 @@ package com.example.service.question;
 
 import com.example.model.question.Question;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface QuestionService {
     int createQuestion(Question question);
-    int deleteQuestion(Long id) throws JsonProcessingException;
+
+    @Transactional
+    void access(Question question);
+
+    int deleteQuestion(Question question) throws JsonProcessingException;
     Question getQuestionById(Long id) throws JsonProcessingException;
     List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId);
 

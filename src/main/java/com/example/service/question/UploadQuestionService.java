@@ -9,7 +9,7 @@ public interface UploadQuestionService {
 
     void update(UploadQuestion uploadQuestion);
 
-    void delete(Long id);
+    void delete(Long questionId, String type);
 
     UploadQuestion findById(Long id);
 
