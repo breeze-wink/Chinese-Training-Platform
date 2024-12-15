@@ -10,21 +10,27 @@ import java.util.List;
 @Setter
 public class GetQuestionResponse {
     private String message;
-    private Long bodyId;
-    private String creator;
-    private String knowledgePointType;
     private String body;
-    private List<infoData> data;
 
-    @Getter
+    /** 以下部分 为小题时的response */
+    private String content;
+    private String answer;
+    private String explanation;
+    private List<String> options;
+    private String type;
+    private String knowledgePoint;
+
+    /** 以下部分 为大题时的response */
+    private List<subQuestion> subQuestions;
+
     @Setter
-    public static class infoData {
-        private Long questionId;
+    @Getter
+    public static class subQuestion {
         private String content;
-        private String type;
-        List<String> options;
         private String answer;
-        private String analysis;
-        private String knowledgePointName;
+        private String explanation;
+        private List<String> options;
+        private String type;
+        private String knowledgePoint;
     }
 }

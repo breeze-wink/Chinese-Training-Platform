@@ -9,5 +9,6 @@ public class PaperQuestion {
     private Long paperId;
     private Long questionId;
     private Integer sequence;
-
+    private String questionType;
+    private String score;
 }

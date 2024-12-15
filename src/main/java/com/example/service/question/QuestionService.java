@@ -23,4 +23,5 @@ public interface QuestionService {
     List<Question> getQuestionsByIds(List<Long> questionIds);
 
     void flushKnowledgePointCache(Long id);
+
 }

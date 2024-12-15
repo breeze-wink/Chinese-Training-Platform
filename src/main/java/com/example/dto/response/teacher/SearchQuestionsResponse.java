@@ -31,9 +31,9 @@ public class SearchQuestionsResponse {
         private String question;
         private String answer;
         private String explanation;
+        private List<String> options;
         private String type;
         private String knowledge;
-        private Integer referencedCount;
     }
 
     @Data
@@ -42,6 +42,7 @@ public class SearchQuestionsResponse {
         private String body;
         private String question;
         private String answer;
+        private List<String> options;
         private String explanation;
         private Integer referencedCount;
         private Double difficulty;

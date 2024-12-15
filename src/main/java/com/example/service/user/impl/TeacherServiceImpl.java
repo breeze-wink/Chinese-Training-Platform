@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -61,8 +62,9 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public boolean existTeacher(String email) {
-        return teacherMapper.findByEmail(email) != null;
+    public boolean existTeacher(Teacher teacher) {
+        Teacher checkTeacher = teacherMapper.findByEmail(teacher.getEmail());
+        return checkTeacher != null && Objects.equals(checkTeacher.getPermission(), teacher.getPermission());
     }
 
     @Override
@@ -79,5 +81,10 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public Teacher getTeacherByUsername(String username) {
         return teacherMapper.findByUsername(username);
+    }
+
+    @Override
+    public String getTeacherNameById(Long teacherId) {
+        return teacherMapper.selectNameById(teacherId);
     }
 }

@@ -13,6 +13,7 @@ public class QuestionResult {
     private String content;
     private String answer;
     private String type;
+    private String options;
     private Double totalScore;
     private Integer completeCount;
     private Integer referencedCount;

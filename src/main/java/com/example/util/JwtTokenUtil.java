@@ -17,11 +17,11 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    private static final long EXPIRATION_TIME = 3600000;
+    private static final long EXPIRATION_TIME = 3600000 * 3;
 
     // 生成 Token
     public String generateToken(BaseUser user) {
-        String subject = user.getUsername() + ":" + user.getClass().getSimpleName();
+        String subject = user.getId() + ":" + user.getUsername() + ":" + user.getClass().getSimpleName();
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date())
@@ -47,7 +47,7 @@ public class JwtTokenUtil {
 
         String subject = claims.getSubject();
 
-        return subject.split(":")[0]; // 返回复合标识符中的username部分
+        return subject.split(":")[1]; // 返回复合标识符中的username部分
     }
 
     public String getClassNameFromToken(String token) {
@@ -57,7 +57,7 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
         String subject = claims.getSubject();
-        return subject.split(":")[1]; // 返回复合标识符中的className部分
+        return subject.split(":")[2]; // 返回复合标识符中的className部分
     }
 
     // 验证 Token 是否有效

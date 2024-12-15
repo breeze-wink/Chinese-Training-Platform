@@ -16,7 +16,7 @@ public interface ClassService {
     List<Clazz> getAllClasses();
     Clazz getClassByInviteCode(String inviteCode);
     List<Clazz> getClassesByTeacherId(Long teacherId);
-
+    List<Clazz> selectBySchoolId(Long schoolId);
 
 
 }

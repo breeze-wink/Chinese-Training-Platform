@@ -57,6 +57,7 @@ public class TeacherManagementController {
             String jwt = jwtTokenUtil.generateToken(teacher);
             response.setToken(jwt);
             response.setMessage("success");
+            response.setPermission(teacher.getPermission());
             response.setId(teacher.getId());
             return ResponseEntity.ok(response);
         }
@@ -76,7 +77,10 @@ public class TeacherManagementController {
             response.setMessage("授权码不可用");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        if (teacherService.existTeacher(email)) {
+        Teacher teacher = new Teacher();
+        teacher.setEmail(email);
+        teacher.setPermission(0);
+        if (teacherService.existTeacher(teacher)) {
             response.setMessage("邮箱已注册");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
@@ -101,7 +105,7 @@ public class TeacherManagementController {
         teacher.setEmail(request.getEmail());
         teacher.setPassword(request.getPassword());
         teacher.setSchoolId(request.getSchoolId());
-        teacher.setPermission(0);
+        teacher.setPermission(Teacher.TEACHER);
         teacherService.addTeacher(teacher);
         response.setId(teacher.getId());
         response.setMessage("注册成功");

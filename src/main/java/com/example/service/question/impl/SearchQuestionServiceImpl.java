@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -65,7 +66,14 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
                     SearchQuestionsResponse.BigQuestion bigQuestion = new SearchQuestionsResponse.BigQuestion();
                     bigQuestion.setBodyId(result.getBodyId());
                     bigQuestion.setBody(result.getBody());
-                    bigQuestion.setDifficulty(result.getTotalScore() / result.getCompleteCount());
+                    if (result.getCompleteCount() == 0) {
+                        bigQuestion.setDifficulty(-1.0);
+                    }
+                    else {
+                        bigQuestion.setDifficulty(result.getTotalScore() / result.getCompleteCount());
+                    }
+
+                    bigQuestion.setReferencedCount(result.getReferencedCount());
                     bigQuestion.setReferencedCount(result.getReferencedCount());
                     // 查询子题
                     List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(result.getBodyId());
@@ -110,12 +118,25 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
                 question.setQuestion(result.getContent());
                 String answers = result.getAnswer();
                 String[] temps = answers.split("\\$\\$");
+
+                if (result.getType().equals("FILL_IN_BLANK")) {
+                    temps[0] = temps[0].replaceAll("##", ";");
+                }
+                question.setAnswer(temps[0]);
+
                 if (temps.length > 1) {
-                    question.setAnswer(temps[0]);
                     question.setExplanation(temps[1]); // 需要根据实际数据填充
                 }
-                question.setDifficulty(result.getTotalScore() / result.getCompleteCount());
+                if (result.getCompleteCount() == 0) {
+                    question.setDifficulty(-1.0);
+                }
+                else {
+                    question.setDifficulty(result.getTotalScore() / result.getCompleteCount());
+                }
                 question.setType(result.getType());
+                if (result.getOptions() != null) {
+                    question.setOptions(Arrays.stream(result.getOptions().split("\\$\\$")).toList());
+                }
                 question.setReferencedCount(result.getReferencedCount());
                 question.setKnowledge(result.getKnowledgeName()); // 设置实际知识点名称
                 response.getQuestions().add(question);
@@ -148,11 +169,17 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
             String answer = q.getAnswer();
 
             String[] temps = answer.split("\\$\\$");
+            if (q.getType().equals("FILL_IN_BLANK")) {
+                temps[0] = temps[0].replaceAll("##", ";");
+            }
             sub.setAnswer(temps[0]);
             if (temps.length > 1) {
-                sub.setExplanation(answer); // 需要根据实际数据填充
+                sub.setExplanation(temps[1]); // 需要根据实际数据填充
             }
             sub.setType(q.getType());
+            if (q.getOptions() != null) {
+                sub.setOptions(Arrays.stream(q.getOptions().split("\\$\\$")).toList());
+            }
             // 获取知识点名称
             String knowledgeName = fetchKnowledgeName(q.getKnowledgePointId());
             sub.setKnowledge(knowledgeName);

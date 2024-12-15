@@ -32,4 +32,7 @@ public interface ClassMapper {
 
     @Select("SELECT * FROM class WHERE creatorId = #{creatorId}")
     List<Clazz> selectByCreatorId(Long teacherId);
+
+    @Select("SELECT * FROM class WHERE schoolId = #{schoolId}")
+    List<Clazz> selectBySchoolId(Long schoolId);
 }

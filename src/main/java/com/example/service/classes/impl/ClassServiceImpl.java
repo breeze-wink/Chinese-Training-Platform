@@ -138,5 +138,11 @@ public class ClassServiceImpl implements ClassService {
         return classMapper.selectByCreatorId(teacherId);
     }
 
+    @Override
+    @Transactional
+    public List<Clazz> selectBySchoolId(Long schoolId) {
+        return classMapper.selectBySchoolId(schoolId);
+    }
+
 
 }

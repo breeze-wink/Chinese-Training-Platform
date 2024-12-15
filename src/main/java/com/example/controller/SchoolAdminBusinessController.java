@@ -1,19 +1,28 @@
 package com.example.controller;
 
+import com.example.dto.request.school.CreateManagerRequest;
 import com.example.dto.response.*;
 import com.example.dto.response.school.*;
+import com.example.model.classes.ClassGroup;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
-import com.example.model.user.AuthorizationCode;
-import com.example.model.user.SchoolAdmin;
-import com.example.model.user.Student;
-import com.example.model.user.Teacher;
+import com.example.model.user.*;
+import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassService;
 import com.example.service.classes.ClassStudentService;
+import com.example.service.classes.impl.ClassGroupServiceImpl;
+import com.example.service.classes.impl.ClassServiceImpl;
+import com.example.service.classes.impl.ClassStudentServiceImpl;
 import com.example.service.user.*;
+import com.example.service.user.impl.AuthorizationCodeServiceImpl;
+import com.example.service.user.impl.SchoolAdminServiceImpl;
+import com.example.service.user.impl.StudentServiceImpl;
+import com.example.service.user.impl.TeacherServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -31,19 +40,23 @@ public class SchoolAdminBusinessController {
     private final AuthorizationCodeService authorizationCodeService;
     private final StudentService studentService;
     private final ClassStudentService classStudentService;
+    private final ClassGroupService classGroupService;
     @Autowired
-    public SchoolAdminBusinessController(SchoolAdminService schoolAdminService,
-                                         ClassService classService,
-                                         TeacherService teacherService,
-                                         AuthorizationCodeService authorizationCodeService,
-                                         StudentService studentService,
-                                         ClassStudentService classStudentService) {
+    public SchoolAdminBusinessController(SchoolAdminServiceImpl schoolAdminService,
+                                         ClassServiceImpl classService,
+                                         TeacherServiceImpl teacherService,
+                                         AuthorizationCodeServiceImpl authorizationCodeService,
+                                         StudentServiceImpl studentService,
+                                         ClassStudentServiceImpl classStudentService,
+                                         ClassGroupServiceImpl classGroupService
+                                         ) {
         this.schoolAdminService = schoolAdminService;
         this.classService = classService;
         this.teacherService = teacherService;
         this.authorizationCodeService = authorizationCodeService;
         this.studentService = studentService;
         this.classStudentService = classStudentService;
+        this.classGroupService = classGroupService;
     }
 
     @GetMapping("/{id}/generate-authorization-code")
@@ -224,5 +237,87 @@ public class SchoolAdminBusinessController {
     }
 
 
+
+    @GetMapping("{id}/get-classes")
+    public ResponseEntity<GetClassesResponse> getClasses(@PathVariable Long id) {
+        GetClassesResponse response = new GetClassesResponse();
+        List<GetClassesResponse.infoData> data = new ArrayList<>();
+        SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+        if(schoolAdmin != null && schoolAdmin.getSchoolId() != null){
+            List<Clazz> classes = classService.selectBySchoolId(schoolAdmin.getSchoolId());
+            for(Clazz clazz : classes){
+                GetClassesResponse.infoData infoData = new GetClassesResponse.infoData();
+                infoData.setClassId(clazz.getId());
+                infoData.setName(clazz.getName());
+                if(clazz.getDescription() != null){
+                    infoData.setDescription(clazz.getDescription());
+                }
+                infoData.setInviteCode(clazz.getInviteCode());
+                data.add(infoData);
+            }
+        }
+        response.setData(data);
+        response.setMessage("班级列表获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("{id}/query-class")
+    public ResponseEntity<ClassDetailResponse> queryClass(@PathVariable Long id, @RequestParam Long classId) {
+        ClassDetailResponse response = new ClassDetailResponse();
+        ClassDetailResponse.infoData data = new ClassDetailResponse.infoData();
+        List<ClassDetailResponse.GroupInfo> groups = new ArrayList<>();
+        List<ClassDetailResponse.StudentInfo> students = new ArrayList<>();
+        Clazz clazz = classService.getClassById(classId);
+        if(clazz != null){
+            data.setClassName(clazz.getName());
+            data.setClassDescription(clazz.getDescription());
+            List<ClassGroup> groupsByClassId = classGroupService.selectByClassId(classId);
+            if(groupsByClassId != null){
+                for(ClassGroup group : groupsByClassId){
+                    ClassDetailResponse.GroupInfo groupInfo = new ClassDetailResponse.GroupInfo();
+                    groupInfo.setGroupId(group.getId());
+                    groupInfo.setGroupName(group.getName());
+                    groupInfo.setGroupDescription(group.getDescription());
+                    groups.add(groupInfo);
+                }
+            }
+            List<ClassStudent> studentsByClassId = classStudentService.getClassStudentsByClassId(classId);
+            if(studentsByClassId != null){
+                for(ClassStudent student : studentsByClassId){
+                    ClassDetailResponse.StudentInfo studentInfo = new ClassDetailResponse.StudentInfo();
+                    studentInfo.setStudentId(student.getStudentId());
+                    studentInfo.setStudentName(studentService.getStudentById(student.getStudentId()).getName());
+                    students.add(studentInfo);
+                }
+            }
+        }
+        data.setGroups(groups);
+        data.setStudents(students);
+        response.setData(data);
+        response.setMessage("班级详情获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/create-manager")
+    public ResponseEntity<Message> createManager(@AuthenticationPrincipal BaseUser user, @RequestBody CreateManagerRequest request) {
+        String email = request.getEmail();
+        String password = request.getPassword();
+        Teacher teacher = new Teacher();
+        teacher.setPermission(1);
+        teacher.setEmail(email);
+        if (teacherService.existTeacher(teacher)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("邮箱已存在"));
+        }
+
+        Long schoolAdminId = user.getId();
+        teacher.setSchoolId(schoolAdminService.getSchoolAdminById(schoolAdminId).getSchoolId());
+        teacher.setPassword(password);
+
+        teacherService.addTeacher(teacher);
+
+        return ResponseEntity.ok(new Message("创建成功"));
+    }
 }
 
