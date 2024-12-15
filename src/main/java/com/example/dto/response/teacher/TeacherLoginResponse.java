@@ -8,6 +8,6 @@ import lombok.Setter;
 public class TeacherLoginResponse {
     private String message;
     private Long id;
-    private Integer role;
+    private Integer permission;
     private String token;
 }
