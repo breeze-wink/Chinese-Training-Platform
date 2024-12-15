@@ -36,4 +36,7 @@ public interface TeacherMapper {
 
     @Select("SELECT * FROM teacher where schoolId = #{schoolId}")
     List<Teacher> selectBySchoolId(Long schoolId);
+
+    @Select("SELECT name FROM teacher where id = #{teacherId}")
+    String selectNameById(Long teacherId);
 }

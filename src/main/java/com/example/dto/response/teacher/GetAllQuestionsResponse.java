@@ -9,14 +9,14 @@ import java.util.List;
 @Setter
 public class GetAllQuestionsResponse {
     private String message;
-    private List<infoData> data;
+    private List<infoData> questions;
 
     @Setter
     @Getter
     public static class infoData{
         private Long id;
-        private String uploadTime;
-        private String knowledgePoint;
         private String type;
+        private String uploadTime;
+        private String uploadTeacher;
     }
 }

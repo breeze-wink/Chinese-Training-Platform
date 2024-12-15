@@ -82,4 +82,9 @@ public class TeacherServiceImpl implements TeacherService {
     public Teacher getTeacherByUsername(String username) {
         return teacherMapper.findByUsername(username);
     }
+
+    @Override
+    public String getTeacherNameById(Long teacherId) {
+        return teacherMapper.selectNameById(teacherId);
+    }
 }

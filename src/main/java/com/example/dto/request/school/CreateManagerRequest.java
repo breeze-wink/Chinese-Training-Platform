@@ -6,7 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class CreateManagerRequest {
-    private String username;
     private String email;
     private String password;
 }

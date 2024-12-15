@@ -28,4 +28,8 @@ public interface UploadQuestionMapper {
 
     @Select("SELECT teacherId FROM upload_question WHERE questionId = #{questionId} AND type = #{type}")
     Long findTeacherIdByQuestionIdAndType(Long questionId, String type);
+
+    @Select("SELECT * FROM upload_question WHERE " +
+            "teacherId IN (SELECT teacherId from teacher WHERE schoolId = #{schoolId})")
+    List<UploadQuestion> getInSchoolQuestions(Long schoolId);
 }

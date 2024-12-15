@@ -310,9 +310,6 @@ public class SchoolAdminBusinessController {
         if (teacherService.existTeacher(teacher)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("邮箱已存在"));
         }
-        if (teacherService.existUsername(request.getUsername())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("用户名已存在"));
-        }
 
         Long schoolAdminId = user.getId();
         teacher.setSchoolId(schoolAdminService.getSchoolAdminById(schoolAdminId).getSchoolId());

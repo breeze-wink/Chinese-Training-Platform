@@ -18,4 +18,6 @@ public interface UploadQuestionService {
     List<UploadQuestion> findAll();
 
     Long findTeacherIdByQuestionIdAndType(Long questionId, String type);
+
+    List<UploadQuestion> getInSchoolQuestions(Long schoolId);
 }

@@ -57,4 +57,9 @@ public class UploadQuestionServiceImpl implements UploadQuestionService {
     public Long findTeacherIdByQuestionIdAndType(Long questionId, String type) {
         return uploadQuestionMapper.findTeacherIdByQuestionIdAndType(questionId, type);
     }
+
+    @Override
+    public List<UploadQuestion> getInSchoolQuestions(Long schoolId) {
+        return uploadQuestionMapper.getInSchoolQuestions(schoolId);
+    }
 }
