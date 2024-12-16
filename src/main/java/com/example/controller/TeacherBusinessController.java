@@ -42,7 +42,6 @@ import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.example.service.view.TeacherQuestionStatisticService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.jdi.DoubleValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -109,8 +108,7 @@ public class TeacherBusinessController {
                                      UploadQuestionServiceImpl uploadQuestionService,
                                      AssignmentRecipientServiceImpl assignmentRecipientService,
                                      AssignmentStudentViewServiceImpl assignmentStudentViewService,
-                                     StudentStatsViewServiceImpl studentStatsViewService
-                                     AssignmentRecipientService assignmentRecipientService,
+                                     StudentStatsViewServiceImpl studentStatsViewService,
                                      ApproveQuestionService approveQuestionService,
                                      TeacherQuestionStatisticService teacherQuestionStatisticService
                                      ) {
