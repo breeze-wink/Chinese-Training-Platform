@@ -111,7 +111,8 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
         QuestionBody questionBody = getQuestionBodyById(id);
         List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(id);
         int result;
-        if (Objects.equals(questionBody.getStatus(), QuestionBody.STATUS_NOT_ACCESS)) {
+        //TODO:修改删除逻辑
+        if (checkQuestionBodyNotUsed(questionBody)) {
             uploadQuestionService.delete(id, "big");
             questionStatisticService.delete(id, "big");
             result =  questionBodyMapper.reallyDelete(id);
@@ -127,6 +128,16 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
         String cacheKey = "questions:questionBody:" + id;
         redisTemplate.delete(cacheKey);
         return result;
+    }
+
+    private boolean checkQuestionBodyNotUsed(QuestionBody questionBody) {
+        boolean inPaper = false;
+        boolean inPractice = false;
+
+        /**判断是否被试卷和练习引用过*/
+
+
+        return !inPaper && !inPractice;
     }
 
     @Override

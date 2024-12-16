@@ -79,11 +79,11 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
     public boolean checkQuestionPassed(Long questionId, String type) {
         if (type.equals("small")) {
             int status = questionMapper.getStatus(questionId);
-            return status == Question.STATUS_ACCESS || status == Question.STATUS_DELETE;
+            return status == Question.STATUS_ACCESS;
         }
         else {
             int status = questionBodyMapper.getStatus(questionId);
-            return status == QuestionBody.STATUS_ACCESS || status == QuestionBody.STATUS_DELETE;
+            return status == QuestionBody.STATUS_ACCESS;
         }
     }
 }

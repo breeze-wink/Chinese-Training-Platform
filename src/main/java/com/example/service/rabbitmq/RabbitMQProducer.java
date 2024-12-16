@@ -4,6 +4,7 @@
    import com.example.model.course.KnowledgePoint;
    import com.example.model.question.Question;
    import com.example.model.question.QuestionBody;
+   import com.example.service.rabbitmq.dto.KnowledgePointSyncMessage;
    import com.example.service.rabbitmq.dto.QuestionBodySyncMessage;
    import com.example.service.rabbitmq.dto.QuestionSyncMessage;
    import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,7 +59,10 @@
        @Async
        public void sendKnowledgePointSyncMessage(KnowledgePoint knowledgePoint, String operation) {
             try{
-                String message = objectMapper.writeValueAsString(knowledgePoint);
+                KnowledgePointSyncMessage knowledgePointSyncMessage = new KnowledgePointSyncMessage();
+                knowledgePointSyncMessage.setKnowledgePoint(knowledgePoint);
+                knowledgePointSyncMessage.setOperation(operation);
+                String message = objectMapper.writeValueAsString(knowledgePointSyncMessage);
                 rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.KNOWLEDGE_POINT_ROUTING_KEY, message);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();

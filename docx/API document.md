@@ -2738,14 +2738,13 @@
     }
     ```
 
+###  Get All Waiting Questions `finished`
 
-###  Get All Questions `finished`
-
-- **接口路径**：`/api/teacher/get-all-questions`
+- **接口路径**：`/api/teacher/get-all-waiting-questions`
 
 - **请求方法**：GET
 
-- **接口说明**：教师获取所有题目。
+- **接口说明**：审核教师获取所有未审核题目。
 
 - **请求说明**：
 
@@ -2775,7 +2774,45 @@
     ```json
     {
       "message": "题目获取失败",
-      "data": null
+    }
+    ```
+
+###  Get All Access Questions `finished`
+
+- **接口路径**：`/api/teacher/get-all-access-questions`
+
+- **请求方法**：GET
+
+- **接口说明**：审核教师获取所有`已审核`题目。
+
+- **请求说明**：
+
+- **响应说明**：
+
+  - **响应格式**：JSON
+
+  - **成功响应**（200 OK）：
+
+    ```json
+    {
+      "message": "获取题目成功",
+      "questions": [
+        {
+          "id": "long", // 对应数据库中的 id 字段
+          "type" : "small" or "big"
+          "uploadTime": "string",
+          "uploadTeacher" : "老师名字"
+        }
+         ...
+      ]
+    }
+    ```
+
+  - **失败响应**（400 Bad Request）：
+
+    ```json
+    {
+      "message": "题目获取失败",
     }
     ```
 
@@ -2785,7 +2822,7 @@
 
 - **请求方法**：GET
 
-- **接口说明**：教师获取题目具体信息。
+- **接口说明**：审核教师获取题目具体信息。
 
 - **请求说明**：
 
@@ -2793,7 +2830,7 @@
     - 查询参数（Query Parameter）`questionId` - 题目的唯一标识符
     - 查询参数（Query Parameter）`type` - 题目的类型(`small` or `big`)
 
-- **响应说明**：
+- **响应说明**：k
 
   - **响应格式**：JSON
 
@@ -2853,6 +2890,41 @@
     {
       "message": "题目获取失败",
       "data": null
+    }
+    ```
+
+### Deny Upload Question
+
+- **接口路径**：`/deny-upload-question`
+
+- **请求方法**：`PUT`
+
+- **接口说明**：拒绝上传指定题目。
+
+**请求说明**
+
+- **请求参数**：
+  - **请求参数（Query Parameter）**：
+    - `id`：题目的唯一标识符（`Long` 类型）
+    - `type`：题目的类型（`String` 类型），`small` or `big`
+
+ **响应说明**
+
+- **响应格式**：`JSON`
+
+- **成功响应（200 OK）**：
+
+    ```json
+    {
+      "message": "题目上传已被拒绝"
+    }
+    ```
+
+- **失败响应（400 Bad Request）**：
+
+    ```json
+    {
+      "message": "无效的题目ID或类型"
     }
     ```
 

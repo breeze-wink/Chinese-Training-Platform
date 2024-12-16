@@ -12,6 +12,7 @@ public class QuestionBody implements Serializable {
     public static final Integer STATUS_NOT_ACCESS = 0;
     public static final Integer STATUS_ACCESS = 1;
     public static final Integer STATUS_DELETE = 2;
+    public static final Integer STATUS_DENIED = 3;
 
     private Long id;          // 自动生成的ID
     private String body;      // 存储题目的正文，通常是富文本格式
