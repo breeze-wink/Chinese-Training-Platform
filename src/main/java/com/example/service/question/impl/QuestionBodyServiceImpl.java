@@ -3,11 +3,13 @@ package com.example.service.question.impl;
 import com.example.mapper.question.QuestionBodyMapper;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
+import com.example.model.view.QuestionUsageView;
 import com.example.service.question.QuestionBodyService;
 import com.example.service.question.QuestionService;
 import com.example.service.question.QuestionStatisticService;
 import com.example.service.question.UploadQuestionService;
 import com.example.service.rabbitmq.RabbitMQProducer;
+import com.example.service.view.QuestionUsageViewService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class QuestionBodyServiceImpl implements QuestionBodyService {
@@ -27,6 +33,7 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     private final RabbitMQProducer rabbitMQProducer;
     private final QuestionService questionService;
     private final UploadQuestionService uploadQuestionService;
+    private final QuestionUsageViewService questionUsageViewService;
     private final QuestionStatisticService questionStatisticService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -36,13 +43,15 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
                                    RabbitMQProducer rabbitMQProducer,
                                    QuestionService questionService,
                                    UploadQuestionService uploadQuestionService,
-                                   QuestionStatisticService questionStatisticService) {
+                                   QuestionStatisticService questionStatisticService,
+                                   QuestionUsageViewService questionUsageViewService) {
         this.questionBodyMapper = questionBodyMapper;
         this.redisTemplate = redisTemplate;
         this.rabbitMQProducer = rabbitMQProducer;
         this.questionService = questionService;
         this.uploadQuestionService = uploadQuestionService;
         this.questionStatisticService = questionStatisticService;
+        this.questionUsageViewService = questionUsageViewService;
     }
 
     @Override
@@ -59,6 +68,18 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
 
     }
 
+    @Override
+    @Transactional
+    public void deny(QuestionBody questionBody) {
+        List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
+        for (Question subQuestion : subQuestions) {
+            questionService.deny(subQuestion);
+            rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.CREATE_OPERATION);
+        }
+
+        questionBodyMapper.deny(questionBody.getId());
+        rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.CREATE_OPERATION);
+    }
     @Override
     @Transactional(readOnly = true)
     public QuestionBody getQuestionBodyById(Long id) {
@@ -111,11 +132,11 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
         QuestionBody questionBody = getQuestionBodyById(id);
         List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(id);
         int result;
-        //TODO:修改删除逻辑
         if (checkQuestionBodyNotUsed(questionBody)) {
             uploadQuestionService.delete(id, "big");
             questionStatisticService.delete(id, "big");
             result =  questionBodyMapper.reallyDelete(id);
+            questionService.fileRemove(questionBody.getBody());
         }
         else {
             result = questionBodyMapper.delete(id);
@@ -130,14 +151,13 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
         return result;
     }
 
+
     private boolean checkQuestionBodyNotUsed(QuestionBody questionBody) {
-        boolean inPaper = false;
-        boolean inPractice = false;
 
-        /**判断是否被试卷和练习引用过*/
+        /*判断是否被试卷和练习引用过*/
+        QuestionUsageView questionUsageView = questionUsageViewService.getQuestionUsageByIdAndType(questionBody.getId(),"big");
 
-
-        return !inPaper && !inPractice;
+        return !questionUsageView.getUsed();
     }
 
     @Override

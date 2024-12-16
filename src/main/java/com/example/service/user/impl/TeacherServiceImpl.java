@@ -85,6 +85,10 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public String getTeacherNameById(Long teacherId) {
-        return teacherMapper.selectNameById(teacherId);
+        Teacher teacher =  teacherMapper.selectById(teacherId);
+        if (Objects.equals(teacher.getStatus(), Teacher.WORKING_STATUS)) {
+            return teacher.getName();
+        }
+        return teacher.getName() + "(已离职)";
     }
 }

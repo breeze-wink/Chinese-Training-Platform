@@ -16,6 +16,7 @@ import com.example.model.user.BaseUser;
 import com.example.model.user.Student;
 import com.example.model.user.Teacher;
 import com.example.model.view.AssignmentStudentView;
+import com.example.model.view.TeacherQuestionStatistic;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.user.StatsStudent;
@@ -39,6 +40,7 @@ import com.example.service.user.impl.StatsStudentServiceImpl;
 import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.view.impl.StudentStatsViewServiceImpl;
+import com.example.service.view.TeacherQuestionStatisticService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.jdi.DoubleValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -80,6 +84,8 @@ public class TeacherBusinessController {
     private final AssignmentRecipientService assignmentRecipientService;
     private final AssignmentStudentViewService assignmentStudentViewService;
     private final StudentStatsViewService studentStatsViewService;
+    private final ApproveQuestionService approveQuestionService;
+    private final TeacherQuestionStatisticService teacherQuestionStatisticService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -104,6 +110,9 @@ public class TeacherBusinessController {
                                      AssignmentRecipientServiceImpl assignmentRecipientService,
                                      AssignmentStudentViewServiceImpl assignmentStudentViewService,
                                      StudentStatsViewServiceImpl studentStatsViewService
+                                     AssignmentRecipientService assignmentRecipientService,
+                                     ApproveQuestionService approveQuestionService,
+                                     TeacherQuestionStatisticService teacherQuestionStatisticService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -128,6 +137,8 @@ public class TeacherBusinessController {
         this.assignmentRecipientService = assignmentRecipientService;
         this.assignmentStudentViewService = assignmentStudentViewService;
         this.studentStatsViewService = studentStatsViewService;
+        this.approveQuestionService = approveQuestionService;
+        this.teacherQuestionStatisticService = teacherQuestionStatisticService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -545,7 +556,7 @@ public class TeacherBusinessController {
         try {
             List<UploadQuestion> uploadQuestions = uploadQuestionService.getInSchoolQuestions(teacher.getSchoolId());
             for (UploadQuestion uploadQuestion : uploadQuestions) {
-                if (questionStatisticService.checkQuestionPassed(uploadQuestion.getQuestionId(), uploadQuestion.getType())) {
+                if (!questionStatisticService.checkQuestionWaiting(uploadQuestion.getQuestionId(), uploadQuestion.getType())) {
                     continue;
                 }
 
@@ -553,11 +564,12 @@ public class TeacherBusinessController {
                 Long questionId = uploadQuestion.getQuestionId();
                 Long teacherId = uploadQuestion.getTeacherId();
                 String type = uploadQuestion.getType();
-                infoData.setId(questionId);
+                infoData.setId(uploadQuestion.getId());
+                infoData.setQuestionId(questionId);
                 infoData.setType(type);
-                Date uploadTime = questionStatisticService.getUploadTime(questionId, type);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String formattedDate = sdf.format(uploadTime);
+                LocalDateTime uploadTime = questionStatisticService.getUploadTime(questionId, type);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = uploadTime.format(formatter);
                 infoData.setUploadTime(formattedDate);
                 infoData.setUploadTeacher(teacherService.getTeacherNameById(teacherId));
                 questions.add(infoData);
@@ -590,11 +602,13 @@ public class TeacherBusinessController {
                 Long questionId = uploadQuestion.getQuestionId();
                 Long teacherId = uploadQuestion.getTeacherId();
                 String type = uploadQuestion.getType();
-                infoData.setId(questionId);
+                infoData.setId(uploadQuestion.getId());
+                infoData.setQuestionId(questionId);
                 infoData.setType(type);
-                Date uploadTime = questionStatisticService.getUploadTime(questionId, type);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String formattedDate = sdf.format(uploadTime);
+                LocalDateTime uploadTime = questionStatisticService.getUploadTime(questionId, type);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = uploadTime.format(formatter);
+                infoData.setUploadTime(formattedDate);
                 infoData.setUploadTime(formattedDate);
                 infoData.setUploadTeacher(teacherService.getTeacherNameById(teacherId));
                 questions.add(infoData);
@@ -695,30 +709,24 @@ public class TeacherBusinessController {
     }
 
 
-    @DeleteMapping("{id}/delete-question")
-    public ResponseEntity<Message> deleteQuestion(@PathVariable Long id, @RequestParam Long deleteId, @RequestParam String type) throws JsonProcessingException {
+    @DeleteMapping("/delete-question")
+    public ResponseEntity<Message> deleteQuestion(@RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
         Message response = new Message();
         if(Objects.equals(type, "small")){
-            Question question = questionService.getQuestionById(deleteId);
+            Question question = questionService.getQuestionById(questionId);
             if(question == null){
                 response.setMessage("问题不存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            if(question.getBodyId() == null || questionService.getQuestionsByQuestionBodyId(question.getBodyId()).size() > 1){
-                questionService.deleteQuestion(question);
-            }
-            else{
-                questionBodyService.deleteQuestionBody(question.getBodyId());
-
-            }
+            questionService.deleteQuestion(question);
         }
         else if(Objects.equals(type, "big")){
-            QuestionBody questionBody = questionBodyService.getQuestionBodyById(deleteId);
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(questionId);
             if(questionBody == null){
                 response.setMessage("问题不存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            questionBodyService.deleteQuestionBody(deleteId);
+            questionBodyService.deleteQuestionBody(questionId);
             cacheRefreshService.markTypeCacheOutOfDate(questionBody.getType());
         }
         response.setMessage("删除成功");
@@ -985,9 +993,9 @@ public class TeacherBusinessController {
                 info.setName(paper.getName());
                 info.setDifficulty(paper.getDifficulty());
                 info.setTotalScore(paper.getTotalScore());
-                Date createTime = paper.getCreateTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String formattedDate = sdf.format(createTime);
+                LocalDateTime createTime = paper.getCreateTime();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = createTime.format(formatter);
                 info.setCreateTime(formattedDate);
                 infos.add(info);
             }
@@ -1097,93 +1105,30 @@ public class TeacherBusinessController {
     @GetMapping("/uploaded-questions")
     public ResponseEntity<GetUploadedQuestionResponse> getUploadedQuestions(@AuthenticationPrincipal BaseUser user) {
         GetUploadedQuestionResponse response = new GetUploadedQuestionResponse();
-        Long teacherId = user.getId();
-        System.out.println(teacherId);
-        List<UploadQuestion> uploadQuestions = uploadQuestionService.findByTeacherId(teacherId);
-        List<Long> smallIds = new ArrayList<>();
-        ArrayList<Long> bigIds = new ArrayList<>();
-
-        for (UploadQuestion uploadQuestion : uploadQuestions) {
-            if (uploadQuestion.getType().equals("big")) {
-                bigIds.add(uploadQuestion.getQuestionId());
+        try{
+            List<TeacherQuestionStatistic> teacherQuestionStatistics = teacherQuestionStatisticService.getStatisticsByTeacherId(user.getId());
+            List<GetUploadedQuestionResponse.UploadQuestionInfo> uploadQuestions = new ArrayList<>();
+            for (TeacherQuestionStatistic teacherQuestionStatistic : teacherQuestionStatistics) {
+                GetUploadedQuestionResponse.UploadQuestionInfo uploadQuestionInfo = new GetUploadedQuestionResponse.UploadQuestionInfo();
+                uploadQuestionInfo.setQuestionId(teacherQuestionStatistic.getQuestionId());
+                uploadQuestionInfo.setType(teacherQuestionStatistic.getQuestionType());
+                LocalDateTime uploadTime = teacherQuestionStatistic.getUploadTime();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = uploadTime.format(formatter);
+                uploadQuestionInfo.setUploadTime(formattedDate);
+                uploadQuestionInfo.setComment(teacherQuestionStatistic.getComment());
+                uploadQuestionInfo.setStatus(teacherQuestionStatistic.getStatus());
+                uploadQuestionInfo.setExecuteTeacher(teacherQuestionStatistic.getExecuteTeacher());
+                uploadQuestions.add(uploadQuestionInfo);
             }
-            else {
-                smallIds.add(uploadQuestion.getQuestionId());
-            }
+            response.setUploadedQuestions(uploadQuestions);
+            response.setMessage("success");
+            return ResponseEntity.ok(response);
         }
-
-        List<Question> smallQuestions = questionService.getQuestionsByIds(smallIds);
-        List<QuestionBody> bigQuestions = questionBodyService.getQuestionBodiesByIds(bigIds);
-        List<GetUploadedQuestionResponse.UploadQuestionInfo> infos = new ArrayList<>();
-
-        for (Question question : smallQuestions) {
-            GetUploadedQuestionResponse.UploadQuestionInfo info = new GetUploadedQuestionResponse.UploadQuestionInfo();
-            if (question.getBodyId() != null) {
-                info.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
-            }
-            info.setContent(question.getContent());
-            Date uploadTime = questionStatisticService.getUploadTime(question.getId(), "small");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            info.setUploadTime(sdf.format(uploadTime));
-            info.setType(question.getType());
-
-            if (question.getType().equals("CHOICE")) {
-                String[] choices = question.getOptions().split("\\$\\$");
-                info.setOptions(Arrays.stream(choices).toList());
-            }
-
-            String [] temps = question.getAnswer().split("\\$\\$");
-            String answer = temps[0];
-            if (question.getType().equals("FILL_IN_BLANK")) {
-                answer = answer.replaceAll("##", ";");
-            }
-            info.setAnswer(answer);
-            if (temps.length > 1) {
-                String explanation = temps[1];
-                info.setExplanation(explanation);
-            }
-            info.setKnowledgePoint(knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId()));
-
-            infos.add(info);
+        catch (Exception e) {
+            response.setMessage("fail");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
-        for (QuestionBody body : bigQuestions) {
-            GetUploadedQuestionResponse.UploadQuestionInfo info = new GetUploadedQuestionResponse.UploadQuestionInfo();
-            info.setBody(body.getBody());
-            Date uploadTime = questionStatisticService.getUploadTime(body.getId(), "big");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            info.setUploadTime(sdf.format(uploadTime));
-
-            List<GetUploadedQuestionResponse.subQuestion> subQuestions = new ArrayList<>();
-            List<Question> questions = questionService.getQuestionsByQuestionBodyId(body.getId());
-            for (Question question : questions) {
-                GetUploadedQuestionResponse.subQuestion subInfo = new GetUploadedQuestionResponse.subQuestion();
-                subInfo.setContent(question.getContent());
-                subInfo.setType(question.getType());
-                if (question.getType().equals("CHOICE")) {
-                    String[] choices = question.getOptions().split("\\$\\$");
-                    subInfo.setOptions(Arrays.stream(choices).toList());
-                }
-
-                String [] temps = question.getAnswer().split("\\$\\$");
-                String answer = temps[0];
-                if (question.getType().equals("FILL_IN_BLANK")) {
-                    answer = answer.replaceAll("##", ";");
-                }
-                subInfo.setAnswer(answer);
-                if (temps.length > 1) {
-                    String explanation = temps[1];
-                    subInfo.setExplanation(explanation);
-                }
-                subInfo.setKnowledgePoint(knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId()));
-                subQuestions.add(subInfo);
-            }
-            info.setSubQuestions(subQuestions);
-            infos.add(info);
-        }
-        response.setMessage("success");
-        response.setUploadedQuestions(infos);
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/homework/publish")
@@ -1237,8 +1182,31 @@ public class TeacherBusinessController {
     }
 
     @PutMapping("/deny-upload-question")
-    public ResponseEntity<Message> denyUploadQuestion(@RequestParam Long id, @RequestParam String type) throws JsonProcessingException {
-        //TODO:
+    public ResponseEntity<Message> denyUploadQuestion(@AuthenticationPrincipal BaseUser user,
+                                                      @RequestBody DenyUploadQuestionRequest request) throws JsonProcessingException {
+
+        Long executeTeacherId = user.getId();
+        Long id = request.getId();
+        String comment = request.getComment();
+
+        UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
+        if (uploadQuestion.getType().equals("small")) {
+            Question question = questionService.getQuestionById(uploadQuestion.getQuestionId());
+            questionService.deny(question);
+        }
+        else {
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(uploadQuestion.getQuestionId());
+            questionBodyService.deny(questionBody);
+        }
+
+        ApproveQuestion approveQuestion = new ApproveQuestion();
+        approveQuestion.setUploadId(id);
+        approveQuestion.setStatus("rejected");
+        if (comment != null && !comment.isEmpty()) {
+            approveQuestion.setComment(comment);
+        }
+        approveQuestion.setExecuteTeacherId(executeTeacherId);
+        approveQuestionService.insert(approveQuestion);
         return ResponseEntity.ok(new Message("success"));
     }
 

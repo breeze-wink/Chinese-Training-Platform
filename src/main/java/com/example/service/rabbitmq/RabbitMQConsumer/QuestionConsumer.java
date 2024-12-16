@@ -2,6 +2,7 @@ package com.example.service.rabbitmq.RabbitMQConsumer;
 import com.example.config.RabbitMQConfig;
 import com.example.model.question.Question;
 import com.example.service.cache.CacheRefreshService;
+import com.example.service.rabbitmq.RabbitMQProducer;
 import com.example.service.rabbitmq.dto.QuestionSyncMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,10 +35,10 @@ public class QuestionConsumer {
             String operation = syncMessage.getOperation();
             Question question = syncMessage.getQuestion();
             // 同步到 Redis
-            if ("create".equals(operation)) {
+            if (RabbitMQProducer.CREATE_OPERATION.equals(operation)) {
                 // 处理创建操作
                 questionService.syncToRedis(question);
-            } else if ("delete".equals(operation)) {
+            } else if (RabbitMQProducer.DELETE_OPERATION.equals(operation)) {
                 // 处理删除操作
                 questionService.deleteFromRedis(question);
             }

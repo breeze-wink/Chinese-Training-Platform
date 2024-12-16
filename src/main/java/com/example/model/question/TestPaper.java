@@ -3,6 +3,7 @@ package com.example.model.question;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Setter
@@ -11,7 +12,7 @@ public class TestPaper {
     private Long id;
     private String name;
     private Long creatorId;
-    private Date createTime;
+    private LocalDateTime createTime;
     private Double difficulty;
     private Integer totalScore;
 }
