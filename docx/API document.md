@@ -2910,7 +2910,7 @@
 
   ```json
   {
-      "id" : 12345 // get all waiting quesitons中的id
+      "id" : 12345,// get all waiting quesitons中的id
       "comment" : "备注"
   }
   ```
@@ -3015,7 +3015,7 @@
     ```
 
 
-### Get Submission
+### Get Submission `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-submission`
 - **请求方法**：`GET`
@@ -3035,17 +3035,20 @@
       "totalScore": 100, // 总分
       "questions": [
         {
+          "submissionAnswerId": "long",
           "body": "题干， 单题为空",
           "sequence": 12345, //题号
           "score": 4, //分数
           "subQuestions": [ //大题时不为空
             {    
+              "submissionAnswerId": "long",
               "question": "问题内容", 
               "answer" : "答案", 
               "explanation": "解析", 
               "options": ["选项1", "选项2"], 
               "type" : "选择、填空、简答、作文",
-    		  "subScore" : [1,1,1] //小题分数
+    		  "subScore" : "int",//小题分数
+              "studentAnswer": "string"
             },
             ...
           ],
@@ -3054,7 +3057,7 @@
           "explanation": "解析", //小题时不为空
           "options": ["选项1", "选项2"], //小题且为选择时不为空
           "type" : "选择、填空、简答、作文",//小题时不为空
-          "knowledge" : "知识点",
+          "studentAnswer": "string"
         },
         ...
       ]
