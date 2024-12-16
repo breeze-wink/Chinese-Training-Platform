@@ -10,4 +10,5 @@ public class AssignmentStudentView {
     private Long studentId;
     private Long teacherId;
     private Long paperId;
+    private String studentName;
 }
