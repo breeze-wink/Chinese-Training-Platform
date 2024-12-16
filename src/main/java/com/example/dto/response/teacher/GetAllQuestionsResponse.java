@@ -15,6 +15,7 @@ public class GetAllQuestionsResponse {
     @Getter
     public static class infoData{
         private Long id;
+        private Long questionId;
         private String type;
         private String uploadTime;
         private String uploadTeacher;

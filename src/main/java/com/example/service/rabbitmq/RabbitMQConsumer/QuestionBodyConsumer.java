@@ -3,6 +3,7 @@ import com.example.config.RabbitMQConfig;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
 import com.example.service.question.QuestionBodyService;
+import com.example.service.rabbitmq.RabbitMQProducer;
 import com.example.service.rabbitmq.dto.QuestionBodySyncMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,10 +29,10 @@ public class QuestionBodyConsumer {
             QuestionBodySyncMessage syncMessage = objectMapper.readValue(message, QuestionBodySyncMessage.class);
             QuestionBody questionBody = syncMessage.getQuestionBody();
             String operation = syncMessage.getOperation();
-            if ("create".equals(operation)) {
+            if (RabbitMQProducer.CREATE_OPERATION.equals(operation)) {
                 // 处理创建操作
                 questionBodyService.syncToRedis(questionBody);
-            } else if ("delete".equals(operation)) {
+            } else if (RabbitMQProducer.DELETE_OPERATION.equals(operation)) {
                 // 处理删除操作
                 questionBodyService.deleteFromRedis(questionBody.getId());
             }

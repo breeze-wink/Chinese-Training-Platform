@@ -13,9 +13,9 @@ public interface QuestionBodyService {
     // 插入一条题目记录
     int createQuestionBody(QuestionBody questionBody);
 
-    @Transactional
     void access(QuestionBody questionBody);
 
+    void deny(QuestionBody questionBody);
     // 根据ID查询题目
     QuestionBody getQuestionBodyById(Long id);
 
@@ -27,6 +27,7 @@ public interface QuestionBodyService {
 
     // 删除题目记录
     int deleteQuestionBody(Long id) throws JsonProcessingException;
+
     List<QuestionBody> getQuestionBodiesByType(String type);
 
     List<String> getAllTypes();

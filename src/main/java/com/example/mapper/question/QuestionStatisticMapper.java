@@ -4,6 +4,7 @@ import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.model.question.QuestionStatistic;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -34,5 +35,5 @@ public interface QuestionStatisticMapper {
     void addReferencedCount(@Param("question") QuestionStatisticDTO question);
 
     @Select("SELECT uploadTime from question_statistic where id = #{id} and type = #{type}")
-    Date selectUploadTime(Long id, String type);
+    LocalDateTime selectUploadTime(Long id, String type);
 }

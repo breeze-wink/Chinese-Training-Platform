@@ -13,25 +13,11 @@ public class GetUploadedQuestionResponse {
     @Setter
     @Getter
     public static class UploadQuestionInfo {
-        private String uploadTime;
-        private String body;
-        private List<subQuestion> subQuestions;
-        private String content;
-        private String answer;
-        private String explanation;
-        private List<String> options;
-        private String type;
-        private String knowledgePoint;
-    }
-
-    @Setter
-    @Getter
-    public static class subQuestion {
-        private String content;
-        private String answer;
-        private String explanation;
-        private List<String> options;
-        private String type;
-        private String knowledgePoint;
+        private Long questionId;        // 问题 ID
+        private String type;            // 题目类型 (small or big)
+        private String uploadTime;      // 上传时间 (string 格式)
+        private String status;          // 状态 (未审核, 通过, 拒绝)
+        private String comment;         // 备注
+        private String executeTeacher;  // 审核老师名字
     }
 }

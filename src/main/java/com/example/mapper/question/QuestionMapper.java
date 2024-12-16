@@ -15,6 +15,8 @@ public interface QuestionMapper {
     @Update("UPDATE question SET status = 2 WHERE id = #{id}")
     int delete(Long id);
 
+    @Update("UPDATE question SET status = 3 WHERE id = #{id}")
+    void deny(Long id);
     @Delete("DELETE FROM question WHERE id = #{id}")
     int reallyDelete(Long id);
 
