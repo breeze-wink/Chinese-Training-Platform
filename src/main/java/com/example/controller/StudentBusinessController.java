@@ -482,7 +482,10 @@ public class StudentBusinessController {
                 List<String> choices = drawOptions(question.getOptions());
                 infoData.getQuestionOptions().addAll(choices);
             }
-            infoData.setAnswerContent(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getAnswerContent());
+            PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
+            if(practiceAnswer != null){
+                infoData.setAnswerContent(practiceAnswer.getAnswerContent());
+            }
             String [] sequences = infoData.getSequence().split("\\.");
             infoData.setQuestionBody("");
             if(sequences.length > 1){
@@ -985,9 +988,10 @@ public class StudentBusinessController {
                             Question question = questionService.getQuestionById(paperQuestion.getQuestionId());
                             if(question != null){
                                 SubmissionAnswer submissionAnswer = new SubmissionAnswer();
-                                submissionAnswer.setQuestionId(question.getId());
                                 submissionAnswer.setSubmissionId(submission.getId());
+                                submissionAnswer.setQuestionId(question.getId());
                                 submissionAnswer.setSequence(paperQuestion.getSequence().toString());
+                                submissionAnswer.setQuestionScore(Integer.parseInt(paperQuestion.getScore()));
                                 submissionAnswerService.insert(submissionAnswer);
                                 HomeworkDetailResponse.infoData infoData = new HomeworkDetailResponse.infoData();
                                 infoData.setSubmissionAnswerId(submissionAnswer.getId());
@@ -1007,11 +1011,13 @@ public class StudentBusinessController {
                             List<Question> questions = questionService.getQuestionsByQuestionBodyId(paperQuestion.getQuestionId());
                             if(questions != null && !questions.isEmpty()){
                                 int indexTemp = 1;
+                                String [] scores = paperQuestion.getScore().split("#");
                                 for(Question question : questions){
                                     SubmissionAnswer submissionAnswer = new SubmissionAnswer();
-                                    submissionAnswer.setQuestionId(question.getId());
                                     submissionAnswer.setSubmissionId(submission.getId());
+                                    submissionAnswer.setQuestionId(question.getId());
                                     submissionAnswer.setSequence(paperQuestion.getSequence() + "." + indexTemp);
+                                    submissionAnswer.setQuestionScore(Integer.parseInt(scores[indexTemp - 1]));
                                     submissionAnswerService.insert(submissionAnswer);
                                     HomeworkDetailResponse.infoData infoData = new HomeworkDetailResponse.infoData();
                                     infoData.setSubmissionAnswerId(submissionAnswer.getId());
@@ -1094,7 +1100,7 @@ public class StudentBusinessController {
             for(SubmissionAnswer submissionAnswer : submissionAnswers){
                 HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
                 if(submissionAnswer.getScore() != null){
-                    infoData.setScore(submissionAnswer.getScore().doubleValue());
+                    infoData.setScore(submissionAnswer.getScore());
                 }
                 infoData.setStudentAnswer(submissionAnswer.getAnswerContent());
                 infoData.setSequence(submissionAnswer.getSequence());

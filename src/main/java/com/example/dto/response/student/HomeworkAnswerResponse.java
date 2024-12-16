@@ -22,7 +22,7 @@ public class HomeworkAnswerResponse {
         private String answer;
         private String analysis;
         private String studentAnswer;
-        private Double score;
+        private Integer score;
         private String feedback;
     }
 }

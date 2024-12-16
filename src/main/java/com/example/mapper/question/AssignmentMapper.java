@@ -27,4 +27,7 @@ public interface AssignmentMapper {
 
     @Select("SELECT * FROM assignment")
     List<Assignment> selectAll();
+
+    @Select("SELECT * FROM assignment WHERE creatorId = #{creatorId}")
+    List<Assignment> selectByTeacherId(Long creatorId);
 }
