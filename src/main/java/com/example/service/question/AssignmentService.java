@@ -15,4 +15,5 @@ public interface AssignmentService {
     List<Assignment> getAllAssignments();
 
     boolean checkPaperUsed(Long id);
+    List<Assignment> getAssignmentsByTeacherId(Long teacherId);
 }

@@ -13,7 +13,9 @@ import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.question.*;
 import com.example.model.user.BaseUser;
+import com.example.model.user.Student;
 import com.example.model.user.Teacher;
+import com.example.model.view.AssignmentStudentView;
 import com.example.model.view.TeacherQuestionStatistic;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
@@ -25,11 +27,11 @@ import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.question.*;
-import com.example.service.question.impl.AssignmentServiceImpl;
-import com.example.service.question.impl.QuestionBodyServiceImpl;
-import com.example.service.question.impl.QuestionServiceImpl;
-import com.example.service.question.impl.UploadQuestionServiceImpl;
+import com.example.service.question.impl.*;
+import com.example.service.view.AssignmentStudentViewService;
 import com.example.service.submission.AssignmentSubmissionService;
+import com.example.service.view.StudentStatsViewService;
+import com.example.service.view.impl.AssignmentStudentViewServiceImpl;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.user.StatsStudentService;
 import com.example.service.user.StudentService;
@@ -37,10 +39,9 @@ import com.example.service.user.TeacherService;
 import com.example.service.user.impl.StatsStudentServiceImpl;
 import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
+import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.example.service.view.TeacherQuestionStatisticService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.catalina.connector.Response;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -48,7 +49,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -56,7 +56,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -82,6 +81,8 @@ public class TeacherBusinessController {
     private final TeacherService teacherService;
     private final AssignmentService assignmentService;
     private final AssignmentRecipientService assignmentRecipientService;
+    private final AssignmentStudentViewService assignmentStudentViewService;
+    private final StudentStatsViewService studentStatsViewService;
     private final ApproveQuestionService approveQuestionService;
     private final TeacherQuestionStatisticService teacherQuestionStatisticService;
     @Autowired
@@ -105,7 +106,9 @@ public class TeacherBusinessController {
                                      PaperQuestionService paperQuestionService,
                                      AssignmentServiceImpl assignmentService,
                                      UploadQuestionServiceImpl uploadQuestionService,
-                                     AssignmentRecipientService assignmentRecipientService,
+                                     AssignmentRecipientServiceImpl assignmentRecipientService,
+                                     AssignmentStudentViewServiceImpl assignmentStudentViewService,
+                                     StudentStatsViewServiceImpl studentStatsViewService,
                                      ApproveQuestionService approveQuestionService,
                                      TeacherQuestionStatisticService teacherQuestionStatisticService
                                      ) {
@@ -130,6 +133,8 @@ public class TeacherBusinessController {
         this.assignmentService = assignmentService;
         this.uploadQuestionService = uploadQuestionService;
         this.assignmentRecipientService = assignmentRecipientService;
+        this.assignmentStudentViewService = assignmentStudentViewService;
+        this.studentStatsViewService = studentStatsViewService;
         this.approveQuestionService = approveQuestionService;
         this.teacherQuestionStatisticService = teacherQuestionStatisticService;
     }
@@ -1201,5 +1206,68 @@ public class TeacherBusinessController {
         approveQuestion.setExecuteTeacherId(executeTeacherId);
         approveQuestionService.insert(approveQuestion);
         return ResponseEntity.ok(new Message("success"));
+    }
+
+    @GetMapping("/{id}/get-assignment-list")
+    public ResponseEntity<AssignmentListResponse> getAssignmentList(@PathVariable Long id) {
+        AssignmentListResponse response = new AssignmentListResponse();
+        List<AssignmentListResponse.infoData> data = new ArrayList<>();
+        List<Assignment> assignments = assignmentService.getAssignmentsByTeacherId(id);
+        for (Assignment assignment : assignments) {
+            AssignmentListResponse.infoData infoData = new AssignmentListResponse.infoData();
+            infoData.setAssignmentId(assignment.getId());
+            infoData.setAssignmentTitle(assignment.getTitle());
+            infoData.setAssignmentDescription(assignment.getDescription());
+            infoData.setStartTime(assignment.getStartTime().toString());
+            infoData.setEndTime(assignment.getEndTime().toString());
+            infoData.setPaperId(assignment.getPaperId());
+            data.add(infoData);
+        }
+        data.sort(Comparator.comparing(AssignmentListResponse.infoData::getEndTime).reversed());
+        response.setData(data);
+        response.setMessage("作业列表获取成功");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("{id}/get-submission-list")
+    public ResponseEntity<GetSubmissionListResponse> getSubmissionList(@PathVariable Long id, @RequestParam Long assignmentId) {
+        GetSubmissionListResponse response = new GetSubmissionListResponse();
+        List<GetSubmissionListResponse.infoData> data = new ArrayList<>();
+        List<AssignmentStudentView> assignmentStudentViews = assignmentStudentViewService.selectByAssignmentId(assignmentId);
+        for (AssignmentStudentView assignmentStudentView : assignmentStudentViews) {
+            GetSubmissionListResponse.infoData infoData = new GetSubmissionListResponse.infoData();
+            infoData.setStudentId(assignmentStudentView.getStudentId());
+            Student student = studentService.getStudentById(assignmentStudentView.getStudentId());
+            infoData.setStudentName(student.getName());
+            AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, assignmentStudentView.getStudentId());
+            if(assignmentSubmission == null){
+                infoData.setIsSubmitted(0);
+                infoData.setSubmitTime(null);
+                infoData.setTotalScore(0.0);
+                infoData.setIsMarked(1);
+            }
+            else if(assignmentSubmission.getSubmitTime() == null){
+                infoData.setSubmitTime(null);
+                infoData.setTotalScore(0.0);
+                infoData.setIsMarked(1);
+            }
+            else{
+                infoData.setIsSubmitted(1);
+                infoData.setSubmitTime(assignmentSubmission.getSubmitTime().toString());
+                if(assignmentSubmission.getTotalScore() != null){
+                    infoData.setTotalScore(assignmentSubmission.getTotalScore().doubleValue());
+                    infoData.setIsMarked(1);
+                }
+                else{
+                    infoData.setTotalScore(null);
+                    infoData.setIsMarked(0);
+                }
+            }
+            data.add(infoData);
+        }
+        response.setMessage("作业提交列表获取成功");
+        response.setAssignmentId(assignmentId);
+        response.setData(data);
+        return ResponseEntity.ok(response);
     }
 }

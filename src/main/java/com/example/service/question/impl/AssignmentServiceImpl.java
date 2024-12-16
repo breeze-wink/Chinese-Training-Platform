@@ -57,4 +57,10 @@ public class AssignmentServiceImpl implements AssignmentService {
     public boolean checkPaperUsed(Long id) {
         return assignmentMapper.selectByPaperId(id) != null && !assignmentMapper.selectByPaperId(id).isEmpty();
     }
+
+    @Override
+    @Transactional
+    public List<Assignment> getAssignmentsByTeacherId(Long teacherId) {
+        return assignmentMapper.selectByTeacherId(teacherId);
+    }
 }

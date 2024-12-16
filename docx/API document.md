@@ -1293,7 +1293,7 @@
     ```json
     {
       "message" : "success",
-      "role" : 0 or 1 // 0 是正常老师
+      "role" : number,//0 or 1 // 0 是正常老师
       "id" : 12345,
       "token" : token
     }
@@ -2543,18 +2543,20 @@
     - 请求体(`JSON` 格式)：
 
       ```json
-      "name" : "试卷名字",
-      "creatorId": 12345, // 老师id
-      "totalScore": 100,
-      "difficulty" : "难度",
-      "questions":[
+      {
+        "name": "试卷名字",
+        "creatorId": 12345, // 老师id
+        "totalScore": 100,
+        "difficulty" : "难度",
+        "questions":[
           {
               "id" : 12345, //可能是questionId或bodyId，根据type
-              "type": "big" or "small", //题目类型
+              "type": "string",//"big" or "small", //题目类型
               "sequence": 1234, //题目序号
               "score" : 5
           },
-      ]
+        ]
+      }
       ```
 
 - **响应说明**
@@ -2641,13 +2643,12 @@
     ```json
     {
       "message": "success",
-      "totalScore": 100 // 总分
+      "totalScore": 100, // 总分
       "questions": [
           {
            	"body": "题干， 单题为空",
-            "sequence": 12345 //题号
-        	"score": 4 //分数
-        	
+            "sequence": 12345, //题号
+        	"score": 4, //分数
             "subQuestions": [ //大题时不为空
                 {    
                     "question": "问题内容", 
@@ -2725,10 +2726,10 @@
         {
           "id": "long", // 对应数据库中upload_question 的 id 字段
           "questionId" : 123,
-          "type" : "small" or "big"
+          "type" : "string",//"small" or "big"
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
-        }
+        },
          ...
       ]
     }
@@ -2768,7 +2769,7 @@
           "type" : "small" or "big"
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
-        }
+        },
          ...
       ]
     }
@@ -2900,6 +2901,7 @@
     }
     ```
 
+
 ### Delete Question `finished`
 
 - **接口路径**：`/api/teacher/delete-question`
@@ -2932,6 +2934,138 @@
       "message": "删除失败"
     }
     ```
+
+### Get Assignment List `finished`
+
+- **接口路径**：`/api/teacher/{id}/get-assignment-list`
+- **请求方法**：`GET`
+- **接口说明**：老师获取作业列表。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数： `id`：教师的唯一标识符（`Long` 类型）
+  - 请求体： 无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+      {
+        "message": "success",
+        "data": [
+          {
+            "assignmentId": "long",
+            "assignmentTitle": "string",
+            "assignmentDescription": "string",
+            "startTime": "string",
+            "endTime": "string",
+            "paperId": "long"
+          },
+          ...
+        ]
+      }
+      ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "data": null
+    }
+    ```
+
+
+### Get Submission List `finished`
+
+- **接口路径**：`/api/teacher/{id}/get-submission-list`
+- **请求方法**：`GET`
+- **接口说明**：老师获取某个作业的提交列表。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数： `id`：教师的唯一标识符（`Long` 类型）
+    - 查询参数： `assignmentId`：作业的唯一标识符（`Long` 类型）
+  - 请求体： 无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+      {
+        "message": "success",
+        "assignmentId": "long",
+        "data": [
+          {
+            "studentId": "long",
+            "studentName": "string",
+            "isSubmitted": "number",//1是已提交，0是未提交
+            "submitTime": "string",
+            "totalScore": "double",
+            "isMarked": "number",//1是已批阅，0是未批阅
+          },
+          ...
+        ]
+      }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "assignmentId": null,
+      "data": null
+    }
+    ```
+
+
+### Get Submission
+
+- **接口路径**：`/api/teacher/{id}/get-submission`
+- **请求方法**：`GET`
+- **接口说明**：老师获取某个学生的作答。
+- **请求说明**：
+  - 请求参数：
+    - 路径参数： `id`：教师的唯一标识符（`Long` 类型）
+    - 查询参数： `assignmentId`：作业的唯一标识符（`Long` 类型）
+    - 查询参数： `studentId`：学生的唯一标识符（`Long` 类型）
+  - 请求体： 无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success",
+      "totalScore": 100, // 总分
+      "questions": [
+        {
+          "body": "题干， 单题为空",
+          "sequence": 12345, //题号
+          "score": 4, //分数
+          "subQuestions": [ //大题时不为空
+            {    
+              "question": "问题内容", 
+              "answer" : "答案", 
+              "explanation": "解析", 
+              "options": ["选项1", "选项2"], 
+              "type" : "选择、填空、简答、作文",
+    		  "subScore" : [1,1,1] //小题分数
+            },
+            ...
+          ],
+          "question": "问题内容", //小题时不为空
+          "answer" : "答案", //小题时不为空
+          "explanation": "解析", //小题时不为空
+          "options": ["选项1", "选项2"], //小题且为选择时不为空
+          "type" : "选择、填空、简答、作文",//小题时不为空
+          "knowledge" : "知识点",
+        },
+        ...
+      ]
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "assignmentId": null,
+      "data": null
+    }
+    ```
+
 
 ## SystemAdmin
 
@@ -4131,7 +4265,7 @@
 
     ```json
     {
-      "message" : "邮箱已注册" or  "用户名已存在"
+      "message" : "邮箱已注册" //or  "用户名已存在"
     }
     ```
 
