@@ -155,10 +155,9 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
     private boolean checkQuestionBodyNotUsed(QuestionBody questionBody) {
 
         /*判断是否被试卷和练习引用过*/
-
         QuestionUsageView questionUsageView = questionUsageViewService.getQuestionUsageByIdAndType(questionBody.getId(),"big");
 
-        return questionUsageView.getUsed();
+        return !questionUsageView.getUsed();
     }
 
     @Override

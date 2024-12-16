@@ -14,4 +14,5 @@ public class TeacherQuestionStatistic {
     private String questionType;      // 题目类型（单题/组合体）
     private String status;            // 审核状态（通过/拒绝）
     private String comment;           // 审核备注
+    private String executeTeacher;
 }

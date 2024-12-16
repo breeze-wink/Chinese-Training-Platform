@@ -1,5 +1,6 @@
 package com.example.service.question.impl;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.example.mapper.question.QuestionMapper;
 import com.example.model.question.Question;
 import com.example.model.view.QuestionUsageView;
@@ -76,26 +77,29 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public int deleteQuestion(Question question) {
         Long id = question.getId();
+        int result;
         if (checkQuestionNotUsed(question)) {
             questionStatisticService.delete(id, "small");
             uploadQuestionService.delete(id, "small");
             rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
             fileRemove(question.getContent());
-            return questionMapper.reallyDelete(id);
+            result = questionMapper.reallyDelete(id);
         }
-        int result = questionMapper.delete(id);
+        else {
+            result = questionMapper.delete(id);
+        }
         // 发送同步消息
         rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
-        if (question.getBodyId() != null) {
-            String cacheKey = "questions:questionBody:" + question.getBodyId();
-            redisTemplate.delete(cacheKey);
-        }
+//        if (question.getBodyId() != null) {
+//            String cacheKey = "questions:questionBody:" + question.getBodyId();
+//            redisTemplate.delete(cacheKey);
+//        }
         return result;
     }
 
     private boolean checkQuestionNotUsed(Question question) {
         QuestionUsageView  questionUsageView = questionUsageViewService.getQuestionUsageByIdAndType(question.getId(),"small");
-        return questionUsageView.getUsed();
+        return !questionUsageView.getUsed();
     }
 
     @Override
@@ -225,6 +229,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void fileRemove(String body) {
         if (body == null || body.isEmpty()) {
+            log.warn("传入的HTML内容为空");
             return;
         }
         final String uploadDir = "uploads";  // 上传目录
@@ -240,8 +245,10 @@ public class QuestionServiceImpl implements QuestionService {
                 continue;
             }
 
-            // 处理相对路径，去除开头的 '/'
-            if (src.startsWith("/")) {
+            // 处理相对路径，去除开头的 '/uploads/' 或 '/'
+            if (src.startsWith("/uploads/")) {
+                src = src.substring("/uploads/".length());
+            } else if (src.startsWith("/")) {
                 src = src.substring(1);
             }
 
@@ -254,7 +261,7 @@ public class QuestionServiceImpl implements QuestionService {
 
             if (!absoluteFilePath.startsWith(uploadPath)) {
                 // 跳过不在上传目录下的文件
-                System.err.println("尝试删除上传目录之外的文件: " + absoluteFilePath);
+                log.warn("尝试删除上传目录之外的文件: {}", absoluteFilePath);
                 continue;
             }
 
@@ -262,12 +269,12 @@ public class QuestionServiceImpl implements QuestionService {
             if (file.exists()) {
                 boolean deleted = file.delete();
                 if (deleted) {
-                    System.out.println("已删除文件: " + absoluteFilePath);
+                    log.info("已删除文件: {}", absoluteFilePath);
                 } else {
-                    System.err.println("删除文件失败: " + absoluteFilePath);
+                    log.error("删除文件失败: {}", absoluteFilePath);
                 }
             } else {
-                System.out.println("文件不存在: " + absoluteFilePath);
+                log.warn("文件不存在: {}", absoluteFilePath);
             }
         }
     }

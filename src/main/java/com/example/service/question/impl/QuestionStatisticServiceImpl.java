@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
     }
 
     @Override
-    public Date getUploadTime(Long id, String type) {
+    public LocalDateTime getUploadTime(Long id, String type) {
         return questionStatisticMapper.selectUploadTime(id, type);
     }
 
@@ -84,6 +85,18 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
         else {
             int status = questionBodyMapper.getStatus(questionId);
             return status == QuestionBody.STATUS_ACCESS;
+        }
+    }
+
+    @Override
+    public boolean checkQuestionWaiting(Long questionId, String type) {
+        if (type.equals("small")) {
+            int status = questionMapper.getStatus(questionId);
+            return status == Question.STATUS_NOT_ACCESS;
+        }
+        else {
+            int status = questionBodyMapper.getStatus(questionId);
+            return status == QuestionBody.STATUS_NOT_ACCESS;
         }
     }
 }
