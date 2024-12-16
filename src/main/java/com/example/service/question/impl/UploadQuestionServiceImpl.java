@@ -34,8 +34,8 @@ public class UploadQuestionServiceImpl implements UploadQuestionService {
     @Override
     @Transactional
 
-    public void delete(Long id) {
-        uploadQuestionMapper.deleteById(id);
+    public void delete(Long questionId, String type) {
+        uploadQuestionMapper.delete(questionId, type);
     }
 
     @Override

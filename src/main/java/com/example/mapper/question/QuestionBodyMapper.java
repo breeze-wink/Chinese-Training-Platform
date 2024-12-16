@@ -32,6 +32,9 @@ public interface QuestionBodyMapper {
     @Update("Update question_body SET status = 2 WHERE id = #{id}")
     int delete(Long id);
 
+    @Delete("DELETE FROM question_body WHERE id = #{id}")
+    int reallyDelete(Long id);
+
     @Select("SELECT * FROM question_body WHERE type = #{type} and status=1")
     List<QuestionBody> getQuestionBodiesByType(String type);
 

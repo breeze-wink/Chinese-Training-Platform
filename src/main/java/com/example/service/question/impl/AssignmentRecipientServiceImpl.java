@@ -23,4 +23,9 @@ public class AssignmentRecipientServiceImpl implements AssignmentRecipientServic
     public List<AssignmentRecipient> selectByRecipient(String type, Long recipientId) {
         return assignmentRecipientMapper.selectByRecipient(type, recipientId);
     }
+
+    @Override
+    public void batchInsert(List<AssignmentRecipient> assignmentRecipientList) {
+        assignmentRecipientMapper.batchInsert(assignmentRecipientList);
+    }
 }
