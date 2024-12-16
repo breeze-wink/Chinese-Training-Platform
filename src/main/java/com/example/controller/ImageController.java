@@ -84,6 +84,31 @@ public class ImageController {
         }
     }
 
+    // 删除图片接口
+    @DeleteMapping("/image/{type}/{imageName}")
+    public ResponseEntity<String> deleteImage(@PathVariable String type, @PathVariable String imageName) {
+        try {
+            // 获取图片文件夹路径
+            Path path = Paths.get(uploadDir, type).resolve(imageName).normalize();
+
+            // 判断文件是否存在
+            File file = path.toFile();
+            if (file.exists() && file.isFile()) {
+                boolean deleted = file.delete();
+                if (deleted) {
+                    return ResponseEntity.ok("文件删除成功");
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("文件删除失败");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("文件未找到");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("删除文件时发生错误");
+        }
+    }
+
     // 根据文件后缀判断媒体类型
     private MediaType getMediaType(String imageName) {
         if (imageName.endsWith(".jpg") || imageName.endsWith(".jpeg")) {

@@ -1277,6 +1277,163 @@ public class TeacherBusinessController {
     }
 
 
+    /**
+     * 批准题目
+     * 考虑题目内容更新
+     * 添加approve_question表
+     */
+
+    @PutMapping("/approve-question")
+    public ResponseEntity<Message> approveQuestion(@AuthenticationPrincipal BaseUser user, @RequestBody ApproveQuestionRequest request) throws JsonProcessingException {
+        Long executeTeacherId = user.getId();
+        Long id = request.getId();
+        UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
+
+        /*处理单题批准 questions数量为1 */
+
+        if (uploadQuestion.getType().equals("small")) {
+            Question question = questionService.getQuestionById(uploadQuestion.getQuestionId());
+
+            if(request.getQuestions().size() != 1) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("题目数量错误"));
+            }
+            ApproveQuestionRequest.QuestionInfo info = request.getQuestions().get(0);
+            question.setContent(info.getProblem());
+            if (question.getType().equals("CHOICE")) {
+                StringBuilder choices = new StringBuilder();
+                for (int i = 0; i < info.getChoices().size(); i ++ ){
+                    choices.append(info.getChoices().get(i));
+                    if (i != info.getChoices().size() - 1) {
+                        choices.append("\\$\\$");
+                    }
+                }
+                question.setOptions(choices.toString());
+            }
+            String temp = info.getAnswer();
+            if (question.getType().equals("FILL_IN_BLANK")) {
+                temp = temp.replace(";", "##");
+            }
+            question.setAnswer(info.getAnswer() + "$$" + info.getAnalysis());
+            questionService.updateQuestion(question);
+            questionService.access(question);
+        }
+
+        //大题
+        else {
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(uploadQuestion.getQuestionId());
+            if(request.getBody() != null && !request.getBody().isEmpty()) {
+                questionBody.setBody(request.getBody());
+            }
+            List<Question> questions = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
+            if (questions.size() != request.getQuestions().size()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("题目数量错误"));
+            }
+            for (int i = 0; i < questions.size(); i++) {
+                ApproveQuestionRequest.QuestionInfo info = request.getQuestions().get(i);
+                Question question = questions.get(i);
+                question.setContent(info.getProblem());
+                if (question.getType().equals("CHOICE")) {
+                    StringBuilder choices = new StringBuilder();
+                    for (int j = 0; j < info.getChoices().size(); j ++ ){
+                        choices.append(info.getChoices().get(j));
+                        if (j!= info.getChoices().size() - 1) {
+                            choices.append("\\$\\$");
+                        }
+                    }
+                    question.setOptions(choices.toString());
+                }
+                String temp = info.getAnswer();
+                if (question.getType().equals("FILL_IN_BLANK")) {
+                    temp = temp.replace(";", "##");
+                }
+                question.setAnswer(info.getAnswer() + "$$" + info.getAnalysis());
+                questionService.updateQuestion(question);
+            }
+            questionBodyService.updateQuestionBody(questionBody);
+            questionBodyService.access(questionBody);
+        }
+        ApproveQuestion approveQuestion = new ApproveQuestion();
+        approveQuestion.setExecuteTeacherId(executeTeacherId);
+        approveQuestion.setComment(request.getComment());
+        approveQuestion.setStatus(ApproveQuestion.APPROVE);
+        approveQuestion.setUploadId(id);
+        approveQuestionService.insert(approveQuestion);
+
+        return ResponseEntity.ok(new Message("题目批准成功"));
+    }
+
+    @PutMapping("/modify-question")
+    public ResponseEntity<Message> modifyQuestion(@AuthenticationPrincipal BaseUser user, @RequestBody ModifyQuestionRequest request) throws JsonProcessingException {
+        Long executeTeacherId = user.getId();
+        Long id = request.getId();
+        UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
+
+        /*处理单题批准 questions数量为1 */
+
+        if (uploadQuestion.getType().equals("small")) {
+            Question question = questionService.getQuestionById(uploadQuestion.getQuestionId());
+
+            if(request.getQuestions().size() != 1) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("题目数量错误"));
+            }
+            ModifyQuestionRequest.QuestionInfo info = request.getQuestions().get(0);
+            question.setContent(info.getProblem());
+            if (question.getType().equals("CHOICE")) {
+                StringBuilder choices = new StringBuilder();
+                for (int i = 0; i < info.getChoices().size(); i ++ ){
+                    choices.append(info.getChoices().get(i));
+                    if (i != info.getChoices().size() - 1) {
+                        choices.append("\\$\\$");
+                    }
+                }
+                question.setOptions(choices.toString());
+            }
+            String temp = info.getAnswer();
+            if (question.getType().equals("FILL_IN_BLANK")) {
+                temp = temp.replace(";", "##");
+            }
+            question.setAnswer(info.getAnswer() + "$$" + info.getAnalysis());
+            questionService.updateQuestion(question);
+            questionService.access(question);
+        }
+
+        //大题
+        else {
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(uploadQuestion.getQuestionId());
+            if (request.getBody() != null && !request.getBody().isEmpty()) {
+                questionBody.setBody(request.getBody());
+            }
+            List<Question> questions = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
+            if (questions.size() != request.getQuestions().size()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("题目数量错误"));
+            }
+            for (int i = 0; i < questions.size(); i++) {
+                ModifyQuestionRequest.QuestionInfo info = request.getQuestions().get(i);
+                Question question = questions.get(i);
+                question.setContent(info.getProblem());
+                if (question.getType().equals("CHOICE")) {
+                    StringBuilder choices = new StringBuilder();
+                    for (int j = 0; j < info.getChoices().size(); j++) {
+                        choices.append(info.getChoices().get(j));
+                        if (j != info.getChoices().size() - 1) {
+                            choices.append("\\$\\$");
+                        }
+                    }
+                    question.setOptions(choices.toString());
+                }
+                String temp = info.getAnswer();
+                if (question.getType().equals("FILL_IN_BLANK")) {
+                    temp = temp.replace(";", "##");
+                }
+                question.setAnswer(info.getAnswer() + "$$" + info.getAnalysis());
+                questionService.updateQuestion(question);
+            }
+            questionBodyService.updateQuestionBody(questionBody);
+            questionBodyService.access(questionBody);
+        }
+
+        return ResponseEntity.ok(new Message("题目修改成功"));
+
     @GetMapping("{id}/get-submission")
     public ResponseEntity<GetSubmissionResponse> getSubmission(@PathVariable Long id, @RequestParam Long assignmentId, @RequestParam Long studentId) {
         GetSubmissionResponse response = new GetSubmissionResponse();
@@ -1390,5 +1547,6 @@ public class TeacherBusinessController {
         response.setQuestions(data);
         response.setMessage("success");
         return ResponseEntity.ok(response);
+
     }
 }

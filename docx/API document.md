@@ -2935,6 +2935,103 @@
     }
     ```
 
+
+### Approve Question `finished`
+
+- **接口路径**：`/api/teacher/approve-question`
+
+- **请求方法**：PUT
+
+- **接口说明**：审核老师批准题目上传
+
+- **请求说明**：
+
+  - 请求体(`JSON` 格式)：
+
+    ```json
+    {
+      "id": 123, //upload_question的id
+      "body": "string", //type为small的时候为空
+      "comment": "备注",
+      "questions": [ //每个字段均不能为空
+        {
+          "problem": "string", // 问题描述
+          "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
+          "answer": "String", // 题目答案
+          "analysis":"string", // 题目解析
+        }
+      ]
+    }
+    ```
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "成功"
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "请求参数错误"
+    }
+    ```
+
+### Modify Question `finished`
+
+- **接口路径**：`/api/teacher/modify-question`
+
+- **请求方法**：PUT
+
+- **接口说明**：审核老师批准题目上传
+
+- **请求说明**：
+
+  - 请求体(`JSON` 格式)：
+
+    ```json
+    {
+      "id": 123, //upload_question的id
+      "body": "string", //type为small的时候为空
+      "questions": [ //每个字段均不能为空
+        {
+          "problem": "string", // 问题描述
+          "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
+          "answer": "String", // 题目答案
+          "analysis":"string", // 题目解析
+        }
+      ]
+    }
+    ```
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "成功"
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "请求参数错误"
+    }
+    ```
+
+
 ### Get Assignment List `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-assignment-list`
@@ -2962,7 +3059,7 @@
           ...
         ]
       }
-      ```
+    ```
   - 失败响应（400 Bad Request）：
     ```json
     {
@@ -3489,6 +3586,7 @@
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
+    
     ```json
     {
       "message": "学校管理员账号信息查询成功",
@@ -4331,3 +4429,49 @@
     }
     ```
 
+### 删除图片接口
+
+- **接口路径**：`/api/uploads/image/{type}/{imageName}`
+
+- **请求方法**：`DELETE`
+
+- **接口说明**：根据图片类型和图片名删除已上传的图片。
+
+- **请求说明**：
+
+  - 请求参数：路径参数
+
+    - `type`：图片类型，取值：`avatar` 或 `content`。
+    - `imageName`：图片文件名。
+
+  - 请求示例：
+
+    ```html
+    DELETE /api/uploads/image/content/a9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    ```
+
+- **响应说明**：
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "File deleted successfully."
+    }
+    ```
+
+  - **失败响应** (`404 Not Found`):
+
+    ```json
+    {
+      "message": "File not found."
+    }
+    ```
+
+  - **服务器错误响应** (`500 Internal Server Error`):
+
+    ```json
+    {
+      "message": "Failed to delete the file."
+    }
+    ```
