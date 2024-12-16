@@ -59,7 +59,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public int deleteQuestion(Question question) {
         Long id = question.getId();
-        if (Objects.equals(question.getStatus(), Question.STATUS_NOT_ACCESS)) {
+        if (checkQuestionNotUsed(question)) {
             questionStatisticService.delete(id, "small");
             uploadQuestionService.delete(id, "small");
             rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
@@ -73,6 +73,11 @@ public class QuestionServiceImpl implements QuestionService {
             redisTemplate.delete(cacheKey);
         }
         return result;
+    }
+
+    private boolean checkQuestionNotUsed(Question question) {
+        //TODO:
+        return true;
     }
 
     @Override

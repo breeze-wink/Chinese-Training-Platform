@@ -37,7 +37,7 @@ public interface QuestionMapper {
     List<Question> getQuestionsByQuestionBodyId(Long questionBodyId);
 
     @Select("SELECT status FROM question WHERE id = #{questionId}")
-    int getStatus(Long questionId);
+    Integer getStatus(Long questionId);
 
 //    List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds);
 }

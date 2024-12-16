@@ -38,6 +38,7 @@ import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.catalina.connector.Response;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +46,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -527,8 +529,8 @@ public class TeacherBusinessController {
 
 
 
-    @GetMapping("/get-all-questions")
-    public ResponseEntity<GetAllQuestionsResponse> getAllQuestions(@AuthenticationPrincipal BaseUser user) {
+    @GetMapping("/get-all-waiting-questions")
+    public ResponseEntity<GetAllQuestionsResponse> getAllWaitingQuestions(@AuthenticationPrincipal BaseUser user) {
         GetAllQuestionsResponse response = new GetAllQuestionsResponse();
         List<GetAllQuestionsResponse.infoData> questions = new ArrayList<>();
 
@@ -564,6 +566,42 @@ public class TeacherBusinessController {
         }
     }
 
+    @GetMapping("/get-all-access-questions")
+    public ResponseEntity<GetAllQuestionsResponse> getALLAccessQuestions(@AuthenticationPrincipal BaseUser user) {
+        GetAllQuestionsResponse response = new GetAllQuestionsResponse();
+        List<GetAllQuestionsResponse.infoData> questions = new ArrayList<>();
+
+        Teacher teacher = teacherService.getTeacherById(user.getId());
+
+        try {
+            List<UploadQuestion> uploadQuestions = uploadQuestionService.getInSchoolQuestions(teacher.getSchoolId());
+            for (UploadQuestion uploadQuestion : uploadQuestions) {
+                if (!questionStatisticService.checkQuestionPassed(uploadQuestion.getQuestionId(), uploadQuestion.getType())) {
+                    continue;
+                }
+
+                GetAllQuestionsResponse.infoData infoData = new GetAllQuestionsResponse.infoData();
+                Long questionId = uploadQuestion.getQuestionId();
+                Long teacherId = uploadQuestion.getTeacherId();
+                String type = uploadQuestion.getType();
+                infoData.setId(questionId);
+                infoData.setType(type);
+                Date uploadTime = questionStatisticService.getUploadTime(questionId, type);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = sdf.format(uploadTime);
+                infoData.setUploadTime(formattedDate);
+                infoData.setUploadTeacher(teacherService.getTeacherNameById(teacherId));
+                questions.add(infoData);
+            }
+            response.setMessage("获取题目成功");
+            response.setQuestions(questions);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("获取题目失败：" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 
 
     @GetMapping("/get-question")
@@ -1189,6 +1227,12 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Message("无权限删除试卷"));
         }
         testPaperService.delete(id);
+        return ResponseEntity.ok(new Message("success"));
+    }
+
+    @PutMapping("/deny-upload-question")
+    public ResponseEntity<Message> denyUploadQuestion(@RequestParam Long id, @RequestParam String type) throws JsonProcessingException {
+        //TODO:
         return ResponseEntity.ok(new Message("success"));
     }
 }

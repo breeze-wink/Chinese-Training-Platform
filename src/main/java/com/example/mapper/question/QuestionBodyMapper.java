@@ -24,6 +24,9 @@ public interface QuestionBodyMapper {
     @Update("UPDATE question_body SET status = 1 WHERE id = #{id}")
     void access(Long id);
 
+    @Update("UPDATE question_body SET status = 3 WHERE id = #{id}")
+    void deny(Long id);
+
     // 更新记录
     @Update("UPDATE question_body SET body = #{body}, type = #{type}, status = #{status} WHERE id = #{id}")
     int update(QuestionBody questionBody);

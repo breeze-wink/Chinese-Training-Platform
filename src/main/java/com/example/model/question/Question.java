@@ -15,6 +15,7 @@ public class Question implements Serializable {
     public static final Integer STATUS_NOT_ACCESS = 0;
     public static final Integer STATUS_ACCESS = 1;
     public static final Integer STATUS_DELETE = 2;
+    public static final Integer STATUS_DENIED = 3;
 
     private Long id;
     private String content;
