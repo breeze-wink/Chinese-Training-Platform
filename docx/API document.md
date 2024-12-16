@@ -2454,32 +2454,6 @@
     }
     ```
 
-### Delete Question `finished`
-
-- **接口路径**：`/api/teacher/{id}/delete-question`
-- **请求方法**：DELETE
-- **接口说明**：教师删除指定ID的题目。
-
-- **请求说明**：
-  - **路径参数**：`id`："long"//教师的唯一标识符。
-  - **查询参数**：`questionId`："long"//题目的唯一标识符。
-                `type`: "string"//"big"OR"small"，判断大题还是小题。
-
-- **响应说明**：
-  - **响应格式**：JSON
-  - **成功响应**（200 OK）：
-    ```json
-    {
-      "message": "删除成功"
-    }
-    ```
-  - **失败响应**（400 Bad Request）：
-    ```json
-    {
-      "message": "删除失败"
-    }
-    ```
-
 ### 获取问题（根据筛选条件） `finished`
 
 - **接口路径**：`/api/teacher/search-questions`
@@ -2683,7 +2657,7 @@
                     "options": ["选项1", "选项2"], 
                     "type" : "选择、填空、简答、作文",
                     "knowledge" : "知识点",
-    				"subScores" : [1,1,1] //小题分数
+    				"score" : 1//小题分数
                 }
             ],
             "question": "问题内容", //小题时不为空
@@ -2718,22 +2692,12 @@
       "message": "success",
       "uploadedQuestions": [
         {
-          "uploadTime": "2024-12-15 10:00:00",
-          "body": "题干， 单题为空",
-          "subQuestions": {
-            "content": "问题内容",
-            "answer": "答案",
-            "explanation": "解析",
-            "options": ["选项1", "选项2"],
-            "type": "选择",
-            "knowledgePoint": "知识点"
-          },
-          "content": "问题内容",
-          "answer": "答案",
-          "explanation": "解析",
-          "options": ["选项1", "选项2"],
-          "type": "选择",
-          "knowledgePoint": "知识点"
+          "questionId" : 123,
+          "type" : "small" or "big"
+          "uploadTime": "string",
+          "status": "未审核" or "通过" or "拒绝"
+          "comment": "备注"
+          "executeTeacher" : "审核老师名字",d
         }
       ]
     }
@@ -2802,7 +2766,7 @@
         {
           "id": "long", // 对应数据库中的 id 字段
           "questionId" : 123,
-          "type" : "string",//"small" or "big"
+          "type" : "small" or "big"
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
         },
@@ -2896,7 +2860,7 @@
     }
     ```
 
-### Deny Upload Question
+### Deny Upload Question `finished`
 
 - **接口路径**：`/deny-upload-question`
 
@@ -2937,6 +2901,39 @@
     }
     ```
 
+
+### Delete Question `finished`
+
+- **接口路径**：`/api/teacher/delete-question`
+
+- **请求方法**：DELETE
+
+- **接口说明**：教师删除指定ID的题目。
+
+- **请求说明**：
+
+  - **查询参数**：`questionId`：题目的唯一标识符。
+  - 查询参数:  `type`: "big"OR"small"，判断大题还是小题。
+
+- **响应说明**：
+
+  - **响应格式**：JSON
+
+  - **成功响应**（200 OK）：
+
+    ```json
+    {
+      "message": "删除成功"
+    }
+    ```
+
+  - **失败响应**（400 Bad Request）：
+
+    ```json
+    {
+      "message": "删除失败"
+    }
+    ```
 
 ### Get Assignment List `finished`
 
@@ -4312,12 +4309,13 @@
 - **请求方法**：GET
 - **接口说明**：根据类型和图片名获取已上传的图片。
 - **请求说明**：
+  
   - 请求参数：路径参数
     - `type`：图片类型，取值：`avatar` 或 `content`
     - `imageName`：图片文件名
   - 请求示例：
     ```bash
-    GET /api/uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    GET /api/uploads/images/content/a9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
     ```
 - **响应说明**：
   - 响应格式：图片文件
