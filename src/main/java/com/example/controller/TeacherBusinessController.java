@@ -78,6 +78,7 @@ public class TeacherBusinessController {
     private final TeacherService teacherService;
     private final AssignmentService assignmentService;
     private final AssignmentRecipientService assignmentRecipientService;
+    private final ApproveQuestionService approveQuestionService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -99,7 +100,8 @@ public class TeacherBusinessController {
                                      PaperQuestionService paperQuestionService,
                                      AssignmentServiceImpl assignmentService,
                                      UploadQuestionServiceImpl uploadQuestionService,
-                                     AssignmentRecipientService assignmentRecipientService
+                                     AssignmentRecipientService assignmentRecipientService,
+                                     ApproveQuestionService approveQuestionService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -122,6 +124,7 @@ public class TeacherBusinessController {
         this.assignmentService = assignmentService;
         this.uploadQuestionService = uploadQuestionService;
         this.assignmentRecipientService = assignmentRecipientService;
+        this.approveQuestionService = approveQuestionService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -547,7 +550,8 @@ public class TeacherBusinessController {
                 Long questionId = uploadQuestion.getQuestionId();
                 Long teacherId = uploadQuestion.getTeacherId();
                 String type = uploadQuestion.getType();
-                infoData.setId(questionId);
+                infoData.setId(uploadQuestion.getId());
+                infoData.setQuestionId(questionId);
                 infoData.setType(type);
                 Date uploadTime = questionStatisticService.getUploadTime(questionId, type);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -584,7 +588,8 @@ public class TeacherBusinessController {
                 Long questionId = uploadQuestion.getQuestionId();
                 Long teacherId = uploadQuestion.getTeacherId();
                 String type = uploadQuestion.getType();
-                infoData.setId(questionId);
+                infoData.setId(uploadQuestion.getId());
+                infoData.setQuestionId(questionId);
                 infoData.setType(type);
                 Date uploadTime = questionStatisticService.getUploadTime(questionId, type);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1231,8 +1236,31 @@ public class TeacherBusinessController {
     }
 
     @PutMapping("/deny-upload-question")
-    public ResponseEntity<Message> denyUploadQuestion(@RequestParam Long id, @RequestParam String type) throws JsonProcessingException {
-        //TODO:
+    public ResponseEntity<Message> denyUploadQuestion(@AuthenticationPrincipal BaseUser user,
+                                                      @RequestBody DenyUploadQuestionRequest request) throws JsonProcessingException {
+
+        Long executeTeacherId = user.getId();
+        Long id = request.getId();
+        String comment = request.getComment();
+
+        UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
+        if (uploadQuestion.getType().equals("small")) {
+            Question question = questionService.getQuestionById(uploadQuestion.getQuestionId());
+            questionService.deny(question);
+        }
+        else {
+            QuestionBody questionBody = questionBodyService.getQuestionBodyById(uploadQuestion.getQuestionId());
+            questionBodyService.deny(questionBody);
+        }
+
+        ApproveQuestion approveQuestion = new ApproveQuestion();
+        approveQuestion.setUploadId(id);
+        approveQuestion.setStatus("rejected");
+        if (comment != null && !comment.isEmpty()) {
+            approveQuestion.setComment(comment);
+        }
+        approveQuestion.setExecuteTeacherId(executeTeacherId);
+        approveQuestionService.insert(approveQuestion);
         return ResponseEntity.ok(new Message("success"));
     }
 }

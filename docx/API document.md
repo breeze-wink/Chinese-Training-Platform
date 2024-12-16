@@ -2759,7 +2759,8 @@
       "message": "获取题目成功",
       "questions": [
         {
-          "id": "long", // 对应数据库中的 id 字段
+          "id": "long", // 对应数据库中upload_question 的 id 字段
+          "questionId" : 123,
           "type" : "small" or "big"
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
@@ -2768,9 +2769,9 @@
       ]
     }
     ```
-
+  
   - **失败响应**（400 Bad Request）：
-
+  
     ```json
     {
       "message": "题目获取失败",
@@ -2799,6 +2800,7 @@
       "questions": [
         {
           "id": "long", // 对应数据库中的 id 字段
+          "questionId" : 123
           "type" : "small" or "big"
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
@@ -2903,10 +2905,16 @@
 
 **请求说明**
 
-- **请求参数**：
-  - **请求参数（Query Parameter）**：
-    - `id`：题目的唯一标识符（`Long` 类型）
-    - `type`：题目的类型（`String` 类型），`small` or `big`
+- **请求格式**: `JSON`
+
+  ```json
+  {
+      "id" : 12345 // get all waiting quesitons中的id
+      "comment" : "备注"
+  }
+  ```
+
+  
 
  **响应说明**
 

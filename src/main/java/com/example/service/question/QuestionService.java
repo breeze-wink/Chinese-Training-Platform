@@ -9,9 +9,8 @@ import java.util.List;
 public interface QuestionService {
     int createQuestion(Question question);
 
-    @Transactional
     void access(Question question);
-
+    void deny(Question question);
     int deleteQuestion(Question question) throws JsonProcessingException;
     Question getQuestionById(Long id) throws JsonProcessingException;
     List<Question> getQuestionsByKnowledgePointId(Long knowledgePointId);
@@ -29,4 +28,5 @@ public interface QuestionService {
 
     void flushKnowledgePointCache(Long id);
 
+    void fileRemove(String body);
 }

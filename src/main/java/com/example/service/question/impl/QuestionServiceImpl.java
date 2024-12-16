@@ -2,10 +2,12 @@ package com.example.service.question.impl;
 
 import com.example.mapper.question.QuestionMapper;
 import com.example.model.question.Question;
+import com.example.model.view.QuestionUsageView;
 import com.example.service.question.QuestionService;
 import com.example.service.question.QuestionStatisticService;
 import com.example.service.question.UploadQuestionService;
 import com.example.service.rabbitmq.RabbitMQProducer;
+import com.example.service.view.QuestionUsageViewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,9 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -28,18 +34,21 @@ public class QuestionServiceImpl implements QuestionService {
     private final RabbitMQProducer rabbitMQProducer;
     private final QuestionStatisticService questionStatisticService;
     private final UploadQuestionService uploadQuestionService;
+    private final QuestionUsageViewService questionUsageViewService;
 
     @Autowired
     public QuestionServiceImpl(QuestionMapper questionMapper,
                                RedisTemplate<String, Object> redisTemplate,
                                RabbitMQProducer rabbitMQProducer,
                                QuestionStatisticService questionStatisticService,
-                               UploadQuestionService uploadQuestionService) {
+                               UploadQuestionService uploadQuestionService,
+                               QuestionUsageViewService questionUsageViewService) {
         this.questionMapper = questionMapper;
         this.redisTemplate = redisTemplate;
         this.rabbitMQProducer = rabbitMQProducer;
         this.questionStatisticService = questionStatisticService;
         this.uploadQuestionService = uploadQuestionService;
+        this.questionUsageViewService = questionUsageViewService;
     }
 
     @Override
@@ -55,6 +64,14 @@ public class QuestionServiceImpl implements QuestionService {
         // 发送同步消息
         rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.CREATE_OPERATION);
     }
+
+    @Override
+    @Transactional
+    public void deny(Question question) {
+        questionMapper.deny(question.getId());
+        // 发送同步消息
+        rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.CREATE_OPERATION);
+    }
     @Override
     @Transactional
     public int deleteQuestion(Question question) {
@@ -63,6 +80,7 @@ public class QuestionServiceImpl implements QuestionService {
             questionStatisticService.delete(id, "small");
             uploadQuestionService.delete(id, "small");
             rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);
+            fileRemove(question.getContent());
             return questionMapper.reallyDelete(id);
         }
         int result = questionMapper.delete(id);
@@ -76,8 +94,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     private boolean checkQuestionNotUsed(Question question) {
-        //TODO:
-        return true;
+        QuestionUsageView  questionUsageView = questionUsageViewService.getQuestionUsageByIdAndType(question.getId(),"small");
+        return questionUsageView.getUsed();
     }
 
     @Override
@@ -199,4 +217,59 @@ public class QuestionServiceImpl implements QuestionService {
         cacheKey = "questions:knowledgePoint:" + question.getKnowledgePointId();
         redisTemplate.delete(cacheKey);
     }
+    /**
+     * 删除HTML内容中引用的图片文件
+     *
+     * @param body 包含图片的HTML文本
+     */
+    @Override
+    public void fileRemove(String body) {
+        if (body == null || body.isEmpty()) {
+            return;
+        }
+        final String uploadDir = "uploads";  // 上传目录
+
+        // 正则表达式匹配 <img> 标签的 src 属性
+        String imgTagPattern = "<img[^>]+src=\"([^\"]+)\"[^>]*>";
+        Pattern pattern = Pattern.compile(imgTagPattern, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(body);
+
+        while (matcher.find()) {
+            String src = matcher.group(1); // 获取 src 属性的值
+            if (src == null || src.isEmpty()) {
+                continue;
+            }
+
+            // 处理相对路径，去除开头的 '/'
+            if (src.startsWith("/")) {
+                src = src.substring(1);
+            }
+
+            // 构建文件的绝对路径
+            Path filePath = Paths.get(uploadDir).resolve(src).normalize();
+
+            // 安全检查，确保文件在指定的上传目录下
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+            Path absoluteFilePath = filePath.toAbsolutePath().normalize();
+
+            if (!absoluteFilePath.startsWith(uploadPath)) {
+                // 跳过不在上传目录下的文件
+                System.err.println("尝试删除上传目录之外的文件: " + absoluteFilePath);
+                continue;
+            }
+
+            File file = filePath.toFile();
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (deleted) {
+                    System.out.println("已删除文件: " + absoluteFilePath);
+                } else {
+                    System.err.println("删除文件失败: " + absoluteFilePath);
+                }
+            } else {
+                System.out.println("文件不存在: " + absoluteFilePath);
+            }
+        }
+    }
+
 }
