@@ -8,4 +8,5 @@ public interface StatsStudentService {
     int addStatsStudent(StatsStudent statsStudent);
     int updateStatsStudent(StatsStudent statsStudent);
     List<StatsStudent> getStatsStudentByStudentId(Long studentId);
+    StatsStudent selectByStudentIdAndKnowledgePointId(Long studentId, Long knowledgePointId);
 }

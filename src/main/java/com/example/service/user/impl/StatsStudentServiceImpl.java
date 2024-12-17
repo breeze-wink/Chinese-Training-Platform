@@ -30,7 +30,14 @@ public class StatsStudentServiceImpl implements StatsStudentService {
     }
 
     @Override
+    @Transactional
     public List<StatsStudent> getStatsStudentByStudentId(Long studentId) {
         return statsStudentMapper.selectByStudentId(studentId);
+    }
+
+    @Override
+    @Transactional
+    public StatsStudent selectByStudentIdAndKnowledgePointId(Long studentId, Long knowledgePointId) {
+        return statsStudentMapper.selectByStudentIdAndKnowledgePointId(studentId, knowledgePointId);
     }
 }

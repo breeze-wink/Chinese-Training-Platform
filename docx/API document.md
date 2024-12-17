@@ -2070,13 +2070,12 @@
 
 ### Get Class's Historical Average Score 
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/historical-average-scores`
+- **接口路径**：`/api/teacher/class/historical-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户获取某个班级的历史平均分列表。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
+    - 查询参数（Path Variable）：`classId` - 班级的唯一标识符
   - 请求体：无
 
 - **响应说明**：
@@ -2085,14 +2084,15 @@
     ```json
     {
       "message": "班级历史平均分获取成功",
+      "avgScore": "double",
       "data": [
         {
-          "score": 85.0,
-          "deadline": "2024-10-20T23:59:59"
+          "score": 85,
+          "endTime": "2024-10-20T23:59:59"
         },
         {
-          "score": 90.5,
-          "deadline": "2024-09-15T23:59:59"
+          "score": 90,
+          "endTime": "2024-09-15T23:59:59"
         }
       ]
     }
@@ -2101,6 +2101,7 @@
     ```json
     {
       "message": "获取班级历史平均分失败",
+      "avgScore": null,
       "data": null
     }
     ```
@@ -2201,14 +2202,12 @@
 
 ### Get Group's Historical Scores 
 
-- **接口路径**：`/api/teacher/{teacherId}/classes/{classId}/groups/{groupId}/historical-scores`
+- **接口路径**：`/api/teacher/group/historical-scores`
 - **请求方法**：GET
 - **接口说明**：教师用户查看某个小组的历史得分率，并包括当次作业的截止时间。
 - **请求说明**：
   - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-    - 路径参数（Path Variable）：`classId` - 班级的唯一标识符
-    - 路径参数（Path Variable）：`groupId` - 小组的唯一标识符
+    - 查询参数（Path Variable）：`groupId` - 小组的唯一标识符
   - 请求体：无
 
 - **响应说明**：
@@ -2217,14 +2216,15 @@
     ```json
     {
       "message": "小组历史得分率获取成功",
+      "avgScore": "double",
       "data": [
         {
-          "score": 85.0,
-          "deadline": "2024-10-20T23:59:59"
+          "score": 85,
+          "endTime": "2024-10-20T23:59:59"
         },
         {
-          "score": 90.5,
-          "deadline": "2024-09-15T23:59:59"
+          "score": 90,
+          "endTime": "2024-09-15T23:59:59"
         }
       ]
     }
@@ -2233,6 +2233,8 @@
     ```json
     {
       "message": "获取小组历史得分率失败",
+      "avgScore": null,
+      "data": null
     }
     ```
 
@@ -3069,6 +3071,46 @@
       "message": "获取失败",
       "assignmentId": null,
       "data": null
+    }
+    ```
+
+
+### Mark Submission `finished`
+
+- **接口路径**：`/api/teacher/mark-submission`
+- **请求方法**：`POST`
+- **接口说明**：老师批改某个学生的作业。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "data" : [
+        {
+          "submissionAnswerId" : "long",
+          "markScore" : "int"
+        },
+        {
+          "submissionAnswerId" : "long",
+          "markScore" : "int"
+        },
+        ...
+      ]
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "提交失败"
     }
     ```
 

@@ -20,4 +20,7 @@ public interface StatsStudentMapper {
 
     @Select("SELECT * FROM stats_student WHERE studentId = #{studentId}")
     List<StatsStudent> selectByStudentId(Long studentId);
+
+    @Select("SELECT * FROM stats_student WHERE studentId = #{studentId} AND knowledgePointId = #{knowledgePointId}")
+    StatsStudent selectByStudentIdAndKnowledgePointId(Long studentId, Long knowledgePointId);
 }
