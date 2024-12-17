@@ -9,6 +9,7 @@ import java.util.List;
 public interface QuestionService {
     int createQuestion(Question question);
 
+    void updateQuestion(Question question);
     void access(Question question);
     void deny(Question question);
     int deleteQuestion(Question question) throws JsonProcessingException;

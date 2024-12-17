@@ -59,6 +59,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public void updateQuestion(Question question) {
+        questionMapper.update(question);
+    }
+
+    @Override
     @Transactional
     public void access(Question question) {
         questionMapper.access(question.getId());

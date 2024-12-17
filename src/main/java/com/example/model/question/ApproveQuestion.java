@@ -6,6 +6,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ApproveQuestion {
+    public static String APPROVE = "approved";
+    public static String REJECT = "rejected";
     private Long id;          // 主键
     private Long uploadId;    // 外键，引用上传题目的 ID
     private Long executeTeacherId;

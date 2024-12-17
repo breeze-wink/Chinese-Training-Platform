@@ -2297,62 +2297,6 @@
     }
     ```
 
-### Generate Exam Paper
-
-- **接口路径**：`/api/teacher/{teacherId}/generate-exam`
-- **请求方法**：GET
-- **接口说明**：教师用户自动生成试卷，返回题目信息。
-- **请求说明**：
-  
-  - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-  - 请求体：无
-  
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "试卷生成成功",
-      "examQuestions": [
-        {
-          "question": "1 + 1 = ?",
-          "type": "单选题",
-          "answer": "2",
-          "options": [
-            "1",
-            "2",
-            "3",
-            "4"
-          ]
-        },
-        {
-          "question": "《西游记》的作者是谁？",
-          "type": "单选题",
-          "answer": "吴承恩",
-          "options": [
-            "李白",
-            "唐婉",
-            "吴承恩",
-            "孔子"
-          ]
-        },
-        {
-          "question": "请简述计算机网络的基本概念。",
-          "type": "简答题",
-          "answer": "计算机网络是指由多台计算机及其连接设备组成的系统，通过通信介质传输数据。"
-        }
-      ]
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "试卷生成失败",
-      "examQuestions": null
-    }
-    ```
-
 
 ### Change Password `finished`
 
@@ -2453,32 +2397,6 @@
     ```json
     {
       "message" : "错误"
-    }
-    ```
-
-### Delete Question `finished`
-
-- **接口路径**：`/api/teacher/{id}/delete-question`
-- **请求方法**：DELETE
-- **接口说明**：教师删除指定ID的题目。
-
-- **请求说明**：
-  - **路径参数**：`id`："long"//教师的唯一标识符。
-  - **查询参数**：`questionId`："long"//题目的唯一标识符。
-                `type`: "string"//"big"OR"small"，判断大题还是小题。
-
-- **响应说明**：
-  - **响应格式**：JSON
-  - **成功响应**（200 OK）：
-    ```json
-    {
-      "message": "删除成功"
-    }
-    ```
-  - **失败响应**（400 Bad Request）：
-    ```json
-    {
-      "message": "删除失败"
     }
     ```
 
@@ -2685,7 +2603,7 @@
                     "options": ["选项1", "选项2"], 
                     "type" : "选择、填空、简答、作文",
                     "knowledge" : "知识点",
-    				"subScores" : [1,1,1] //小题分数
+    				"score" : 1//小题分数
                 }
             ],
             "question": "问题内容", //小题时不为空
@@ -2720,22 +2638,12 @@
       "message": "success",
       "uploadedQuestions": [
         {
-          "uploadTime": "2024-12-15 10:00:00",
-          "body": "题干， 单题为空",
-          "subQuestions": {
-            "content": "问题内容",
-            "answer": "答案",
-            "explanation": "解析",
-            "options": ["选项1", "选项2"],
-            "type": "选择",
-            "knowledgePoint": "知识点"
-          },
-          "content": "问题内容",
-          "answer": "答案",
-          "explanation": "解析",
-          "options": ["选项1", "选项2"],
-          "type": "选择",
-          "knowledgePoint": "知识点"
+          "questionId" : 123,
+          "type" : "small" or "big"
+          "uploadTime": "string",
+          "status": "未审核" or "通过" or "拒绝"
+          "comment": "备注"
+          "executeTeacher" : "审核老师名字",d
         }
       ]
     }
@@ -2804,7 +2712,7 @@
         {
           "id": "long", // 对应数据库中的 id 字段
           "questionId" : 123,
-          "type" : "string",//"small" or "big"
+          "type" : "small" or "big"
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
         },
@@ -2898,7 +2806,7 @@
     }
     ```
 
-### Deny Upload Question
+### Deny Upload Question `finished`
 
 - **接口路径**：`/deny-upload-question`
 
@@ -2940,6 +2848,136 @@
     ```
 
 
+### Delete Question `finished`
+
+- **接口路径**：`/api/teacher/delete-question`
+
+- **请求方法**：DELETE
+
+- **接口说明**：教师删除指定ID的题目。
+
+- **请求说明**：
+
+  - **查询参数**：`questionId`：题目的唯一标识符。
+  - 查询参数:  `type`: "big"OR"small"，判断大题还是小题。
+
+- **响应说明**：
+
+  - **响应格式**：JSON
+
+  - **成功响应**（200 OK）：
+
+    ```json
+    {
+      "message": "删除成功"
+    }
+    ```
+
+  - **失败响应**（400 Bad Request）：
+
+    ```json
+    {
+      "message": "删除失败"
+    }
+    ```
+
+
+### Approve Question `finished`
+
+- **接口路径**：`/api/teacher/approve-question`
+
+- **请求方法**：PUT
+
+- **接口说明**：审核老师批准题目上传
+
+- **请求说明**：
+
+  - 请求体(`JSON` 格式)：
+
+    ```json
+    {
+      "id": 123, //upload_question的id
+      "body": "string", //type为small的时候为空
+      "comment": "备注",
+      "questions": [ //每个字段均不能为空
+        {
+          "problem": "string", // 问题描述
+          "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
+          "answer": "String", // 题目答案
+          "analysis":"string", // 题目解析
+        }
+      ]
+    }
+    ```
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "成功"
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "请求参数错误"
+    }
+    ```
+
+### Modify Question `finished`
+
+- **接口路径**：`/api/teacher/modify-question`
+
+- **请求方法**：PUT
+
+- **接口说明**：审核老师批准题目上传
+
+- **请求说明**：
+
+  - 请求体(`JSON` 格式)：
+
+    ```json
+    {
+      "id": 123, //upload_question的id
+      "body": "string", //type为small的时候为空
+      "questions": [ //每个字段均不能为空
+        {
+          "problem": "string", // 问题描述
+          "choices": ["string", "string", "string"], // 若题目为选择题，提供选项，若不是选择题则为空数组
+          "answer": "String", // 题目答案
+          "analysis":"string", // 题目解析
+        }
+      ]
+    }
+    ```
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "成功"
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "请求参数错误"
+    }
+    ```
+
+
 ### Get Assignment List `finished`
 
 - **接口路径**：`/api/teacher/{id}/get-assignment-list`
@@ -2967,7 +3005,7 @@
           ...
         ]
       }
-      ```
+    ```
   - 失败响应（400 Bad Request）：
     ```json
     {
@@ -3074,6 +3112,126 @@
     }
     ```
 
+### generate testPaper with types `finished`
+
+- **接口路径**：`/api/teacher/generate-paper-with-types`
+
+- **请求方法**：Post
+
+- **接口说明**：教师生成试卷题目。
+
+- **请求说明**
+
+  - 请求头: `Content-Type` : `application/json`
+
+  - 请求参数:
+
+    - 请求体(`JSON` 格式)：
+
+      ```json
+      {
+        "types":[
+            {
+               "type" : "题型",
+               "number" : 2, //数量
+            },
+            ...
+        ]
+      }
+      ```
+
+- **响应说明**
+
+  - **响应格式**：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "success",  // 响应的状态信息，表示操作是否成功
+      "questions" : [
+          {
+              "body": "题干",  // 响应的具体内容描述
+              "subQuestions": [  // 包含多个子问题的大题部分
+                {
+                  "content": "大题子问题1",  // 内容
+                  "answer": "子问题1的答案",  // 答案
+                  "explanation": "子问题1的解释",  // 解释
+                  "options": [],
+                  "type": "",  // 题目类型
+                  "knowledgePoint": "子问题1知识点"  // 子问题1的知识点
+        		},
+                  ...
+      			]  
+          },
+                  ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message" : "错误",
+    }
+    ```
+
+### Generate Exam Paper
+
+- **接口路径**：`/api/teacher/paper/auto`
+
+- **请求方法**：GET
+
+- **接口说明**：教师用户自动生成试卷，返回题目信息。
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "试卷生成成功",
+      "quesitons" : [ //积累与运用
+          {
+              "content": "问题",  
+              "answer": "问题的答案",  
+              "explanation": "问题的解释",  
+              "options": [],
+              "type": "",  // 题目类型
+              "knowledgePoint": "问题知识点"
+          },
+          ...
+      ],
+      "bigQuestions":[ //后续大题
+          {
+              "body": "题干",  // 响应的具体内容描述
+              "subQuestions": [  // 包含多个子问题的大题部分
+                {
+                  "content": "大题子问题1",  // 内容
+                  "answer": "子问题1的答案",  // 答案
+                  "explanation": "子问题1的解释",  // 解释
+                  "options": [],
+                  "type": "",  // 题目类型
+                  "knowledgePoint": "子问题1知识点"  // 子问题1的知识点
+        		},
+                  ...
+              ]
+          },
+                  ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "试卷生成失败",
+    }
+    ```
 
 ### Mark Submission `finished`
 
@@ -3534,6 +3692,7 @@
 - **响应说明**：
   - 响应格式：`JSON`
   - **成功响应** (`200 OK`):
+    
     ```json
     {
       "message": "学校管理员账号信息查询成功",
@@ -4357,12 +4516,13 @@
 - **请求方法**：GET
 - **接口说明**：根据类型和图片名获取已上传的图片。
 - **请求说明**：
+  
   - 请求参数：路径参数
     - `type`：图片类型，取值：`avatar` 或 `content`
     - `imageName`：图片文件名
   - 请求示例：
     ```bash
-    GET /api/uploads/images/content/9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    GET /api/uploads/images/content/a9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
     ```
 - **响应说明**：
   - 响应格式：图片文件
@@ -4375,3 +4535,49 @@
     }
     ```
 
+### 删除图片接口
+
+- **接口路径**：`/api/uploads/image/{type}/{imageName}`
+
+- **请求方法**：`DELETE`
+
+- **接口说明**：根据图片类型和图片名删除已上传的图片。
+
+- **请求说明**：
+
+  - 请求参数：路径参数
+
+    - `type`：图片类型，取值：`avatar` 或 `content`。
+    - `imageName`：图片文件名。
+
+  - 请求示例：
+
+    ```html
+    DELETE /api/uploads/image/content/a9a3ed290-bc68-4bff-bef2-4c71f774d07b-image.jpg
+    ```
+
+- **响应说明**：
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "File deleted successfully."
+    }
+    ```
+
+  - **失败响应** (`404 Not Found`):
+
+    ```json
+    {
+      "message": "File not found."
+    }
+    ```
+
+  - **服务器错误响应** (`500 Internal Server Error`):
+
+    ```json
+    {
+      "message": "Failed to delete the file."
+    }
+    ```

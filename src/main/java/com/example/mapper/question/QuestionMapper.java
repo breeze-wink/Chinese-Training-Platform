@@ -23,7 +23,7 @@ public interface QuestionMapper {
     @Update("UPDATE question SET status = 1 WHERE id = #{id}")
     void access(Long id);
 
-    @Update("UPDATE question SET content = #{content}, type = #{type}, options = #{options}, answer = #{answer}, knowledgePointId = #{knowledgePointId}, bodyId = #{bodyId} WHERE id = #{id}")
+    @Update("UPDATE question SET content = #{content}, options = #{options}, answer = #{answer} WHERE id = #{id}")
     int update(Question question);
 
     @Select("SELECT * FROM question WHERE id = #{id}")

@@ -17,5 +17,7 @@ public class SubQuestion implements Serializable {
     private String questionContent;
     private String type;
     private String questionOptions;
-
+    private String questionAnswer;
+    private String questionExplanation;
+    private String knowledgePoint;
 }

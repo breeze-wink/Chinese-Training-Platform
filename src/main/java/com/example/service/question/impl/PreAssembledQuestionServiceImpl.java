@@ -4,6 +4,7 @@ import com.example.dto.redis.PreAssembledQuestion;
 import com.example.dto.redis.SubQuestion;
 import com.example.model.question.Question;
 import com.example.model.question.QuestionBody;
+import com.example.service.course.KnowledgePointService;
 import com.example.service.question.PreAssembledQuestionService;
 import com.example.service.question.QuestionBodyService;
 import com.example.service.question.QuestionService;
@@ -25,15 +26,18 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
 
     private final QuestionService questionService;
     private final QuestionBodyService questionBodyService;
+    private final KnowledgePointService knowledgePointService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public PreAssembledQuestionServiceImpl(RedisTemplate<String, Object> redisTemplate,
                                            QuestionService questionService,
+                                           KnowledgePointService knowledgePointService,
                                            QuestionBodyService questionBodyService) {
         this.redisTemplate = redisTemplate;
         this.questionService = questionService;
         this.questionBodyService = questionBodyService;
+        this.knowledgePointService = knowledgePointService;
     }
 
     @Override
@@ -122,6 +126,19 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
                 if ("CHOICE".equals(question.getType())) {
                     subQuestion.setQuestionOptions(question.getOptions());
                 }
+                String temp = question.getAnswer();
+                String[] temps = temp.split("\\$\\$");
+                String answer = temps[0];
+                if (question.getType().equals("FILL_IN_BLANK")) {
+                    answer = answer.replaceAll("##", ";");
+                }
+                subQuestion.setQuestionAnswer(answer);
+                if (temps.length > 1) {
+                    String explanation = temps[1];
+                    subQuestion.setQuestionExplanation(explanation);
+                }
+                String knowledgePoint = knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId());
+                subQuestion.setKnowledgePoint(knowledgePoint);
                 return subQuestion;
             }).collect(Collectors.toList());
             preassembledQuestion.setType(type);
