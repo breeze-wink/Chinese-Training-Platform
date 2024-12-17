@@ -5,10 +5,10 @@ import com.example.model.user.Teacher;
 import java.util.List;
 
 public interface TeacherService {
-    int addTeacher(Teacher teacher);
+    void addTeacher(Teacher teacher);
     int removeTeacher(Long id);
 
-    int updateTeacher(Teacher teacher);
+    void updateTeacher(Teacher teacher);
     Teacher getTeacherById(Long id);
     List<Teacher> getAllTeachers();
 
@@ -21,4 +21,6 @@ public interface TeacherService {
     Teacher getTeacherByUsername(String username);
 
     String getTeacherNameById(Long teacherId);
+
+    String getPersonInfo(Teacher teacher);
 }
