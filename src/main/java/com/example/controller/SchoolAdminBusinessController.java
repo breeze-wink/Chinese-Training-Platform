@@ -18,6 +18,8 @@ import com.example.service.user.impl.AuthorizationCodeServiceImpl;
 import com.example.service.user.impl.SchoolAdminServiceImpl;
 import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +36,12 @@ import java.util.Random;
 @RestController
 @RequestMapping("/api/school-admin")
 public class SchoolAdminBusinessController {
+    private static final Logger logger = LoggerFactory.getLogger(SchoolAdminBusinessController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("SCHOOL_ADMIN_OPERATIONS_FILE");
     private final SchoolAdminService schoolAdminService;
     private final ClassService classService;
     private final TeacherService teacherService;
+    private final SchoolService schoolService;
     private final AuthorizationCodeService authorizationCodeService;
     private final StudentService studentService;
     private final ClassStudentService classStudentService;
@@ -48,7 +53,8 @@ public class SchoolAdminBusinessController {
                                          AuthorizationCodeServiceImpl authorizationCodeService,
                                          StudentServiceImpl studentService,
                                          ClassStudentServiceImpl classStudentService,
-                                         ClassGroupServiceImpl classGroupService
+                                         ClassGroupServiceImpl classGroupService,
+                                         SchoolService schoolService
                                          ) {
         this.schoolAdminService = schoolAdminService;
         this.classService = classService;
@@ -57,49 +63,59 @@ public class SchoolAdminBusinessController {
         this.studentService = studentService;
         this.classStudentService = classStudentService;
         this.classGroupService = classGroupService;
+        this.schoolService = schoolService;
     }
 
     @GetMapping("/{id}/generate-authorization-code")
     public ResponseEntity<GenerateAuthorizationCodeResponse> generateAuthorizationCode(@PathVariable Long id) {
-        GenerateAuthorizationCodeResponse response = new GenerateAuthorizationCodeResponse();
-        SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        if (schoolAdmin == null) {
-            response.setMessage("用户未找到");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-        Random random = new Random();
-        String[] charsToCode = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        StringBuilder code = new StringBuilder();
-        extracted(code, charsToCode, random);
-        while(authorizationCodeService.codeIsExist(code.toString())){
+        try{
+            GenerateAuthorizationCodeResponse response = new GenerateAuthorizationCodeResponse();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            if (schoolAdmin == null) {
+                response.setMessage("用户未找到");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            Random random = new Random();
+            String[] charsToCode = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+            StringBuilder code = new StringBuilder();
             extracted(code, charsToCode, random);
-        }
-        if(authorizationCodeService.schoolIsExist(schoolAdmin.getSchoolId())){
-            AuthorizationCode authorizationCode = new AuthorizationCode();
-            authorizationCode.setCode(code.toString());
-            authorizationCode.setSchoolId(schoolAdmin.getSchoolId());
-            authorizationCode.setCreateDate(LocalDate.now());
-            int result = authorizationCodeService.updateAuthorizationCode(authorizationCode);
-            if(result != 0){
-                response.setMessage("授权码更新成功");
-                response.setCode(code.toString());
-                response.setCreateDate(LocalDate.now().toString());
-                return ResponseEntity.ok(response);
+            while(authorizationCodeService.codeIsExist(code.toString())){
+                extracted(code, charsToCode, random);
             }
-            response.setMessage("授权码更新失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }else{
-            AuthorizationCode authorizationCode = new AuthorizationCode();
-            authorizationCode.setCode(code.toString());
-            authorizationCode.setSchoolId(schoolAdmin.getSchoolId());
-            int result = authorizationCodeService.addAuthorizationCode(authorizationCode);
-            if(result != 0){
-                response.setMessage("授权码创建成功");
-                response.setCode(code.toString());
-                return ResponseEntity.ok(response);
+            String schoolName = schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName();
+
+            if(authorizationCodeService.schoolIsExist(schoolAdmin.getSchoolId())){
+                AuthorizationCode authorizationCode = new AuthorizationCode();
+                authorizationCode.setCode(code.toString());
+                authorizationCode.setSchoolId(schoolAdmin.getSchoolId());
+                authorizationCode.setCreateDate(LocalDate.now());
+                int result = authorizationCodeService.updateAuthorizationCode(authorizationCode);
+                if(result != 0){
+                    response.setMessage("授权码更新成功");
+                    response.setCode(code.toString());
+                    response.setCreateDate(LocalDate.now().toString());
+                    operationLogger.info("学校管理员 {} 为学校 {} 生成授权码", schoolAdmin.getName(), schoolName);
+                    return ResponseEntity.ok(response);
+                }
+                response.setMessage("授权码更新失败");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }else{
+                AuthorizationCode authorizationCode = new AuthorizationCode();
+                authorizationCode.setCode(code.toString());
+                authorizationCode.setSchoolId(schoolAdmin.getSchoolId());
+                int result = authorizationCodeService.addAuthorizationCode(authorizationCode);
+                if(result != 0){
+                    response.setMessage("授权码创建成功");
+                    response.setCode(code.toString());
+                    operationLogger.info("学校管理员 {} 为学校 {} 生成授权码", schoolAdmin.getName(), schoolName);
+                    return ResponseEntity.ok(response);
+                }
+                response.setMessage("授权码创建失败");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            response.setMessage("授权码创建失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            logger.error("生成授权码失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
     }
@@ -112,45 +128,64 @@ public class SchoolAdminBusinessController {
 
     @DeleteMapping("{id}/delete-teacher/{teacherId}")
     public ResponseEntity<Message> deleteTeacher(@PathVariable Long id, @PathVariable Long teacherId) {
-        Message response = new Message();
-        SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        Teacher teacher = teacherService.getTeacherById(teacherId);
-        if(!Objects.equals(schoolAdmin.getSchoolId(), teacher.getSchoolId())){
-            response.setMessage("该教师不是该学校教师");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        List<Clazz> classes = classService.getClassesByTeacherId(teacherId);
-        for (Clazz clazz : classes) {
-            classService.removeClass(clazz.getId());
-        }
-        int result = teacherService.removeTeacher(teacherId);
-        if(result != 0){
-            response.setMessage("教师账号删除成功");
-            return ResponseEntity.ok(response);
-        }else{
-            response.setMessage("教师账号删除失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        try {
+            Message response = new Message();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            Teacher teacher = teacherService.getTeacherById(teacherId);
+            if(!Objects.equals(schoolAdmin.getSchoolId(), teacher.getSchoolId())){
+                response.setMessage("该教师不是该学校教师");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            String schoolName = schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName();
+            List<Clazz> classes = classService.getClassesByTeacherId(teacherId);
+            for (Clazz clazz : classes) {
+                classService.removeClass(clazz.getId());
+            }
+            int result = teacherService.removeTeacher(teacherId);
+
+            if(result != 0){
+                response.setMessage("教师账号删除成功");
+                if (teacher.getName() != null) {
+                    operationLogger.info("{} 的管理员{} 删除了教师{}的账号", schoolName ,schoolAdmin.getName(), teacher.getName());
+                }
+                return ResponseEntity.ok(response);
+            }else{
+                response.setMessage("教师账号删除失败");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        } catch (Exception e) {
+            logger.error("删除教师失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @DeleteMapping ("/{id}/delete-student/{studentId}")
     public ResponseEntity<Message> deleteStudent(@PathVariable Long id, @PathVariable Long studentId) {
-        Message response = new Message();
-        SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-        Student student = studentService.getStudentById(studentId);
-        if(!Objects.equals(schoolAdmin.getSchoolId(), student.getSchoolId())){
-            response.setMessage("该学生不是该学校学生");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        try {
+            Message response = new Message();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            String schoolName = schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName();
+            Student student = studentService.getStudentById(studentId);
+            if(!Objects.equals(schoolAdmin.getSchoolId(), student.getSchoolId())){
+                response.setMessage("该学生不是该学校学生");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
+            if(!classStudents.isEmpty()){
+                ClassStudent classStudent = classStudents.get(0);
+                classService.removeStudentFromClass(classStudent.getClassId(), studentId);
+            }
+            student.setSchoolId(null);
+            studentService.updateStudent(student);
+            if (student.getName() != null && schoolAdmin.getName() != null) {
+                operationLogger.info("{} 的管理员{} 删除了学生{}的账号", schoolName ,schoolAdmin.getName(), student.getName());
+            }
+            response.setMessage("学生账号删除成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("删除学生失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
-        if(!classStudents.isEmpty()){
-            ClassStudent classStudent = classStudents.get(0);
-            classService.removeStudentFromClass(classStudent.getClassId(), studentId);
-        }
-        student.setSchoolId(null);
-        studentService.updateStudent(student);
-        response.setMessage("学生账号删除成功");
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}/query-all-students")
@@ -319,5 +354,6 @@ public class SchoolAdminBusinessController {
 
         return ResponseEntity.ok(new Message("创建成功"));
     }
+
 }
 

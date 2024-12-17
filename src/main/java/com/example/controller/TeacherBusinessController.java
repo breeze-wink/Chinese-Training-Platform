@@ -1719,7 +1719,7 @@ public class TeacherBusinessController {
           积累与运用的小题 knowledgeName = {"字音", "字形", "语言运用", "病句", "信息的提取与概括", "古诗文默写"};
          */
         Long[] knowledgeIds = {102L, 103L, 8L, 7L, 9L, 13L};
-        String[] typeNames = {"非连续文本", "现代文阅读", "古代诗歌鉴赏", "文言文阅读", "名著阅读"};
+        String[] typeNames = {"非连续文本", "文学性文本阅读", "古代诗歌鉴赏", "文言文阅读", "名著阅读"};
 
         AutoPaperResponse response = new AutoPaperResponse();
         List<AutoPaperResponse.Question> questionInfos = new ArrayList<>(); //积累与运用
@@ -1734,6 +1734,10 @@ public class TeacherBusinessController {
             AutoPaperResponse.Question questionInfo = new AutoPaperResponse.Question();
             questionInfo.setContent(question.getContent());
             questionInfo.setType(question.getType());
+            if (question.getBodyId() != null) {
+                String body = questionBodyService.getQuestionBodyById(question.getBodyId()).getBody();
+                questionInfo.setBody(body);
+            }
             String[] temps = question.getAnswer().split("\\$\\$");
             if (question.getType().equals("CHOICE")) {
                 questionInfo.setOptions(List.of(question.getOptions().split("\\$\\$")));
