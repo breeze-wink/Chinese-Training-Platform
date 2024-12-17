@@ -11,6 +11,7 @@ public class AutoPaperResponse {
     private String message;           // 消息
     private List<Question> questions; // 普通问题
     private List<BigQuestion> bigQuestions; // 后续大题
+    private Question essay;
 
     @Getter
     @Setter

@@ -26,4 +26,7 @@ public interface KnowledgePointMapper {
 
     @Select("SELECT * FROM knowledge_point WHERE knowledge_point.isHidden = false order by type")
     List<KnowledgePoint> selectAllOrderByType();
+
+    @Select("SELECT DISTINCT type FROM knowledge_point WHERE knowledge_point.isHidden = false")
+    List<String> selectAllTypes();
 }

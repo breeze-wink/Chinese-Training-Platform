@@ -77,7 +77,7 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
     @Override
     public void flushPreAssembledQuestions() {
 
-        List<String> allTypes = questionBodyService.getAllTypes();
+        List<String> allTypes = knowledgePointService.getAllTypes();
         for (String type : allTypes) {
             flushPreAssembledQuestionsByType(type);
         }
@@ -102,49 +102,70 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
     protected List<PreAssembledQuestion> assembleQuestionsByType(String type) {
         List<PreAssembledQuestion> preassembledQuestions = new ArrayList<>();
         // 获取指定类型的所有 QuestionBody
-        List<QuestionBody> questionBodies = questionBodyService.getQuestionBodiesByType(type);
-        if (questionBodies == null || questionBodies.isEmpty()) {
+        //作文需要特殊处理
+        if (type.equals("作文")) {
+            List<Question> questions = questionService.getQuestionsByKnowledgePointId(138L);
+            for (Question question : questions) {
+                PreAssembledQuestion preassembledQuestion = new PreAssembledQuestion();
+                preassembledQuestion.setId(question.getId());
+                SubQuestion subQ = new SubQuestion();
+                subQ.setQuestionId(question.getId());
+                subQ.setType(question.getType());
+                subQ.setQuestionContent(question.getContent());
+                subQ.setQuestionExplanation(question.getAnswer().split("\\$\\$")[1]);
+                String knowledgePoint = knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId());
+                subQ.setKnowledgePoint(knowledgePoint);
+                preassembledQuestion.setSubQuestions(List.of(subQ));
+                preassembledQuestions.add(preassembledQuestion);
+            }
             return preassembledQuestions;
         }
-
-        for (QuestionBody questionBody : questionBodies) {
-            // 获取与 QuestionBody 关联的所有 Question
-            List<Question> questions = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
-            if (questions == null || questions.isEmpty()) {
-                continue;
+        //其他
+        else {
+            List<QuestionBody> questionBodies = questionBodyService.getQuestionBodiesByType(type);
+            if (questionBodies == null || questionBodies.isEmpty()) {
+                return preassembledQuestions;
             }
 
-            // 组装 PreAssembledQuestion
-            PreAssembledQuestion preassembledQuestion = new PreAssembledQuestion();
-            preassembledQuestion.setId(questionBody.getId());
-            preassembledQuestion.setQuestionBody(questionBody.getBody());
+            for (QuestionBody questionBody : questionBodies) {
+                // 获取与 QuestionBody 关联的所有 Question
+                List<Question> questions = questionService.getQuestionsByQuestionBodyId(questionBody.getId());
+                if (questions == null || questions.isEmpty()) {
+                    continue;
+                }
 
-            List<SubQuestion> subQuestions = questions.stream().map(question -> {
-                SubQuestion subQuestion = new SubQuestion();
-                subQuestion.setQuestionId(question.getId());
-                subQuestion.setQuestionContent(question.getContent());
-                subQuestion.setType(question.getType());
-                if ("CHOICE".equals(question.getType())) {
-                    subQuestion.setQuestionOptions(question.getOptions());
-                }
-                String temp = question.getAnswer();
-                String[] temps = temp.split("\\$\\$");
-                String answer = temps[0];
-                if (question.getType().equals("FILL_IN_BLANK")) {
-                    answer = answer.replaceAll("##", ";");
-                }
-                subQuestion.setQuestionAnswer(answer);
-                if (temps.length > 1) {
-                    String explanation = temps[1];
-                    subQuestion.setQuestionExplanation(explanation);
-                }
-                String knowledgePoint = knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId());
-                subQuestion.setKnowledgePoint(knowledgePoint);
-                return subQuestion;
-            }).collect(Collectors.toList());
-            preassembledQuestion.setType(type);
-            preassembledQuestion.setSubQuestions(subQuestions);
-            preassembledQuestions.add(preassembledQuestion);
+                // 组装 PreAssembledQuestion
+                PreAssembledQuestion preassembledQuestion = new PreAssembledQuestion();
+                preassembledQuestion.setId(questionBody.getId());
+                preassembledQuestion.setQuestionBody(questionBody.getBody());
+
+                List<SubQuestion> subQuestions = questions.stream().map(question -> {
+                    SubQuestion subQuestion = new SubQuestion();
+                    subQuestion.setQuestionId(question.getId());
+                    subQuestion.setQuestionContent(question.getContent());
+                    subQuestion.setType(question.getType());
+                    if ("CHOICE".equals(question.getType())) {
+                        subQuestion.setQuestionOptions(question.getOptions());
+                    }
+                    String temp = question.getAnswer();
+                    String[] temps = temp.split("\\$\\$");
+                    String answer = temps[0];
+                    if (question.getType().equals("FILL_IN_BLANK")) {
+                        answer = answer.replaceAll("##", ";");
+                    }
+                    subQuestion.setQuestionAnswer(answer);
+                    if (temps.length > 1) {
+                        String explanation = temps[1];
+                        subQuestion.setQuestionExplanation(explanation);
+                    }
+                    String knowledgePoint = knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId());
+                    subQuestion.setKnowledgePoint(knowledgePoint);
+                    return subQuestion;
+                }).collect(Collectors.toList());
+                preassembledQuestion.setType(type);
+                preassembledQuestion.setSubQuestions(subQuestions);
+                preassembledQuestions.add(preassembledQuestion);
+            }
         }
         return preassembledQuestions;
     }

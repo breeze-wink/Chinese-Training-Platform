@@ -3149,11 +3149,11 @@
     ```json
     {
       "message": "success",  // 响应的状态信息，表示操作是否成功
-      "questions" : [
+      "questions" : [ //除作文
           {
               "id" : 123, //题目id
               "body": "题干",  // 响应的具体内容描述
-              "diificulty" : 0.44,
+              "difficulty" : 0.44,
               "subQuestions": [  // 包含多个子问题的大题部分
                 {
                   "content": "大题子问题1",  // 内容
@@ -3167,6 +3167,16 @@
       			]  
           },
                   ...
+      ],
+      "essays":[
+          {
+              "id" : 123, 
+              "content": "问题",  
+              "explanation": "问题的解释",  
+              "type": "ESSAY",  // 题目类型
+              "difficulty" : 0.44,
+              "knowledgePoint": "问题知识点"    
+    	  }
       ]
     }
     ```
@@ -3179,7 +3189,7 @@
     }
     ```
 
-### Generate Exam Paper
+### Generate Exam Paper `finished`
 
 - **接口路径**：`/api/teacher/paper/auto`
 
@@ -3199,12 +3209,13 @@
       "quesitons" : [ //积累与运用
           {
               "id" : 123, 
+              "body" : "单题为空",
               "content": "问题",  
               "answer": "问题的答案",  
               "explanation": "问题的解释",  
               "options": [],
               "type": "",  // 题目类型
-              "diificulty" : 0.44,
+              "difficulty" : 0.44,
               "knowledgePoint": "问题知识点"
           },
           ...
@@ -3220,7 +3231,7 @@
                   "explanation": "子问题1的解释",  // 解释
                   "options": [],
                   "type": "",  // 题目类型
-    		     "diificulty" : 0.44,
+    		      "difficulty" : 0.44,
                   "knowledgePoint": "子问题1知识点"  // 子问题1的知识点
         		},
                   ...
@@ -3228,6 +3239,14 @@
           },
                   ...
       ]
+      "essay" : {
+          "id" : 123, 
+          "content": "问题",  
+          "explanation": "问题的解释",  
+          "type": "ESSAY",  // 题目类型
+          "difficulty" : 0.44,
+          "knowledgePoint": "问题知识点"
+      }
     }
     ```
 
@@ -4388,6 +4407,7 @@
     - **路径参数**: `id`：学校管理员ID，路径参数。
   - **请求体**: 无
 - **响应说明**：
+  
   - **响应格式**：JSON
   - **成功响应**（200 OK）：
     ```json
@@ -4411,6 +4431,7 @@
     }
     ```
   - **失败响应**（400 Bad Request）：
+    
     ```json
     {
       "message": "班级获取失败",
