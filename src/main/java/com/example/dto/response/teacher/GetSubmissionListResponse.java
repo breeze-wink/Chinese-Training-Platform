@@ -19,7 +19,7 @@ public class GetSubmissionListResponse {
         private String studentName;
         private int isSubmitted;
         private String submitTime;
-        private Double totalScore;
+        private Integer totalScore;
         private int isMarked;
     }
 }
