@@ -15,4 +15,16 @@ public class Teacher extends BaseUser {
     private Long schoolId;
     private Integer permission;
     private Integer status;
+
+    public String info() {
+        String ret = "(id:" + id;
+        if (name != null && !name.isEmpty()) {
+            ret += ", 姓名:" + name;
+        }
+        if (username != null && !username.isEmpty()) {
+            ret += ", 昵称:" + username;
+        }
+        ret += ")";
+        return ret;
+    }
 }

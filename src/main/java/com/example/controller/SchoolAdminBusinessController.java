@@ -94,7 +94,7 @@ public class SchoolAdminBusinessController {
                     response.setMessage("授权码更新成功");
                     response.setCode(code.toString());
                     response.setCreateDate(LocalDate.now().toString());
-                    operationLogger.info("学校管理员 {} 为学校 {} 生成授权码", schoolAdmin.getName(), schoolName);
+                    operationLogger.info("学校管理员 {} 为学校 {} 生成授权码", schoolAdmin.info(), schoolName);
                     return ResponseEntity.ok(response);
                 }
                 response.setMessage("授权码更新失败");
@@ -107,7 +107,7 @@ public class SchoolAdminBusinessController {
                 if(result != 0){
                     response.setMessage("授权码创建成功");
                     response.setCode(code.toString());
-                    operationLogger.info("学校管理员 {} 为学校 {} 生成授权码", schoolAdmin.getName(), schoolName);
+                    operationLogger.info("学校管理员 {} 为学校 {} 生成授权码", schoolAdmin.info(), schoolName);
                     return ResponseEntity.ok(response);
                 }
                 response.setMessage("授权码创建失败");
@@ -146,7 +146,7 @@ public class SchoolAdminBusinessController {
             if(result != 0){
                 response.setMessage("教师账号删除成功");
                 if (teacher.getName() != null) {
-                    operationLogger.info("{} 的管理员{} 删除了教师{}的账号", schoolName ,schoolAdmin.getName(), teacher.getName());
+                    operationLogger.info("{} 的管理员{} 删除了教师{}的账号", schoolName ,schoolAdmin.info(), teacher.info());
                 }
                 return ResponseEntity.ok(response);
             }else{
@@ -178,7 +178,7 @@ public class SchoolAdminBusinessController {
             student.setSchoolId(null);
             studentService.updateStudent(student);
             if (student.getName() != null && schoolAdmin.getName() != null) {
-                operationLogger.info("{} 的管理员{} 删除了学生{}的账号", schoolName ,schoolAdmin.getName(), student.getName());
+                operationLogger.info("{} 的管理员{} 删除了学生{}的账号", schoolName ,schoolAdmin.info(), student.info());
             }
             response.setMessage("学生账号删除成功");
             return ResponseEntity.ok(response);
@@ -188,6 +188,7 @@ public class SchoolAdminBusinessController {
         }
     }
 
+    //TODO:
     @GetMapping("/{id}/query-all-students")
     public ResponseEntity<SchoolAdminQueryStudents> queryAllStudents(@PathVariable Long id) {
         SchoolAdminQueryStudents response = new SchoolAdminQueryStudents();

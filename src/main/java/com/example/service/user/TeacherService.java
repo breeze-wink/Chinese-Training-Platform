@@ -22,5 +22,4 @@ public interface TeacherService {
 
     String getTeacherNameById(Long teacherId);
 
-    String getPersonInfo(Teacher teacher);
 }

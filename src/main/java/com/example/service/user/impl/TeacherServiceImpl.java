@@ -92,8 +92,4 @@ public class TeacherServiceImpl implements TeacherService {
         return teacher.getName() + "(已离职)";
     }
 
-    @Override
-    public String getPersonInfo(Teacher teacher) {
-        return null;
-    }
 }

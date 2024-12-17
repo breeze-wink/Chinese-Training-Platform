@@ -11,10 +11,10 @@ import java.util.Collections;
 @Setter
 @Getter
 public abstract class BaseUser implements UserDetails {
-    private Long id;
-    private String username;
-    private String email;
-    private String password;
+    protected Long id;
+    protected String username;
+    protected String email;
+    protected String password;
 
     // 返回一个空的权限集合，因为系统目前不涉及权限
     public Collection<? extends GrantedAuthority> getAuthorities() {
