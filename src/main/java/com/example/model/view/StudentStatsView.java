@@ -8,8 +8,8 @@ import lombok.Setter;
 public class StudentStatsView {
     private Long studentId;
     private Long classId;
-    private Long groupId;
     private Long knowledgePointId;
     private Long score;
     private Long totalScore;
+    private String type;
 }

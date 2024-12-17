@@ -2068,7 +2068,7 @@
     }
     ```
 
-### Get Class's Historical Average Score 
+### Get Class's Historical Average Score `finished`
 
 - **接口路径**：`/api/teacher/class/historical-scores`
 - **请求方法**：GET
@@ -2200,7 +2200,7 @@
     }
     ```
 
-### Get Group's Historical Scores 
+### Get Group's Historical Scores `finished`
 
 - **接口路径**：`/api/teacher/group/historical-scores`
 - **请求方法**：GET
@@ -3269,6 +3269,40 @@
     ```json
     {
       "message": "提交失败"
+    }
+    ```
+
+
+### Get Class Knowledge Point Status
+
+- **接口路径**：`/api/teacher/class/knowledge-point-status`
+- **请求方法**：`POST`
+- **接口说明**：老师获取班级知识点掌握情况。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`classId`
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success",
+      "data": [
+        {
+          "name": "string",
+          "score": 85.5
+        },
+        ...
+      ]
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "data": null
     }
     ```
 
@@ -4357,13 +4391,13 @@
         {
           "classId": "number", // 对应数据库中的 id 字段
           "name": "string", // 对应数据库中的 name 字段
-          "description": "string",// 对应数据库中的 description 字段
+          "teacherName": "string",// 对应数据库中的 description 字段
           "inviteCode": "string" // 对应数据库中的 inviteCode 字段
         },
         {
           "classId": "number", // 对应数据库中的 id 字段
           "name": "string", // 对应数据库中的 name 字段
-          "description": "string",// 对应数据库中的 description 字段
+          "teacherName": "string",// 对应数据库中的 description 字段
           "inviteCode": "string" // 对应数据库中的 inviteCode 字段
         },
         ...

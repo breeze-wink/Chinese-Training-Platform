@@ -1,22 +1,21 @@
-package com.example.dto.response.school;
+package com.example.dto.response.teacher;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-@Getter
 @Setter
-public class GetClassesResponse {
+@Getter
+public class ClassKnowledgePointStatusResponse {
     private String message;
     private List<infoData> data;
 
     @Getter
     @Setter
     public static class infoData {
-        private Long classId;
         private String name;
-        private String teacherName;
-        private String inviteCode;
+        private BigDecimal score;
     }
 }
