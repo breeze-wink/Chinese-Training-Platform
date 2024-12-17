@@ -15,6 +15,7 @@ public class AutoPaperResponse {
     @Getter
     @Setter
     public static class Question {
+        private String body;
         private String content;          // 问题内容
         private String answer;           // 答案
         private String explanation;      // 解释

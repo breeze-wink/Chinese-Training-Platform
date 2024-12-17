@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 定义日志格式 -->
+    <property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    <!-- 定义日志根目录 -->
+    <property name="LOG_DIR" value="logs"/>
+
+    <!-- 控制台日志输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 错误日志文件输出 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/error/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天一个日志文件 -->
+            <fileNamePattern>${LOG_DIR}/error/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 保留30天的日志 -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 操作日志文件输出 - 教师 -->
+    <appender name="TEACHER_OPERATIONS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/teacher/operations.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/teacher/operations.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 操作日志文件输出 - 学生 -->
+    <appender name="STUDENT_OPERATIONS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/student/operations.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/student/operations.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 操作日志文件输出 - 学校管理员 -->
+    <appender name="SCHOOL_ADMIN_OPERATIONS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/schoolAdministrator/operations.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/schoolAdministrator/operations.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 操作日志文件输出 - 系统管理员 -->
+    <appender name="SYSTEM_ADMIN_OPERATIONS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/systemAdministrator/operations.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/systemAdministrator/operations.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 根日志记录器 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+
+    <!-- 专门用于记录教师操作的日志记录器 -->
+    <logger name="operations.teacher" level="INFO" additivity="false">
+        <appender-ref ref="TEACHER_OPERATIONS_FILE" />
+    </logger>
+
+    <!-- 专门用于记录学生操作的日志记录器 -->
+    <logger name="operations.student" level="INFO" additivity="false">
+        <appender-ref ref="STUDENT_OPERATIONS_FILE" />
+    </logger>
+
+    <!-- 专门用于记录学校管理员操作的日志记录器 -->
+    <logger name="operations.schoolAdministrator" level="INFO" additivity="false">
+        <appender-ref ref="SCHOOL_ADMIN_OPERATIONS_FILE" />
+    </logger>
+
+    <!-- 专门用于记录系统管理员操作的日志记录器 -->
+    <logger name="operations.systemAdministrator" level="INFO" additivity="false">
+        <appender-ref ref="SYSTEM_ADMIN_OPERATIONS_FILE" />
+    </logger>
+
+</configuration>

@@ -21,8 +21,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public int addTeacher(Teacher teacher) {
-        return teacherMapper.insert(teacher);
+    public void addTeacher(Teacher teacher) {
+        teacherMapper.insert(teacher);
     }
 
     @Override
@@ -33,8 +33,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public int updateTeacher(Teacher teacher) {
-        return teacherMapper.update(teacher);
+    public void updateTeacher(Teacher teacher) {
+        teacherMapper.update(teacher);
     }
 
     @Override
@@ -90,5 +90,10 @@ public class TeacherServiceImpl implements TeacherService {
             return teacher.getName();
         }
         return teacher.getName() + "(已离职)";
+    }
+
+    @Override
+    public String getPersonInfo(Teacher teacher) {
+        return null;
     }
 }

@@ -106,7 +106,7 @@
         question_statistic qs
         ON qb.id = qs.id AND qs.type = 'big'
         WHERE
-        1=1
+        status=1
         <if test="knowledgeType != null and knowledgeType != ''">
             AND qb.type = #{knowledgeType}
         </if>
@@ -223,7 +223,7 @@
         LEFT JOIN
         knowledge_point kp ON q.knowledgePointId = kp.id
         WHERE
-        1=1
+        q.status=1
 
         <if test="type != null and type != ''">
             AND q.type = #{type}
