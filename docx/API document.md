@@ -2295,62 +2295,6 @@
     }
     ```
 
-### Generate Exam Paper
-
-- **接口路径**：`/api/teacher/{teacherId}/generate-exam`
-- **请求方法**：GET
-- **接口说明**：教师用户自动生成试卷，返回题目信息。
-- **请求说明**：
-  
-  - 请求参数：
-    - 路径参数（Path Variable）：`teacherId` - 教师的唯一标识符
-  - 请求体：无
-  
-- **响应说明**：
-  - 响应格式：`JSON`
-  - **成功响应** (`200 OK`):
-    ```json
-    {
-      "message": "试卷生成成功",
-      "examQuestions": [
-        {
-          "question": "1 + 1 = ?",
-          "type": "单选题",
-          "answer": "2",
-          "options": [
-            "1",
-            "2",
-            "3",
-            "4"
-          ]
-        },
-        {
-          "question": "《西游记》的作者是谁？",
-          "type": "单选题",
-          "answer": "吴承恩",
-          "options": [
-            "李白",
-            "唐婉",
-            "吴承恩",
-            "孔子"
-          ]
-        },
-        {
-          "question": "请简述计算机网络的基本概念。",
-          "type": "简答题",
-          "answer": "计算机网络是指由多台计算机及其连接设备组成的系统，通过通信介质传输数据。"
-        }
-      ]
-    }
-    ```
-  - **失败响应** (`400 Bad Request`):
-    ```json
-    {
-      "message": "试卷生成失败",
-      "examQuestions": null
-    }
-    ```
-
 
 ### Change Password `finished`
 
@@ -3166,6 +3110,126 @@
     }
     ```
 
+### generate testPaper with types `finished`
+
+- **接口路径**：`/api/teacher/generate-paper-with-types`
+
+- **请求方法**：Post
+
+- **接口说明**：教师生成试卷题目。
+
+- **请求说明**
+
+  - 请求头: `Content-Type` : `application/json`
+
+  - 请求参数:
+
+    - 请求体(`JSON` 格式)：
+
+      ```json
+      {
+        "types":[
+            {
+               "type" : "题型",
+               "number" : 2, //数量
+            },
+            ...
+        ]
+      }
+      ```
+
+- **响应说明**
+
+  - **响应格式**：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "success",  // 响应的状态信息，表示操作是否成功
+      "questions" : [
+          {
+              "body": "题干",  // 响应的具体内容描述
+              "subQuestions": [  // 包含多个子问题的大题部分
+                {
+                  "content": "大题子问题1",  // 内容
+                  "answer": "子问题1的答案",  // 答案
+                  "explanation": "子问题1的解释",  // 解释
+                  "options": [],
+                  "type": "",  // 题目类型
+                  "knowledgePoint": "子问题1知识点"  // 子问题1的知识点
+        		},
+                  ...
+      			]  
+          },
+                  ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message" : "错误",
+    }
+    ```
+
+### Generate Exam Paper
+
+- **接口路径**：`/api/teacher/paper/auto`
+
+- **请求方法**：GET
+
+- **接口说明**：教师用户自动生成试卷，返回题目信息。
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "试卷生成成功",
+      "quesitons" : [ //积累与运用
+          {
+              "content": "问题",  
+              "answer": "问题的答案",  
+              "explanation": "问题的解释",  
+              "options": [],
+              "type": "",  // 题目类型
+              "knowledgePoint": "问题知识点"
+          },
+          ...
+      ],
+      "bigQuestions":[ //后续大题
+          {
+              "body": "题干",  // 响应的具体内容描述
+              "subQuestions": [  // 包含多个子问题的大题部分
+                {
+                  "content": "大题子问题1",  // 内容
+                  "answer": "子问题1的答案",  // 答案
+                  "explanation": "子问题1的解释",  // 解释
+                  "options": [],
+                  "type": "",  // 题目类型
+                  "knowledgePoint": "子问题1知识点"  // 子问题1的知识点
+        		},
+                  ...
+              ]
+          },
+                  ...
+      ]
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "试卷生成失败",
+    }
+    ```
 
 ## SystemAdmin
 
