@@ -116,6 +116,7 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
 
             // 组装 PreAssembledQuestion
             PreAssembledQuestion preassembledQuestion = new PreAssembledQuestion();
+            preassembledQuestion.setId(questionBody.getId());
             preassembledQuestion.setQuestionBody(questionBody.getBody());
 
             List<SubQuestion> subQuestions = questions.stream().map(question -> {

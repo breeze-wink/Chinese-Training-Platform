@@ -13,7 +13,7 @@ import java.util.List;
 public class PreAssembledQuestion implements Serializable {
     @Serial
     private static final long serialVersionUID = 1;
-
+    private Long id;
     private String questionBody;
     private String type;
     private List<SubQuestion> subQuestions;

@@ -2493,7 +2493,7 @@
         "name": "试卷名字",
         "creatorId": 12345, // 老师id
         "totalScore": 100,
-        "difficulty" : "难度",
+        "difficulty" : 0.25,
         "questions":[
           {
               "id" : 12345, //可能是questionId或bodyId，根据type
@@ -3151,7 +3151,9 @@
       "message": "success",  // 响应的状态信息，表示操作是否成功
       "questions" : [
           {
+              "id" : 123, //题目id
               "body": "题干",  // 响应的具体内容描述
+              "diificulty" : 0.44,
               "subQuestions": [  // 包含多个子问题的大题部分
                 {
                   "content": "大题子问题1",  // 内容
@@ -3196,17 +3198,20 @@
       "message": "试卷生成成功",
       "quesitons" : [ //积累与运用
           {
+              "id" : 123, 
               "content": "问题",  
               "answer": "问题的答案",  
               "explanation": "问题的解释",  
               "options": [],
               "type": "",  // 题目类型
+              "diificulty" : 0.44,
               "knowledgePoint": "问题知识点"
           },
           ...
       ],
       "bigQuestions":[ //后续大题
           {
+    	      "id" : 123, 
               "body": "题干",  // 响应的具体内容描述
               "subQuestions": [  // 包含多个子问题的大题部分
                 {
@@ -3215,6 +3220,7 @@
                   "explanation": "子问题1的解释",  // 解释
                   "options": [],
                   "type": "",  // 题目类型
+    		     "diificulty" : 0.44,
                   "knowledgePoint": "子问题1知识点"  // 子问题1的知识点
         		},
                   ...

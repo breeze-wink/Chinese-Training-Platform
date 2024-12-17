@@ -15,6 +15,7 @@ public class AutoPaperResponse {
     @Getter
     @Setter
     public static class Question {
+        private Long id;
         private String body;
         private String content;          // 问题内容
         private String answer;           // 答案
@@ -22,12 +23,15 @@ public class AutoPaperResponse {
         private List<String> options;    // 选项
         private String type;             // 题目类型
         private String knowledgePoint;   // 知识点
+        private Double difficulty;
     }
 
     @Getter
     @Setter
     public static class BigQuestion {
+        private Long id;
         private String body;                   // 题干内容
+        private Double difficulty;
         private List<SubQuestion> subQuestions; // 子问题列表
     }
     @Getter

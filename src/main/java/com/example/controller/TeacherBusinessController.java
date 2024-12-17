@@ -1754,6 +1754,7 @@ public class TeacherBusinessController {
                     .toList();
             for (PreAssembledQuestion question : selectedQuestions) {
                 GeneratePaperWithTypesResponse.QuestionInfo info = new GeneratePaperWithTypesResponse.QuestionInfo();
+                info.setId(question.getId());
                 info.setBody(question.getQuestionBody());
                 List<GeneratePaperWithTypesResponse.SubQuestion> subQuestions = new ArrayList<>();
                 for (SubQuestion subQuestion : question.getSubQuestions()) {
@@ -1767,6 +1768,13 @@ public class TeacherBusinessController {
                     }
                     subInfo.setType(subQuestion.getType());
                     subQuestions.add(subInfo);
+                }
+                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "big");
+                if (questionStatistic.getCompleteCount() != 0) {
+                    info.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+                }
+                else {
+                    info.setDifficulty(-1.0);
                 }
                 info.setQuestions(subQuestions);
                 infos.add(info);
@@ -1798,6 +1806,7 @@ public class TeacherBusinessController {
             Collections.shuffle(questions);
             Question question = questions.get(0);
             AutoPaperResponse.Question questionInfo = new AutoPaperResponse.Question();
+            questionInfo.setId(question.getId());
             questionInfo.setContent(question.getContent());
             questionInfo.setType(question.getType());
             if (question.getBodyId() != null) {
@@ -1819,6 +1828,13 @@ public class TeacherBusinessController {
             }
             String knowledgePoint = knowledgePointService.getKnowledgePointNameById(question.getKnowledgePointId());
             questionInfo.setKnowledgePoint(knowledgePoint);
+            QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
+            if (questionStatistic.getCompleteCount() != 0) {
+                questionInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+            }
+            else {
+                questionInfo.setDifficulty(-1.0);
+            }
             questionInfos.add(questionInfo);
         }
         for (String typeName : typeNames) {
@@ -1828,6 +1844,7 @@ public class TeacherBusinessController {
             // 随机抽取一道
             PreAssembledQuestion question = questions.get(0);
             AutoPaperResponse.BigQuestion bigQuestionInfo = new AutoPaperResponse.BigQuestion();
+            bigQuestionInfo.setId(question.getId());
             bigQuestionInfo.setBody(question.getQuestionBody());
             List<AutoPaperResponse.SubQuestion> subQuestions = new ArrayList<>();
             for (SubQuestion subQ : question.getSubQuestions()) {
@@ -1841,6 +1858,14 @@ public class TeacherBusinessController {
                 }
                 subInfo.setKnowledgePoint(subQ.getKnowledgePoint());
                 subQuestions.add(subInfo);
+            }
+            QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "big");
+
+            if (questionStatistic.getCompleteCount() != 0) {
+                bigQuestionInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+            }
+            else {
+                bigQuestionInfo.setDifficulty(-1.0);
             }
             bigQuestionInfos.add(bigQuestionInfo);
             bigQuestionInfo.setSubQuestions(subQuestions);

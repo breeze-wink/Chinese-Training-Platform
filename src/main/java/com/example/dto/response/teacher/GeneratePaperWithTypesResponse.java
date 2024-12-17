@@ -14,7 +14,9 @@ public class GeneratePaperWithTypesResponse {
     @Setter
     @Getter
     public static class QuestionInfo{
+        private Long id;
         private String body;
+        private Double difficulty;
         private List<SubQuestion> questions;
     }
 
