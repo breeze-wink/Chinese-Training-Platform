@@ -2068,7 +2068,7 @@
     }
     ```
 
-### Get Class's Historical Average Score 
+### Get Class's Historical Average Score `finished`
 
 - **接口路径**：`/api/teacher/class/historical-scores`
 - **请求方法**：GET
@@ -2200,7 +2200,7 @@
     }
     ```
 
-### Get Group's Historical Scores 
+### Get Group's Historical Scores `finished`
 
 - **接口路径**：`/api/teacher/group/historical-scores`
 - **请求方法**：GET
