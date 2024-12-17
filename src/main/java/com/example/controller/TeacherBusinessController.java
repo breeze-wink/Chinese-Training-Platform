@@ -17,10 +17,7 @@ import com.example.model.question.*;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.BaseUser;
 import com.example.model.user.Teacher;
-import com.example.model.view.AssignmentScoresView;
-import com.example.model.view.AssignmentStatsView;
-import com.example.model.view.AssignmentStudentView;
-import com.example.model.view.TeacherQuestionStatistic;
+import com.example.model.view.*;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
 import com.example.model.user.StatsStudent;
@@ -2064,6 +2061,40 @@ public class TeacherBusinessController {
             data.sort(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed());
             response.setData(data);
         }
+        response.setMessage("success");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/class/knowledge-point-status")
+    public ResponseEntity<ClassKnowledgePointStatusResponse> getClassKnowledgePointStatus(@RequestParam Long classId){
+        ClassKnowledgePointStatusResponse response = new ClassKnowledgePointStatusResponse();
+        List<ClassKnowledgePointStatusResponse.infoData> data = new ArrayList<>();
+        List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByClassId(classId);
+        if(studentStatsViews != null){
+            studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+            String nameTemp = studentStatsViews.get(0).getType();
+            int score = 0;
+            int totalScore = 0;
+            ClassKnowledgePointStatusResponse.infoData infoData;
+            for(int i = 0; i < studentStatsViews.size(); i++){
+                if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                    infoData = new ClassKnowledgePointStatusResponse.infoData();
+                    infoData.setName(nameTemp);
+                    infoData.setScore(new BigDecimal(100 * score).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP));
+                    data.add(infoData);
+                    nameTemp = studentStatsViews.get(i).getType();
+                    score = 0;
+                    totalScore = 0;
+                }
+                score += studentStatsViews.get(i).getScore();
+                totalScore += studentStatsViews.get(i).getTotalScore();
+            }
+            infoData = new ClassKnowledgePointStatusResponse.infoData();
+            infoData.setName(nameTemp);
+            infoData.setScore(new BigDecimal(100 * score).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP));
+            data.add(infoData);
+        }
+        response.setData(data);
         response.setMessage("success");
         return ResponseEntity.ok(response);
     }

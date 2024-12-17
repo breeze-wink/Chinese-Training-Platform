@@ -249,8 +249,9 @@ public class SchoolAdminBusinessController {
                 GetClassesResponse.infoData infoData = new GetClassesResponse.infoData();
                 infoData.setClassId(clazz.getId());
                 infoData.setName(clazz.getName());
-                if(clazz.getDescription() != null){
-                    infoData.setDescription(clazz.getDescription());
+                if(clazz.getCreatorId() != null){
+                    Teacher teacher = teacherService.getTeacherById(clazz.getCreatorId());
+                    infoData.setTeacherName(teacher.getName());
                 }
                 infoData.setInviteCode(clazz.getInviteCode());
                 data.add(infoData);
