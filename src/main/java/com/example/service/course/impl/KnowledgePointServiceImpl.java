@@ -103,6 +103,11 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
     }
 
     @Override
+    public List<String> getAllTypes() {
+        return knowledgePointMapper.selectAllTypes();
+    }
+
+    @Override
     public Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> getAllKnowledgePointsGroupByType() {
         String cacheKey = "knowledgePointsGroupByType";
         Object object = redisTemplate.opsForValue().get(cacheKey);
