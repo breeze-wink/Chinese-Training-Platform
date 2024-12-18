@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface AssignmentSubmissionMapper {
 
-    @Insert("INSERT INTO assignment_submission(assignmentId, studentId, submitTime, totalScore, graded) VALUES(#{assignmentId}, #{studentId}, #{submitTime}, #{totalScore}, #{graded})")
+    @Insert("INSERT INTO assignment_submission(assignmentId, studentId, submitTime, totalScore, graded, feedback) VALUES(#{assignmentId}, #{studentId}, #{submitTime}, #{totalScore}, #{graded}, #{feedback})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(AssignmentSubmission submission);
 
     @Delete("DELETE FROM assignment_submission WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE assignment_submission SET assignmentId = #{assignmentId}, studentId = #{studentId}, submitTime = #{submitTime}, totalScore = #{totalScore}, graded = #{graded} WHERE id = #{id}")
+    @Update("UPDATE assignment_submission SET assignmentId = #{assignmentId}, studentId = #{studentId}, submitTime = #{submitTime}, totalScore = #{totalScore}, graded = #{graded}, feedback = #{feedback} WHERE id = #{id}")
     int update(AssignmentSubmission submission);
 
     @Select("SELECT * FROM assignment_submission WHERE id = #{id}")
