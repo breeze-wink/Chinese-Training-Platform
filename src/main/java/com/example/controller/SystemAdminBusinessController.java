@@ -43,7 +43,7 @@ public class SystemAdminBusinessController {
     private static final Logger operationLogger = LoggerFactory.getLogger("operations.systemAdministrator");
     private final SchoolAdminService schoolAdminService;
     private final QuestionService questionService;
-    private final StudentStatsViewService studentStatsViewService;
+
     private final SystemAdminService systemAdminService;
     private final SchoolService schoolService;
 
@@ -51,14 +51,12 @@ public class SystemAdminBusinessController {
     public SystemAdminBusinessController(SchoolAdminServiceImpl schoolAdminService,
                                          QuestionServiceImpl questionService,
                                          SchoolServiceImpl schoolService,
-                                         SystemAdminServiceImpl systemAdminService,
-                                         StudentStatsViewService studentStatsViewService
+                                         SystemAdminServiceImpl systemAdminService
                                          ) {
         this.schoolAdminService = schoolAdminService;
         this.questionService = questionService;
         this.schoolService = schoolService;
         this.systemAdminService = systemAdminService;
-        this.studentStatsViewService = studentStatsViewService;
     }
 
     @GetMapping("/get-school-admin-accounts")
@@ -148,37 +146,5 @@ public class SystemAdminBusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping("/class/knowledge-point-status")
-    public ResponseEntity<ClassKnowledgePointStatusResponse> getClassKnowledgePointStatus(@RequestParam Long classId){
-        ClassKnowledgePointStatusResponse response = new ClassKnowledgePointStatusResponse();
-        List<ClassKnowledgePointStatusResponse.infoData> data = new ArrayList<>();
-        List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByClassId(classId);
-        if(studentStatsViews != null){
-            studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
-            String nameTemp = studentStatsViews.get(0).getType();
-            int score = 0;
-            int totalScore = 0;
-            ClassKnowledgePointStatusResponse.infoData infoData;
-            for(int i = 0; i < studentStatsViews.size(); i++){
-                if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
-                    infoData = new ClassKnowledgePointStatusResponse.infoData();
-                    infoData.setName(nameTemp);
-                    infoData.setScore(new BigDecimal(100 * score).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP));
-                    data.add(infoData);
-                    nameTemp = studentStatsViews.get(i).getType();
-                    score = 0;
-                    totalScore = 0;
-                }
-                score += studentStatsViews.get(i).getScore();
-                totalScore += studentStatsViews.get(i).getTotalScore();
-            }
-            infoData = new ClassKnowledgePointStatusResponse.infoData();
-            infoData.setName(nameTemp);
-            infoData.setScore(new BigDecimal(100 * score).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP));
-            data.add(infoData);
-        }
-        response.setData(data);
-        response.setMessage("success");
-        return ResponseEntity.ok(response);
-    }
+
 }
