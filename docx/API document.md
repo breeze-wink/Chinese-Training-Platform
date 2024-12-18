@@ -3334,7 +3334,7 @@
     ```
 
 
-### Send Email Code
+### Send Email Code `finished`
 
 - **接口路径**：`/api/teacher/send-email-code`
 - **请求方法**：`GET`
@@ -3362,7 +3362,7 @@
     ```
 
 
-### Change Email
+### Change Email `finished`
 
 - **接口路径**：`/api/teacher/change-email`
 - **请求方法**：`GET`
@@ -3371,6 +3371,31 @@
   - 请求头: `Content-Type` : `application/json`
   - 请求参数：
     - 查询参数：`newEmail`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
+    }
+    ```
+
+
+### Delete Account `finished`
+
+- **接口路径**：`/api/teacher/delete-account`
+- **请求方法**：`DELETE`
+- **接口说明**：注销账号。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：无
   - 请求体(`JSON` 格式)：无
 - **响应说明**：
   - 响应格式：`JSON`
@@ -3935,7 +3960,7 @@
     ```
 
 
-### Send Email Code
+### Send Email Code `finished`
 
 - **接口路径**：`/api/system-admin/send-email-code`
 - **请求方法**：`GET`
@@ -3963,7 +3988,7 @@
     ```
 
 
-### Change Email
+### Change Email `finished`
 
 - **接口路径**：`/api/system-admin/change-email`
 - **请求方法**：`GET`
@@ -4647,7 +4672,7 @@
     ```
 
 
-### Send Email Code
+### Send Email Code `finished`
 
 - **接口路径**：`/api/school-admin/send-email-code`
 - **请求方法**：`GET`
@@ -4675,7 +4700,7 @@
     ```
 
 
-### Change Email
+### Change Email `finished`
 
 - **接口路径**：`/api/school-admin/change-email`
 - **请求方法**：`GET`

@@ -40,6 +40,6 @@ public interface TeacherMapper {
     @Select("SELECT name FROM teacher where id = #{teacherId}")
     Teacher selectNameById(Long teacherId);
 
-    @Select("SELECT * FROM teacher where email = #{email}")
+    @Select("SELECT * FROM teacher where email = #{email} and status = #{status}")
     Teacher emailExist(String email);
 }

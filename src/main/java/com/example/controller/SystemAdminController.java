@@ -405,7 +405,7 @@ public class SystemAdminController {
         }
     }
 
-    @PostMapping("/send-email-code")
+    @GetMapping("/send-email-code")
     public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
         SendEmailCodeResponse response = new SendEmailCodeResponse();
         if (systemAdminService.emailExist(email)) {
@@ -418,7 +418,7 @@ public class SystemAdminController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/change-email")
+    @GetMapping("/change-email")
     public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {
