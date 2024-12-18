@@ -16,6 +16,8 @@ public interface KnowledgePointService {
     String getKnowledgePointNameById(Long id);
     List<KnowledgePoint> getAllKnowledgePoints();
 
+    List<String> getAllTypes();
+
     Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> getAllKnowledgePointsGroupByType();
 
     void flushKnowledgePointCache();

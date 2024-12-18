@@ -10,6 +10,7 @@ import java.util.List;
 public class GeneratePaperWithTypesResponse {
     private String message;
     private List<QuestionInfo> questions;
+    private List<Essay> essay;
 
     @Setter
     @Getter
@@ -29,5 +30,16 @@ public class GeneratePaperWithTypesResponse {
         private String type;
         private String knowledgePoint;
         private List<String> options;
+    }
+
+    @Setter
+    @Getter
+    public static class Essay {
+        private Long id;
+        private String content;
+        private String explanation;
+        private String type;
+        private Double difficulty;
+        private String knowledgePoint;
     }
 }

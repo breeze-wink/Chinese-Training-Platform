@@ -1744,40 +1744,74 @@ public class TeacherBusinessController {
 
         for (GeneratePaperWithTypeRequest.Type type : request.getTypes()) {
             String knowledgeType = type.getType();
-            List<PreAssembledQuestion> questions = preAssembledQuestionService.getPreAssembledQuestionsByType(knowledgeType);
-            int number = type.getNumber();
 
-            // 高效随机抽取题目 number道
-            Collections.shuffle(questions);
-            List<PreAssembledQuestion> selectedQuestions = questions.stream()
-                    .limit(number)
-                    .toList();
-            for (PreAssembledQuestion question : selectedQuestions) {
-                GeneratePaperWithTypesResponse.QuestionInfo info = new GeneratePaperWithTypesResponse.QuestionInfo();
-                info.setId(question.getId());
-                info.setBody(question.getQuestionBody());
-                List<GeneratePaperWithTypesResponse.SubQuestion> subQuestions = new ArrayList<>();
-                for (SubQuestion subQuestion : question.getSubQuestions()) {
-                    GeneratePaperWithTypesResponse.SubQuestion subInfo = new GeneratePaperWithTypesResponse.SubQuestion();
-                    subInfo.setAnswer(subQuestion.getQuestionAnswer());
-                    subInfo.setContent(subQuestion.getQuestionContent());
-                    subInfo.setExplanation(subQuestion.getQuestionExplanation());
-                    subInfo.setKnowledgePoint(subQuestion.getKnowledgePoint());
-                    if (subQuestion.getType().equals("CHOICE")) {
-                        subInfo.setOptions(List.of(subQuestion.getQuestionOptions().split("\\$\\$")));
+            // 作文特殊处理
+            if (knowledgeType.equals("作文")) {
+                List<PreAssembledQuestion> questions = preAssembledQuestionService.getPreAssembledQuestionsByType(knowledgeType);
+                int number = type.getNumber();
+
+                // 高效随机抽取题目 number道
+                Collections.shuffle(questions);
+                List<PreAssembledQuestion> selectedQuestions = questions.stream()
+                        .limit(number)
+                        .toList();
+                List<GeneratePaperWithTypesResponse.Essay> essayList = new ArrayList<>();
+                for (PreAssembledQuestion question : selectedQuestions) {
+                    GeneratePaperWithTypesResponse.Essay essay = new GeneratePaperWithTypesResponse.Essay();
+                    essay.setId(question.getId());
+                    SubQuestion essayInfo = question.getSubQuestions().get(0);
+                    essay.setContent(essayInfo.getQuestionContent());
+                    essay.setType(essayInfo.getType());
+                    essay.setExplanation(essay.getExplanation());
+                    essay.setKnowledgePoint(essayInfo.getKnowledgePoint());
+
+                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
+                    if (questionStatistic.getCompleteCount() == 0) {
+                        essay.setDifficulty(-1.0);
                     }
-                    subInfo.setType(subQuestion.getType());
-                    subQuestions.add(subInfo);
+                    else {
+                        essay.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+                    }
+                    essayList.add(essay);
                 }
-                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "big");
-                if (questionStatistic.getCompleteCount() != 0) {
-                    info.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+                response.setEssay(essayList);
+            }
+            else {
+                List<PreAssembledQuestion> questions = preAssembledQuestionService.getPreAssembledQuestionsByType(knowledgeType);
+                int number = type.getNumber();
+
+                // 高效随机抽取题目 number道
+                Collections.shuffle(questions);
+                List<PreAssembledQuestion> selectedQuestions = questions.stream()
+                        .limit(number)
+                        .toList();
+                for (PreAssembledQuestion question : selectedQuestions) {
+                    GeneratePaperWithTypesResponse.QuestionInfo info = new GeneratePaperWithTypesResponse.QuestionInfo();
+                    info.setId(question.getId());
+                    info.setBody(question.getQuestionBody());
+                    List<GeneratePaperWithTypesResponse.SubQuestion> subQuestions = new ArrayList<>();
+                    for (SubQuestion subQuestion : question.getSubQuestions()) {
+                        GeneratePaperWithTypesResponse.SubQuestion subInfo = new GeneratePaperWithTypesResponse.SubQuestion();
+                        subInfo.setAnswer(subQuestion.getQuestionAnswer());
+                        subInfo.setContent(subQuestion.getQuestionContent());
+                        subInfo.setExplanation(subQuestion.getQuestionExplanation());
+                        subInfo.setKnowledgePoint(subQuestion.getKnowledgePoint());
+                        if (subQuestion.getType().equals("CHOICE")) {
+                            subInfo.setOptions(List.of(subQuestion.getQuestionOptions().split("\\$\\$")));
+                        }
+                        subInfo.setType(subQuestion.getType());
+                        subQuestions.add(subInfo);
+                    }
+                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "big");
+                    if (questionStatistic.getCompleteCount() != 0) {
+                        info.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+                    }
+                    else {
+                        info.setDifficulty(-1.0);
+                    }
+                    info.setQuestions(subQuestions);
+                    infos.add(info);
                 }
-                else {
-                    info.setDifficulty(-1.0);
-                }
-                info.setQuestions(subQuestions);
-                infos.add(info);
             }
         }
         response.setQuestions(infos);
@@ -1870,6 +1904,29 @@ public class TeacherBusinessController {
             bigQuestionInfos.add(bigQuestionInfo);
             bigQuestionInfo.setSubQuestions(subQuestions);
         }
+        //作文
+        Long essayKnowledgeId = 138L;
+        List<Question> essays = questionService.getQuestionsByKnowledgePointId(essayKnowledgeId);
+        //随机抽取一道
+        Collections.shuffle(essays);
+        Question essay = essays.get(0);
+
+        AutoPaperResponse.Question essayInfo = new AutoPaperResponse.Question();
+        essayInfo.setId(essay.getId());
+        essayInfo.setContent(essay.getContent());
+        essayInfo.setType(essay.getType());
+        essayInfo.setExplanation(essay.getAnswer().split("\\$\\$")[1]);
+        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(essay.getId(), "small");
+        if (questionStatistic.getCompleteCount() != 0) {
+            essayInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+        }
+        else {
+            essayInfo.setDifficulty(-1.0);
+        }
+        String knowledgePoint = knowledgePointService.getKnowledgePointNameById(essay.getKnowledgePointId());
+        essayInfo.setKnowledgePoint(knowledgePoint);
+
+        response.setEssay(essayInfo);
         response.setMessage("success");
         response.setQuestions(questionInfos);
         response.setBigQuestions(bigQuestionInfos);
