@@ -16,4 +16,8 @@ public class Assignment {
     private LocalDateTime endTime;
     private Long creatorId; // 外键，关联Teacher表的id
     private String description;
+
+    public String info() {
+        return "(id:" + id + ", title:" + title + ")";
+    }
 }

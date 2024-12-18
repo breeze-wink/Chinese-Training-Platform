@@ -1,1 +1,5 @@
 2024-12-18 23:08:10 [http-nio-8081-exec-4] INFO  operations.teacher - 老师(id:27, 姓名:cez, 昵称:Aozora)获取学生(id:1, 姓名:cez, 昵称:Aozora)各项成绩
+2024-12-18 21:58:08 [http-nio-8081-exec-3] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取了试卷列表
+2024-12-18 21:58:08 [http-nio-8081-exec-1] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取班级列表
+2024-12-18 21:58:09 [http-nio-8081-exec-2] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取小组列表
+2024-12-18 21:58:11 [http-nio-8081-exec-5] INFO  operations.teacher - 老师 (id:77, 姓名:周旭豪, 昵称:logic) 获取作业列表
