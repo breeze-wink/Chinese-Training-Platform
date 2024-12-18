@@ -1,0 +1,4 @@
+2024-12-18 19:58:34 [http-nio-8081-exec-2] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 查询全校教师信息
+2024-12-18 19:59:16 [http-nio-8081-exec-6] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 删除了教师(id:312, 姓名:杨洁, 昵称:yangjie)的账号
+2024-12-18 20:00:39 [http-nio-8081-exec-4] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 查询全校教师信息
+2024-12-18 20:03:55 [http-nio-8081-exec-3] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 查询全校教师信息

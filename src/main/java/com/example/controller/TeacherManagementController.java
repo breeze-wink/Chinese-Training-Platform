@@ -51,163 +51,208 @@ public class TeacherManagementController {
 
     @PostMapping("/login")
     public ResponseEntity<TeacherLoginResponse> login(@RequestBody TeacherLoginRequest request) {
-        String account = request.getAccount();
-        String password = request.getPassword();
+        try {
+            String account = request.getAccount();
+            String password = request.getPassword();
 
-        Teacher teacher = teacherService.authenticate(account, password);
+            Teacher teacher = teacherService.authenticate(account, password);
 
-        TeacherLoginResponse response = new TeacherLoginResponse();
-        if (teacher != null) {
-            String jwt = jwtTokenUtil.generateToken(teacher);
-            response.setToken(jwt);
-            response.setMessage("success");
-            response.setPermission(teacher.getPermission());
-            response.setId(teacher.getId());
-            return ResponseEntity.ok(response);
-        }
-        else {
-            response.setMessage("用户名或密码错误");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            TeacherLoginResponse response = new TeacherLoginResponse();
+            if (teacher != null) {
+                String jwt = jwtTokenUtil.generateToken(teacher);
+                response.setToken(jwt);
+                response.setMessage("success");
+                response.setPermission(teacher.getPermission());
+                response.setId(teacher.getId());
+                return ResponseEntity.ok(response);
+            }
+            else {
+                response.setMessage("用户名或密码错误");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        } catch (Exception e) {
+            logger.error("教师登陆出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
     @PostMapping("/send-verification")
     public ResponseEntity<TeacherVerifyResponse> sendVerificationCode(@RequestBody TeacherVerifyRequest request) throws MessagingException {
-        String email = request.getEmail();
-        String code = request.getAuthorizationCode();
+        try {
+            String email = request.getEmail();
+            String code = request.getAuthorizationCode();
 
-        TeacherVerifyResponse response = new TeacherVerifyResponse();
-        AuthorizationCode authorizationCode = authorizationCodeService.getAuthorizationCodeByCode(code);
-        if (authorizationCode == null) {
-            response.setMessage("授权码不可用");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            TeacherVerifyResponse response = new TeacherVerifyResponse();
+            AuthorizationCode authorizationCode = authorizationCodeService.getAuthorizationCodeByCode(code);
+            if (authorizationCode == null) {
+                response.setMessage("授权码不可用");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            Teacher teacher = new Teacher();
+            teacher.setEmail(email);
+            teacher.setPermission(0);
+            if (teacherService.existTeacher(teacher)) {
+                response.setMessage("邮箱已注册");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            String verificationCode = emailService.sendEmail(email);
+            response.setVerificationCode(verificationCode);
+            response.setSchoolId(authorizationCode.getSchoolId());
+            response.setMessage("验证码已发送");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("教师发送验证码出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Teacher teacher = new Teacher();
-        teacher.setEmail(email);
-        teacher.setPermission(0);
-        if (teacherService.existTeacher(teacher)) {
-            response.setMessage("邮箱已注册");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        String verificationCode = emailService.sendEmail(email);
-        response.setVerificationCode(verificationCode);
-        response.setSchoolId(authorizationCode.getSchoolId());
-        response.setMessage("验证码已发送");
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     public ResponseEntity<TeacherRegisterResponse> register(@RequestBody TeacherRegisterRequest request) {
-        TeacherRegisterResponse response = new TeacherRegisterResponse();
-        String email = request.getEmail();
-        String password = request.getPassword();
-        String confirmPassword = request.getConfirmPassword();
-        if (!password.equals(confirmPassword)) {
-            response.setMessage("密码输入不一致");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        try {
+            TeacherRegisterResponse response = new TeacherRegisterResponse();
+            String email = request.getEmail();
+            String password = request.getPassword();
+            String confirmPassword = request.getConfirmPassword();
+            if (!password.equals(confirmPassword)) {
+                response.setMessage("密码输入不一致");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            Teacher teacher = new Teacher();
+            teacher.setEmail(request.getEmail());
+            teacher.setPassword(request.getPassword());
+            teacher.setSchoolId(request.getSchoolId());
+            teacher.setPermission(Teacher.TEACHER);
+            teacherService.addTeacher(teacher);
+            response.setId(teacher.getId());
+            response.setMessage("注册成功");
+            operationLogger.info("老师 {} 注册成功", teacher.info());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("教师注册出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Teacher teacher = new Teacher();
-        teacher.setEmail(request.getEmail());
-        teacher.setPassword(request.getPassword());
-        teacher.setSchoolId(request.getSchoolId());
-        teacher.setPermission(Teacher.TEACHER);
-        teacherService.addTeacher(teacher);
-        response.setId(teacher.getId());
-        response.setMessage("注册成功");
-        return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}")
     public ResponseEntity<TeacherInfoResponse> getTeacherInfo(@PathVariable Long id) {
-        TeacherInfoResponse response = new TeacherInfoResponse();
-        Teacher teacher = teacherService.getTeacherById(id);
+        try {
+            TeacherInfoResponse response = new TeacherInfoResponse();
+            Teacher teacher = teacherService.getTeacherById(id);
 
-        if (teacher == null) {
-            response.setMessage("用户未找到");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            if (teacher == null) {
+                response.setMessage("用户未找到");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            response.setMessage("success");
+            TeacherInfoResponse.InfoData data = new TeacherInfoResponse.InfoData();
+            data.setName(teacher.getName());
+            data.setUsername(teacher.getUsername());
+            data.setPhoneNumber(teacher.getPhoneNumber());
+            data.setEmail(teacher.getEmail());
+            data.setSchoolName(schoolService.getSchoolById(teacher.getSchoolId()).getName());
+            response.setData(data);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("获取教师信息出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        response.setMessage("success");
-        TeacherInfoResponse.InfoData data = new TeacherInfoResponse.InfoData();
-        data.setName(teacher.getName());
-        data.setUsername(teacher.getUsername());
-        data.setPhoneNumber(teacher.getPhoneNumber());
-        data.setEmail(teacher.getEmail());
-        data.setSchoolName(schoolService.getSchoolById(teacher.getSchoolId()).getName());
-        response.setData(data);
-
-        return ResponseEntity.ok(response);
     }
     @PostMapping("/{id}/update-username")
     public ResponseEntity<Message> updateUsername(@PathVariable Long id, @RequestBody UpdateUsernameRequest request) {
-        Message response = new Message();
-        String newName = request.getUsername();
-        Teacher teacher = teacherService.getTeacherById(id);
-        if (teacher == null) {
-            response.setMessage("Id错误");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        if (teacherService.existUsername(newName)) {
-            response.setMessage("用户名已存在，修改失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        try {
+            Message response = new Message();
+            String newName = request.getUsername();
+            Teacher teacher = teacherService.getTeacherById(id);
+            if (teacher == null) {
+                response.setMessage("Id错误");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if (teacherService.existUsername(newName)) {
+                response.setMessage("用户名已存在，修改失败");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
 
-        //开始执行
-        teacher.setUsername(newName);
-        teacherService.updateTeacher(teacher);
+            //开始执行
+            teacher.setUsername(newName);
+            teacherService.updateTeacher(teacher);
 
-        response.setMessage("用户名修改成功");
-        return ResponseEntity.ok(response);
+            response.setMessage("用户名修改成功");
+            operationLogger.info("老师 {} 修改了用户名", teacher.info());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("修改用户名出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误"));
+        }
     }
     @PostMapping("/{id}/update-phoneNumber")
     public ResponseEntity<Message> updatePhoneNumber(@PathVariable Long id, @RequestBody TeacherUpdatePhoneNumberRequest request) {
-        Message response = new Message();
-        String newNumber = request.getPhoneNumber();
-        Teacher teacher = teacherService.getTeacherById(id);
-        if (teacher == null) {
-            response.setMessage("Id错误");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+       try {
+           Message response = new Message();
+           String newNumber = request.getPhoneNumber();
+           Teacher teacher = teacherService.getTeacherById(id);
+           if (teacher == null) {
+               response.setMessage("Id错误");
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+           }
 
-        //开始执行
-        teacher.setPhoneNumber(newNumber);
-        teacherService.updateTeacher(teacher);
+           //开始执行
+           teacher.setPhoneNumber(newNumber);
+           teacherService.updateTeacher(teacher);
 
-        response.setMessage("手机号修改成功");
-        return ResponseEntity.ok(response);
+           response.setMessage("手机号修改成功");
+           operationLogger.info("老师 {} 修改了手机号", teacher.info());
+           return ResponseEntity.ok(response);
+       } catch (Exception e) {
+           logger.error("修改手机号出现问题 {}", e.getMessage(), e);
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误"));
+       }
     }
 
     @PutMapping("/{id}/update-name")
     public ResponseEntity<Message> updateName(@PathVariable Long id, @RequestBody UpdateNameRequest request) {
-        Message response = new Message();
-        String newNumber = request.getName();
-        Teacher teacher = teacherService.getTeacherById(id);
-        if (teacher == null) {
-            response.setMessage("Id错误");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        try {
+            Message response = new Message();
+            String newNumber = request.getName();
+            Teacher teacher = teacherService.getTeacherById(id);
+            if (teacher == null) {
+                response.setMessage("Id错误");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            //开始执行
+            teacher.setName(request.getName());
+            teacherService.updateTeacher(teacher);
+
+            response.setMessage("姓名修改成功");
+            operationLogger.info("老师 {} 修改了姓名", teacher.info());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("修改姓名出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误"));
         }
-
-        //开始执行
-        teacher.setName(request.getName());
-        teacherService.updateTeacher(teacher);
-
-        response.setMessage("姓名修改成功");
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/change-password")
     public ResponseEntity<Message> changePassword(@PathVariable Long id, @RequestBody TeacherChangePasswordRequest request) {
-        Message response = new Message();
-        Teacher teacher = teacherService.getTeacherById(id);
-        if (teacher == null) {
-            response.setMessage("用户不存在");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        try {
+            Message response = new Message();
+            Teacher teacher = teacherService.getTeacherById(id);
+            if (teacher == null) {
+                response.setMessage("用户不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if (!teacher.getPassword().equals(request.getPassword())) {
+                response.setMessage("旧密码错误");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            teacher.setPassword(request.getNewPassword());
+            teacherService.updateTeacher(teacher);
+            response.setMessage("密码修改成功");
+            operationLogger.info("老师 {} 修改密码", teacher.info());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("修改密码出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误"));
         }
-        if (!teacher.getPassword().equals(request.getPassword())) {
-            response.setMessage("旧密码错误");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        teacher.setPassword(request.getNewPassword());
-        teacherService.updateTeacher(teacher);
-        response.setMessage("密码修改成功");
-        return ResponseEntity.ok(response);
     }
 
 }

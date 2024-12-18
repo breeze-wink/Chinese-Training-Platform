@@ -10,4 +10,8 @@ public class JoinClass {
     private Long id;
     private Long classId;
     private Long studentId;
+
+    public String info() {
+        return "(id:" + id + ",classId:" + classId + ",studentId:" + studentId + ")";
+    }
 }
