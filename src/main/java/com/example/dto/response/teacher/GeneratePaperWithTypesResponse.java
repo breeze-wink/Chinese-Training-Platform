@@ -10,7 +10,7 @@ import java.util.List;
 public class GeneratePaperWithTypesResponse {
     private String message;
     private List<QuestionInfo> questions;
-    private List<Essay> essay;
+    private List<Essay> essays;
 
     @Setter
     @Getter
@@ -18,7 +18,7 @@ public class GeneratePaperWithTypesResponse {
         private Long id;
         private String body;
         private Double difficulty;
-        private List<SubQuestion> questions;
+        private List<SubQuestion> subQuestions;
     }
 
     @Setter

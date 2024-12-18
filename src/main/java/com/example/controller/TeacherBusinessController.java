@@ -1974,7 +1974,7 @@ public class TeacherBusinessController {
                         }
                         essayList.add(essay);
                     }
-                    response.setEssay(essayList);
+                    response.setEssays(essayList);
                 }
                 else {
                     List<PreAssembledQuestion> questions = preAssembledQuestionService.getPreAssembledQuestionsByType(knowledgeType);
@@ -2009,7 +2009,7 @@ public class TeacherBusinessController {
                         else {
                             info.setDifficulty(-1.0);
                         }
-                        info.setQuestions(subQuestions);
+                        info.setSubQuestions(subQuestions);
                         infos.add(info);
                     }
                 }
