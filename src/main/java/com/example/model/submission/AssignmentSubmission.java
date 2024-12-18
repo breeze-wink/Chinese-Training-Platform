@@ -15,5 +15,5 @@ public class AssignmentSubmission {
     private LocalDateTime submitTime;
     private Integer totalScore;
     private Boolean graded;
-
+    private String feedback;
 }
