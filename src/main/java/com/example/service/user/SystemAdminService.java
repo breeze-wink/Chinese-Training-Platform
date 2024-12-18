@@ -16,4 +16,6 @@ public interface SystemAdminService {
     SystemAdmin authenticate(String account, String password);
 
     SystemAdmin getSystemAdminByUsername(String username);
+
+    boolean emailExist(String email);
 }

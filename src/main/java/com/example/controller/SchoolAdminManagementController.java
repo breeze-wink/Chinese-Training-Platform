@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.dto.request.school.SchoolAdminBindEmailRequest;
 import com.example.dto.request.school.SchoolAdminLoginRequest;
+import com.example.dto.response.ChangeEmailResponse;
+import com.example.dto.response.SendEmailCodeResponse;
 import com.example.dto.response.school.SchoolEmailVerifyResponse;
 import com.example.dto.request.school.SchoolAdminChangePasswordRequest;
 import com.example.dto.request.UpdateNameRequest;
@@ -9,9 +11,7 @@ import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.response.Message;
 import com.example.dto.response.school.SchoolAdminInfoResponse;
 import com.example.dto.response.school.SchoolAdminLoginResponse;
-import com.example.model.user.AuthorizationCode;
-import com.example.model.user.School;
-import com.example.model.user.SchoolAdmin;
+import com.example.model.user.*;
 import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -205,6 +206,35 @@ public class SchoolAdminManagementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
         }
 
+    }
+
+    @PostMapping("/send-email-code")
+    public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
+        SendEmailCodeResponse response = new SendEmailCodeResponse();
+        if (schoolAdminService.emailExist(email)) {
+            response.setMessage("邮箱已注册");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        String code = emailService.sendEmail(email);
+        response.setCode(code);
+        response.setMessage("验证码已发送");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+        ChangeEmailResponse response = new ChangeEmailResponse();
+        try {
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(user.getId());
+            schoolAdmin.setEmail(newEmail);
+            schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            response.setMessage("邮箱更换成功");
+            response.setNewEmail(newEmail);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("邮箱更换失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
 }

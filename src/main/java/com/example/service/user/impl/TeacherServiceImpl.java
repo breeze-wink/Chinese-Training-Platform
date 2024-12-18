@@ -92,4 +92,11 @@ public class TeacherServiceImpl implements TeacherService {
         return teacher.getName() + "(已离职)";
     }
 
+    @Override
+    @Transactional
+    public Boolean emailExist(String email) {
+        Teacher teacher = teacherMapper.emailExist(email);
+        return teacher != null;
+    }
+
 }
