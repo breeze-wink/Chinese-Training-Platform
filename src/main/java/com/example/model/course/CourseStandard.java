@@ -13,4 +13,8 @@ public class CourseStandard {
     private String title;
     private byte[] content;
     private LocalDate executedDate;
+
+    public String info() {
+        return "(id:" + id + ", 标题:" + title + ", 执行日期:" + executedDate + ")";
+    }
 }
