@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface StudentStatsViewService {
     List<StudentStatsView> selectByClassId(Long classId);
+    List<StudentStatsView> selectByStudentId(Long studentId);
 }

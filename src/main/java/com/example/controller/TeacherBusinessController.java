@@ -934,56 +934,42 @@ public class TeacherBusinessController {
 
 
     @GetMapping("{id}/get-student-multidimensional-scores")
-    public ResponseEntity<MultidimensionalScoresResponse> getMultidimensionalScores(@AuthenticationPrincipal BaseUser user,
-                                                                                    @PathVariable Long id,
-                                                                                    @RequestParam Long studentId) {
-        MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
+    public ResponseEntity<MultidimensionalScoresResponse> getMultidimensionalScores(@PathVariable Long id, @RequestParam Long studentId) {
         try {
+            MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
             List<MultidimensionalScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                MultidimensionalScoresResponse.infoData infoData = new MultidimensionalScoresResponse.infoData();
-                infoData.setName(knowledgePoint.getType());
-                infoData.setScore(null);
-                boolean flag = false;
-                for (MultidimensionalScoresResponse.infoData datum : data) {
-                    if (datum.getName().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(studentId);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Double score = 0.0;
+                Double totalScore = 0.0;
+                MultidimensionalScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new MultidimensionalScoresResponse.infoData();
+                        infoData.setName(nameTemp);
+                        infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        score = 0.0;
+                        totalScore = 0.0;
                     }
+                    score += studentStatsViews.get(i).getScore();
+                    totalScore += studentStatsViews.get(i).getTotalScore();
                 }
-                if(!flag){
-                    long totalScore = 0L;
-                    long score = 0L;
-                    for(StatsStudent statsStudent : statsStudents) {
-                        if(knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId()).getType().equals(infoData.getName())){
-                            if(statsStudent.getTotalScore() != null){
-                                totalScore += statsStudent.getTotalScore();
-                            }
-                            if(statsStudent.getScore() != null){
-                                score += statsStudent.getScore();
-                            }
-                        }
-                    }
-                    if(totalScore != 0){
-                        double scorePercentage = 100 * (double) score / (double) totalScore;
-                        scorePercentage = Double.parseDouble(String.format("%.2f", scorePercentage));
-                        infoData.setScore(scorePercentage);
-                    }
-                    data.add(infoData);
-                }
+                infoData = new MultidimensionalScoresResponse.infoData();
+                infoData.setName(nameTemp);
+                infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("各项成绩获取成功");
-            Teacher teacher = teacherService.getTeacherById(user.getId());
-            Student student = studentService.getStudentById(studentId);
-            operationLogger.info("教师 {} 获取了学生 {} 的多维数据得分率", teacher.info(), student.info());
+            operationLogger.info("老师{}获取学生{}各项成绩", teacherService.getTeacherById(id).info(), studentService.getStudentById(studentId).info());
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("获取各项成绩出现问题 {}", e.getMessage(), e);
-            response.setMessage("获取各项成绩失败：" + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e){
+            logger.error("老师获取学生各项成绩失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -2221,7 +2207,7 @@ public class TeacherBusinessController {
         HistoricalScoresResponse response = new HistoricalScoresResponse();
         List<HistoricalScoresResponse.infoData> data = new ArrayList<>();
         List<AssignmentScoresView> assignmentScoresViews = assignmentScoresViewService.selectAvgScoresByClassId(classId);
-        if(assignmentScoresViews != null){
+        if(assignmentScoresViews != null && !assignmentScoresViews.isEmpty()){
             assignmentScoresViews.sort(Comparator.comparing(AssignmentScoresView::getAssignmentId));
             Double totalScore = 0.0;
             int count = 0;
@@ -2295,7 +2281,7 @@ public class TeacherBusinessController {
         HistoricalScoresResponse response = new HistoricalScoresResponse();
         List<HistoricalScoresResponse.infoData> data = new ArrayList<>();
         List<AssignmentScoresView> assignmentScoresViews = assignmentScoresViewService.selectAvgScoresByClassId(groupId);
-        if(assignmentScoresViews != null){
+        if(assignmentScoresViews != null && !assignmentScoresViews.isEmpty()){
             assignmentScoresViews.sort(Comparator.comparing(AssignmentScoresView::getAssignmentId));
             Double totalScore = 0.0;
             int count = 0;
