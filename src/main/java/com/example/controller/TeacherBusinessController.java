@@ -3,12 +3,11 @@ package com.example.controller;
 import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.dto.redis.PreAssembledQuestion;
 import com.example.dto.redis.SubQuestion;
+import com.example.dto.request.student.StudentChangeEmailRequest;
+import com.example.dto.request.student.StudentChangeEmailVerificationRequest;
 import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
-import com.example.dto.response.student.AvgScoreResponse;
-import com.example.dto.response.student.HistoryScoresResponse;
-import com.example.dto.response.student.MultidimensionalScoresResponse;
-import com.example.dto.response.student.WeaknessScoresResponse;
+import com.example.dto.response.student.*;
 import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
@@ -16,6 +15,7 @@ import com.example.model.course.KnowledgePoint;
 import com.example.model.question.*;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.BaseUser;
+import com.example.model.user.Student;
 import com.example.model.user.Teacher;
 import com.example.model.view.*;
 import com.example.service.cache.CacheRefreshService;
@@ -31,6 +31,7 @@ import com.example.service.question.*;
 import com.example.service.question.impl.*;
 import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
+import com.example.service.utils.EmailService;
 import com.example.service.view.*;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.view.impl.AssignmentScoresViewServiceImpl;
@@ -45,6 +46,7 @@ import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -93,6 +95,7 @@ public class TeacherBusinessController {
     private final AssignmentStatsViewService assignmentStatsViewService;
     private final AssignmentScoresViewService assignmentScoresViewService;
     private final PreAssembledQuestionService preAssembledQuestionService;
+    private final EmailService emailService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -122,7 +125,8 @@ public class TeacherBusinessController {
                                      SubmissionAnswerServiceImpl submissionAnswerService,
                                      AssignmentStatsViewServiceImpl assignmentStatsViewService,
                                      AssignmentScoresViewServiceImpl assignmentScoresViewService,
-                                     PreAssembledQuestionService preAssembledQuestionService
+                                     PreAssembledQuestionService preAssembledQuestionService,
+                                     EmailService emailService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -153,6 +157,7 @@ public class TeacherBusinessController {
         this.assignmentStatsViewService = assignmentStatsViewService;
         this.assignmentScoresViewService = assignmentScoresViewService;
         this.preAssembledQuestionService = preAssembledQuestionService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -2182,5 +2187,34 @@ public class TeacherBusinessController {
         response.setData(data);
         response.setMessage("success");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/send-email-code")
+    public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
+        SendEmailCodeResponse response = new SendEmailCodeResponse();
+        if (teacherService.emailExist(email)) {
+            response.setMessage("邮箱已注册");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        String code = emailService.sendEmail(email);
+        response.setCode(code);
+        response.setMessage("验证码已发送");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+        ChangeEmailResponse response = new ChangeEmailResponse();
+        try {
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            teacher.setEmail(newEmail);
+            teacherService.updateTeacher(teacher);
+            response.setMessage("邮箱更换成功");
+            response.setNewEmail(newEmail);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("邮箱更换失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

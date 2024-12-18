@@ -16,4 +16,6 @@ public interface SchoolAdminService {
     boolean checkExistUsername(String name);
 
     SchoolAdmin getSchoolAdminByUsername(String username);
+
+    boolean emailExist(String email);
 }

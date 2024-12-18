@@ -21,5 +21,6 @@ public interface TeacherService {
     Teacher getTeacherByUsername(String username);
 
     String getTeacherNameById(Long teacherId);
+    Boolean emailExist(String email);
 
 }
