@@ -3253,11 +3253,13 @@
       "data" : [
         {
           "submissionAnswerId" : "long",
-          "markScore" : "int"
+          "markScore" : "int",
+          "feedback" : "string"
         },
         {
           "submissionAnswerId" : "long",
-          "markScore" : "int"
+          "markScore" : "int",
+          "feedback" : "string"
         },
         ...
       ]

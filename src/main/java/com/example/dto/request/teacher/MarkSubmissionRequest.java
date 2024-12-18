@@ -15,5 +15,6 @@ public class MarkSubmissionRequest {
     public static class infoData {
         private Long submissionAnswerId;
         private Integer markScore;
+        private String feedback;
     }
 }
