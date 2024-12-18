@@ -156,25 +156,27 @@ public class StudentBusinessController {
             GetFinishedPractices response = new GetFinishedPractices();
             List<Practice> practices = practiceService.getPracticesByStudentId(id);
             List<GetFinishedPractices.InfoData> data = new ArrayList<>();
-            for(Practice practice : practices){
-                if(practice.getPracticeTime() != null){
-                    GetFinishedPractices.InfoData infoData = new GetFinishedPractices.InfoData();
-                    infoData.setPracticeId(practice.getId());
-                    infoData.setPracticeName(practice.getName());
-                    infoData.setPracticeTime(practice.getPracticeTime().toString());
-                    infoData.setTotalScore(null);
-                    if(practice.getTotalScore() != null){
-                        infoData.setTotalScore(practice.getTotalScore().doubleValue());
+            if(practices != null && !practices.isEmpty()){
+                for(Practice practice : practices) {
+                    if (practice.getPracticeTime() != null) {
+                        GetFinishedPractices.InfoData infoData = new GetFinishedPractices.InfoData();
+                        infoData.setPracticeId(practice.getId());
+                        infoData.setPracticeName(practice.getName());
+                        infoData.setPracticeTime(practice.getPracticeTime().toString());
+                        infoData.setTotalScore(null);
+                        if (practice.getTotalScore() != null) {
+                            infoData.setTotalScore(practice.getTotalScore().doubleValue());
+                        }
+                        data.add(infoData);
                     }
-                    data.add(infoData);
                 }
             }
             response.setData(data);
-            response.setMessage("已完成作业列表获取成功");
-            operationLogger.info("学生{} 获取了作业列表", studentService.getStudentById(id).info());
+            response.setMessage("已完成练习列表获取成功");
+            operationLogger.info("学生{} 获取了练习列表", studentService.getStudentById(id).info());
             return ResponseEntity.ok(response);
         } catch (Exception e){
-            logger.error("获取已完成作业列表失败，错误信息: {}", e.getMessage(), e);
+            logger.error("获取已完成练习列表失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -648,8 +650,9 @@ public class StudentBusinessController {
                     Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
                     List<String> answerArray = drawOptions(question.getOptions());
                     infoData.setQuestionOptions(answerArray);
-                    if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
-                        infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
+                    PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
+                    if(practiceAnswer != null && practiceAnswer.getScore() != null){
+                        infoData.setScore(practiceAnswer.getScore().doubleValue());
                     }
                 }
                 String [] answerAndAnalysis = questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer().split("\\$\\$");

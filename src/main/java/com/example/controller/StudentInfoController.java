@@ -181,7 +181,7 @@ public class StudentInfoController {
             }
             JoinClass joinClass = joinClassService.selectJoinClassByStudentIdAndClassId(id, clazz.getId());
             List<ClassStudent> classStudent = classStudentService.getClassStudentsByStudentId(id);
-            if(!classStudent.isEmpty()){
+            if(classStudent != null && !classStudent.isEmpty()){
                 response.setMessage("请勿重复加入班级");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
