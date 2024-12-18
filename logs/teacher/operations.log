@@ -1,3 +1,0 @@
-2024-12-19 00:06:00 [http-nio-8081-exec-2] INFO  operations.teacher - 老师(id:27, 姓名:cez, 昵称:Aozora)获取学生(id:1, 姓名:cez, 昵称:Aozora)获取短板
-2024-12-19 00:06:24 [http-nio-8081-exec-7] INFO  operations.teacher - 教师 (id:27, 姓名:cez, 昵称:Aozora) 获取了学生 (id:1, 姓名:cez, 昵称:Aozora) 的成绩
-2024-12-19 00:20:38 [http-nio-8081-exec-2] INFO  operations.teacher - 教师 (id:27, 姓名:cez, 昵称:Aozora) 获取了学生 (id:1, 姓名:cez, 昵称:Aozora) 的历史作业成绩
