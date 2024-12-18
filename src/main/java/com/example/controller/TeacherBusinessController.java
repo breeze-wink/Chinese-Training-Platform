@@ -2125,7 +2125,7 @@ public class TeacherBusinessController {
         }
     }
 
-    @PostMapping("/api/teacher/mark-submission")
+    @PostMapping("/mark-submission")
     public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal BaseUser user, @RequestBody MarkSubmissionRequest request) {
         Message response = new Message();
         try {
