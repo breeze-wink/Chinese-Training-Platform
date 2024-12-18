@@ -15,4 +15,8 @@ public class TestPaper {
     private LocalDateTime createTime;
     private Double difficulty;
     private Integer totalScore;
+
+    public String info() {
+        return "(试卷id:" + id + ", 试卷名:" + name + ")";
+    }
 }

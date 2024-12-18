@@ -19,6 +19,7 @@ public class SchoolAdminQueryTeachers {
         private String name;
         private String email;
         private String phoneNumber;
+        private Integer permission;
         private Long schoolId;
     }
 }

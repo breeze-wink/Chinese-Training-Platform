@@ -12,4 +12,8 @@ public class UploadQuestion implements Serializable {
     private Long teacherId;
     private Long questionId;
     private String type;
+
+    public String info() {
+        return "(id:" + id + ", teacherId: " + teacherId + "questionId: " + questionId + ")";
+    }
 }

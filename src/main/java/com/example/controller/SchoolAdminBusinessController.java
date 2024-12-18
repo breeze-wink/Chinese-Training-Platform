@@ -228,6 +228,7 @@ public class SchoolAdminBusinessController {
                 infoData.setUsername(teacher.getUsername());
                 infoData.setEmail(teacher.getEmail());
                 infoData.setPhoneNumber(teacher.getPhoneNumber());
+                infoData.setPermission(teacher.getPermission());
                 infoData.setSchoolId(teacher.getSchoolId());
                 data.add(infoData);
             }
