@@ -1964,66 +1964,66 @@ public class TeacherBusinessController {
     public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal BaseUser user, @RequestBody MarkSubmissionRequest request) {
         Message response = new Message();
         try {
-            AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectById(submissionAnswerService.selectById(request.getData().get(0).getSubmissionAnswerId()).getSubmissionId());
-            if(assignmentSubmission.getTotalScore() != null){
-                response.setMessage("不允许重复提交");
-                return ResponseEntity.ok(response);
-            }
             if(request.getData() != null && !request.getData().isEmpty()){
+                AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectById(submissionAnswerService.selectById(request.getData().get(0).getSubmissionAnswerId()).getSubmissionId());
+                if(assignmentSubmission.getTotalScore() != null){
+                    response.setMessage("不允许重复提交");
+                    return ResponseEntity.ok(response);
+                }
                 for(MarkSubmissionRequest.infoData infoData : request.getData()){
-                    if(infoData.getMarkScore() != null){
-                        SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
-                        submissionAnswer.setScore(infoData.getMarkScore());
-                        submissionAnswerService.update(submissionAnswer);
-                        Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
-                        double scoreTempD = (double) submissionAnswer.getScore() / (double) submissionAnswer.getQuestionScore();
+                    SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
+                    submissionAnswer.setScore(infoData.getMarkScore());
+                    submissionAnswerService.update(submissionAnswer);
+                    Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
+                    double scoreTempD = (double) submissionAnswer.getScore() / (double) submissionAnswer.getQuestionScore();
 
-                        Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
-                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                        questionStatistic.setTotalScore(questionStatistic.getTotalScore() + scoreTempD);
-                        questionStatisticService.update(questionStatistic);
-                        if(question.getBodyId() != null){
-                            QuestionStatistic bodyQuestionStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                            bodyQuestionStatistic.setCompleteCount(bodyQuestionStatistic.getCompleteCount() + 1);
-                            bodyQuestionStatistic.setTotalScore(bodyQuestionStatistic.getTotalScore() + scoreTempD);
-                            questionStatisticService.update(bodyQuestionStatistic);
-                        }
+                    Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
+                    questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
+                    questionStatistic.setTotalScore(questionStatistic.getTotalScore() + scoreTempD);
+                    questionStatisticService.update(questionStatistic);
+                    if(question.getBodyId() != null){
+                        QuestionStatistic bodyQuestionStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
+                        bodyQuestionStatistic.setCompleteCount(bodyQuestionStatistic.getCompleteCount() + 1);
+                        bodyQuestionStatistic.setTotalScore(bodyQuestionStatistic.getTotalScore() + scoreTempD);
+                        questionStatisticService.update(bodyQuestionStatistic);
+                    }
 
 
-                        AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
-                        if(assignmentStatsView.getStatsScore() != null){
-                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
-                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                            statsStudent.setScore(statsStudent.getScore() + scoreTemp);
-                            statsStudentService.updateStatsStudent(statsStudent);
-                        }
-                        else {
-                            StatsStudent statsStudent = new StatsStudent();
-                            statsStudent.setStudentId(assignmentStatsView.getStudentId());
-                            statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
-                            statsStudent.setTotalScore(100L);
-                            statsStudent.setScore(scoreTemp);
-                            statsStudentService.addStatsStudent(statsStudent);
-                        }
-
+                    AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
+                    if(assignmentStatsView.getStatsScore() != null){
+                        StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
+                        statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
+                        statsStudent.setScore(statsStudent.getScore() + scoreTemp);
+                        statsStudentService.updateStatsStudent(statsStudent);
+                    }
+                    else {
+                        StatsStudent statsStudent = new StatsStudent();
+                        statsStudent.setStudentId(assignmentStatsView.getStudentId());
+                        statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
+                        statsStudent.setTotalScore(100L);
+                        statsStudent.setScore(scoreTemp);
+                        statsStudentService.addStatsStudent(statsStudent);
                     }
                 }
-            }
-            int score = 0;
-            List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
-            for(SubmissionAnswer submissionAnswer : submissionAnswers){
-                if(submissionAnswer.getScore() != null) {
-                    score += submissionAnswer.getScore();
+                int score = 0;
+                List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
+                for(SubmissionAnswer submissionAnswer : submissionAnswers){
+                    if(submissionAnswer.getScore() != null) {
+                        score += submissionAnswer.getScore();
+                    }
                 }
+                assignmentSubmission.setTotalScore(score);
+                assignmentSubmission.setFeedback(request.getFeedback());
+                assignmentSubmissionService.update(assignmentSubmission);
+                response.setMessage("success");
+                return ResponseEntity.ok(response);
             }
-            assignmentSubmission.setTotalScore(score);
-            assignmentSubmission.setFeedback(request.getFeedback());
-            assignmentSubmissionService.update(assignmentSubmission);
-            response.setMessage("success");
-            return ResponseEntity.ok(response);
+            response.setMessage("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }catch (Exception e){
             response.setMessage("error");
+            logger.error("教师批改学生作业出现错误 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
