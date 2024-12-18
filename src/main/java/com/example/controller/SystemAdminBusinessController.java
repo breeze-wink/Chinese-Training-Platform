@@ -5,11 +5,13 @@ import com.example.dto.request.system.CreateSchoolAdminRequest;
 import com.example.dto.response.Message;
 import com.example.dto.response.system.QuestionsResponse;
 import com.example.dto.response.system.GetSchoolAdminAccountsResponse;
+import com.example.dto.response.teacher.ClassKnowledgePointStatusResponse;
 import com.example.model.question.Question;
 import com.example.model.user.BaseUser;
 import com.example.model.user.School;
 import com.example.model.user.SchoolAdmin;
 import com.example.model.user.SystemAdmin;
+import com.example.model.view.StudentStatsView;
 import com.example.service.question.QuestionService;
 import com.example.service.question.impl.QuestionServiceImpl;
 import com.example.service.user.SchoolAdminService;
@@ -18,6 +20,7 @@ import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SchoolAdminServiceImpl;
 import com.example.service.user.impl.SchoolServiceImpl;
 import com.example.service.user.impl.SystemAdminServiceImpl;
+import com.example.service.view.StudentStatsViewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +29,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/system-admin")
@@ -36,6 +43,7 @@ public class SystemAdminBusinessController {
     private static final Logger operationLogger = LoggerFactory.getLogger("operations.systemAdministrator");
     private final SchoolAdminService schoolAdminService;
     private final QuestionService questionService;
+    private final StudentStatsViewService studentStatsViewService;
     private final SystemAdminService systemAdminService;
     private final SchoolService schoolService;
 
@@ -43,12 +51,14 @@ public class SystemAdminBusinessController {
     public SystemAdminBusinessController(SchoolAdminServiceImpl schoolAdminService,
                                          QuestionServiceImpl questionService,
                                          SchoolServiceImpl schoolService,
-                                         SystemAdminServiceImpl systemAdminService
+                                         SystemAdminServiceImpl systemAdminService,
+                                         StudentStatsViewService studentStatsViewService
                                          ) {
         this.schoolAdminService = schoolAdminService;
         this.questionService = questionService;
         this.schoolService = schoolService;
         this.systemAdminService = systemAdminService;
+        this.studentStatsViewService = studentStatsViewService;
     }
 
     @GetMapping("/get-school-admin-accounts")
@@ -138,5 +148,37 @@ public class SystemAdminBusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @GetMapping("/class/knowledge-point-status")
+    public ResponseEntity<ClassKnowledgePointStatusResponse> getClassKnowledgePointStatus(@RequestParam Long classId){
+        ClassKnowledgePointStatusResponse response = new ClassKnowledgePointStatusResponse();
+        List<ClassKnowledgePointStatusResponse.infoData> data = new ArrayList<>();
+        List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByClassId(classId);
+        if(studentStatsViews != null){
+            studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+            String nameTemp = studentStatsViews.get(0).getType();
+            int score = 0;
+            int totalScore = 0;
+            ClassKnowledgePointStatusResponse.infoData infoData;
+            for(int i = 0; i < studentStatsViews.size(); i++){
+                if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                    infoData = new ClassKnowledgePointStatusResponse.infoData();
+                    infoData.setName(nameTemp);
+                    infoData.setScore(new BigDecimal(100 * score).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP));
+                    data.add(infoData);
+                    nameTemp = studentStatsViews.get(i).getType();
+                    score = 0;
+                    totalScore = 0;
+                }
+                score += studentStatsViews.get(i).getScore();
+                totalScore += studentStatsViews.get(i).getTotalScore();
+            }
+            infoData = new ClassKnowledgePointStatusResponse.infoData();
+            infoData.setName(nameTemp);
+            infoData.setScore(new BigDecimal(100 * score).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP));
+            data.add(infoData);
+        }
+        response.setData(data);
+        response.setMessage("success");
+        return ResponseEntity.ok(response);
+    }
 }
