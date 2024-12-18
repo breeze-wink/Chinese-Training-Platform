@@ -18,6 +18,8 @@ import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/teacher")
 public class TeacherManagementController {
+    private static final Logger logger = LoggerFactory.getLogger(TeacherBusinessController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("operations.teacher");
     private final TeacherService teacherService;
     private final AuthorizationCodeService authorizationCodeService;
 

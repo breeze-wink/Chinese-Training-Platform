@@ -46,7 +46,11 @@ import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jakarta.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -66,6 +70,8 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/teacher")
 public class TeacherBusinessController {
+    private static final Logger logger = LoggerFactory.getLogger(TeacherBusinessController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("operations.teacher");
     private final CourseStandardService courseStandardService;
     private final ClassService classService;
     private final ClassGroupService classGroupService;
@@ -1319,7 +1325,7 @@ public class TeacherBusinessController {
                 for (int i = 0; i < info.getChoices().size(); i ++ ){
                     choices.append(info.getChoices().get(i));
                     if (i != info.getChoices().size() - 1) {
-                        choices.append("\\$\\$");
+                        choices.append("$$");
                     }
                 }
                 question.setOptions(choices.toString());
@@ -1398,7 +1404,7 @@ public class TeacherBusinessController {
                 for (int i = 0; i < info.getChoices().size(); i++) {
                     choices.append(info.getChoices().get(i));
                     if (i != info.getChoices().size() - 1) {
-                        choices.append("\\$\\$");
+                        choices.append("$$");
                     }
                 }
                 question.setOptions(choices.toString());
@@ -1409,7 +1415,6 @@ public class TeacherBusinessController {
             }
             question.setAnswer(info.getAnswer() + "$$" + info.getAnalysis());
             questionService.updateQuestion(question);
-            questionService.access(question);
         }
 
         //大题
@@ -1431,7 +1436,7 @@ public class TeacherBusinessController {
                     for (int j = 0; j < info.getChoices().size(); j++) {
                         choices.append(info.getChoices().get(j));
                         if (j != info.getChoices().size() - 1) {
-                            choices.append("\\$\\$");
+                            choices.append("$$");
                         }
                     }
                     question.setOptions(choices.toString());
@@ -1444,7 +1449,6 @@ public class TeacherBusinessController {
                 questionService.updateQuestion(question);
             }
             questionBodyService.updateQuestionBody(questionBody);
-            questionBodyService.access(questionBody);
         }
 
         return ResponseEntity.ok(new Message("题目修改成功"));

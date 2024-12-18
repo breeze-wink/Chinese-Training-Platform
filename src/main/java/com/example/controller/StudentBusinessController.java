@@ -14,6 +14,7 @@ import com.example.model.submission.AssignmentSubmission;
 import com.example.model.submission.PracticeAnswer;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.StatsStudent;
+import com.example.model.user.Student;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.GroupStudentService;
@@ -28,12 +29,16 @@ import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.submission.PracticeAnswerService;
 import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
+import com.example.service.user.StudentService;
+import com.example.service.user.impl.StudentServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.submission.impl.PracticeAnswerServiceImpl;
 import com.example.service.user.StatsStudentService;
 import com.example.service.user.impl.StatsStudentServiceImpl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +55,10 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/student")
 public class StudentBusinessController {
+    private static final Logger logger = LoggerFactory.getLogger(StudentBusinessController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("operations.student");
     private final PracticeService practiceService;
+    private final StudentService studentService;
     private final KnowledgePointService knowledgePointService;
     private final QuestionService questionService;
     private final PracticeQuestionService practiceQuestionService;
@@ -81,7 +89,8 @@ public class StudentBusinessController {
                                       AssignmentRecipientServiceImpl assignmentRecipientService,
                                       AssignmentServiceImpl assignmentService,
                                       PaperQuestionServiceImpl paperQuestionService,
-                                      SubmissionAnswerServiceImpl submissionAnswerService
+                                      SubmissionAnswerServiceImpl submissionAnswerService,
+                                      StudentServiceImpl studentService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -98,24 +107,32 @@ public class StudentBusinessController {
         this.assignmentService = assignmentService;
         this.paperQuestionService = paperQuestionService;
         this.submissionAnswerService = submissionAnswerService;
+        this.studentService = studentService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
     public ResponseEntity<GetUnfinishedPractices> getUnfinishedPractices(@PathVariable Long id) {
-        GetUnfinishedPractices response = new GetUnfinishedPractices();
-        List<Practice> practices = practiceService.getPracticesByStudentId(id);
-        List<GetUnfinishedPractices.InfoData> data = new ArrayList<>();
-        for(Practice practice : practices){
-            if(practice.getPracticeTime() == null ){
-                GetUnfinishedPractices.InfoData infoData = new GetUnfinishedPractices.InfoData();
-                infoData.setPracticeId(practice.getId());
-                infoData.setPracticeName(practice.getName());
-                data.add(infoData);
-            }
-        }
-        response.setData(data);
-        response.setMessage("未完成作业列表获取成功");
-        return ResponseEntity.ok(response);
+       try {
+           GetUnfinishedPractices response = new GetUnfinishedPractices();
+           List<Practice> practices = practiceService.getPracticesByStudentId(id);
+           List<GetUnfinishedPractices.InfoData> data = new ArrayList<>();
+           for(Practice practice : practices){
+               if(practice.getPracticeTime() == null ){
+                   GetUnfinishedPractices.InfoData infoData = new GetUnfinishedPractices.InfoData();
+                   infoData.setPracticeId(practice.getId());
+                   infoData.setPracticeName(practice.getName());
+                   data.add(infoData);
+               }
+           }
+           response.setData(data);
+           response.setMessage("未完成作业列表获取成功");
+           Student student = studentService.getStudentById(id);
+           operationLogger.info("学生{} 获取了作业列表", student.info());
+           return ResponseEntity.ok(response);
+       } catch (Exception e) {
+           logger.error("获取未完成作业列表失败，错误信息: {}", e.getMessage(), e);
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+       }
     }
 
 

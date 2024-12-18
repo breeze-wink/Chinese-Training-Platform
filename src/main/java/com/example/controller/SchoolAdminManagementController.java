@@ -20,15 +20,20 @@ import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/school-admin")
 public class SchoolAdminManagementController {
+    private static final Logger logger = LoggerFactory.getLogger(SchoolAdminManagementController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("operations.schoolAdministrator");
     private final SchoolAdminService schoolAdminService;
     private final SchoolService schoolService;
     private final AuthorizationCodeService authorizationCodeService;
@@ -51,71 +56,87 @@ public class SchoolAdminManagementController {
 
     @PostMapping("/login")
     public ResponseEntity<SchoolAdminLoginResponse> login(@RequestBody SchoolAdminLoginRequest request) {
-        String account = request.getAccount();
-        String password = request.getPassword();
+        try {
+            String account = request.getAccount();
+            String password = request.getPassword();
 
-        SchoolAdmin admin = schoolAdminService.authenticate(account, password);
+            SchoolAdmin admin = schoolAdminService.authenticate(account, password);
 
-        if (admin != null) {
-            SchoolAdminLoginResponse response = new SchoolAdminLoginResponse();
-            String jwt = jwtTokenUtil.generateToken(admin);
-            response.setToken(jwt);
-            response.setMessage("success");
-            response.setId(admin.getId());
-            return ResponseEntity.ok(response);
-        }
-        else {
-            SchoolAdminLoginResponse response = new SchoolAdminLoginResponse();
-            response.setMessage("用户名或密码错误");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            if (admin != null) {
+                SchoolAdminLoginResponse response = new SchoolAdminLoginResponse();
+                String jwt = jwtTokenUtil.generateToken(admin);
+                response.setToken(jwt);
+                response.setMessage("success");
+                response.setId(admin.getId());
+                return ResponseEntity.ok(response);
+            }
+            else {
+                SchoolAdminLoginResponse response = new SchoolAdminLoginResponse();
+                response.setMessage("用户名或密码错误");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        } catch (Exception e) {
+            logger.error("学校管理员登陆出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
     @GetMapping("/{id}")
     public ResponseEntity<SchoolAdminInfoResponse> getSchoolAdminInfo(@PathVariable Long id) {
-        SchoolAdmin admin = schoolAdminService.getSchoolAdminById(id);
-        SchoolAdminInfoResponse response = new SchoolAdminInfoResponse();
-        if (admin != null) {
-            AuthorizationCode code = authorizationCodeService.getAuthorizationCodeBySchoolId(admin.getSchoolId());
-            response.setMessage("success");
-            School school = schoolService.getSchoolById(admin.getSchoolId());
-            SchoolAdminInfoResponse.InfoData data = new SchoolAdminInfoResponse.InfoData();
-            data.setUsername(admin.getUsername());
-            data.setEmail(admin.getEmail());
-            data.setName(admin.getName());
-            data.setSchoolName(school.getName());
-            if(code == null){
-                data.setAuthorizationCode("无");
-            }
-            else{
-                data.setAuthorizationCode(code.getCode());
-                data.setCreateDate(code.getCreateDate().toString());
-            }
-            response.setData(data);
+        try {
+            SchoolAdmin admin = schoolAdminService.getSchoolAdminById(id);
+            SchoolAdminInfoResponse response = new SchoolAdminInfoResponse();
+            if (admin != null) {
+                AuthorizationCode code = authorizationCodeService.getAuthorizationCodeBySchoolId(admin.getSchoolId());
+                response.setMessage("success");
+                School school = schoolService.getSchoolById(admin.getSchoolId());
+                SchoolAdminInfoResponse.InfoData data = new SchoolAdminInfoResponse.InfoData();
+                data.setUsername(admin.getUsername());
+                data.setEmail(admin.getEmail());
+                data.setName(admin.getName());
+                data.setSchoolName(school.getName());
+                if(code == null){
+                    data.setAuthorizationCode("无");
+                }
+                else{
+                    data.setAuthorizationCode(code.getCode());
+                    data.setCreateDate(code.getCreateDate().toString());
+                }
+                response.setData(data);
 
-            return ResponseEntity.ok(response);
-        } else {
-            response.setMessage("用户未找到");
-            response.setData(null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.ok(response);
+            } else {
+                response.setMessage("用户未找到");
+                response.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        }catch (Exception e) {
+            logger.error("学校管理员获取信息出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping("/{id}/change-password")
     public ResponseEntity<Message> changePassword(@PathVariable Long id, @RequestBody SchoolAdminChangePasswordRequest request) {
-        Message response = new Message();
-        SchoolAdmin admin = schoolAdminService.getSchoolAdminById(id);
-        if(admin == null) {
-            response.setMessage("用户未找到");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        if(!admin.getPassword().equals(request.getPassword())){
-            response.setMessage("旧密码错误");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        admin.setPassword(request.getNewPassword());
-        schoolAdminService.updateSchoolAdmin(admin);
-        response.setMessage("密码修改成功");
-        return ResponseEntity.ok(response);
+       try {
+           Message response = new Message();
+           SchoolAdmin admin = schoolAdminService.getSchoolAdminById(id);
+           if(admin == null) {
+               response.setMessage("用户未找到");
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+           }
+           if(!admin.getPassword().equals(request.getPassword())){
+               response.setMessage("旧密码错误");
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+           }
+           admin.setPassword(request.getNewPassword());
+           schoolAdminService.updateSchoolAdmin(admin);
+           response.setMessage("密码修改成功");
+           operationLogger.info("学校管理员 {} 修改密码", admin.info());
+           return ResponseEntity.ok(response);
+       } catch (Exception e) {
+           logger.error("学校管理员修改密码出现问题 {}", e.getMessage(), e);
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+       }
     }
     @PutMapping("/{id}/update-username")
     public ResponseEntity<Message> updateUserName(@PathVariable Long id, @RequestBody UpdateUsernameRequest request) {
@@ -128,9 +149,10 @@ public class SchoolAdminManagementController {
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
             schoolAdmin.setUsername(username);
             schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            operationLogger.info("学校管理员 {} 修改用户名", schoolAdmin.info());
             return ResponseEntity.ok(new Message("修改成功"));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("学校管理员修改用户名出现问题 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误" + e.getMessage()));
         }
     }
@@ -144,23 +166,29 @@ public class SchoolAdminManagementController {
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
             schoolAdmin.setName(name);
             schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            operationLogger.info("学校管理员 {} 修改姓名", schoolAdmin.info());
             return ResponseEntity.ok(new Message("修改成功"));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("学校管理员修改姓名出现问题 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message("修改错误" + e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/send-verification-code")
     public ResponseEntity<SchoolEmailVerifyResponse> sendVerificationCode(@PathVariable Long id, @RequestBody SchoolAdminBindEmailRequest request) throws MessagingException {
-        String email = request.getEmail();
+        try {
+            String email = request.getEmail();
 
-        SchoolEmailVerifyResponse response = new SchoolEmailVerifyResponse();
+            SchoolEmailVerifyResponse response = new SchoolEmailVerifyResponse();
 
-        String verificationCode = emailService.sendEmail(email);
-        response.setVerificationCode(verificationCode);
-        response.setMessage("验证码已发送");
-        return ResponseEntity.ok(response);
+            String verificationCode = emailService.sendEmail(email);
+            response.setVerificationCode(verificationCode);
+            response.setMessage("验证码已发送");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("学校管理员发送验证码出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/{id}/bind-email")
@@ -171,8 +199,10 @@ public class SchoolAdminManagementController {
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
             schoolAdmin.setEmail(email);
             schoolAdminService.updateSchoolAdmin(schoolAdmin);
+            operationLogger.info("学校管理员 {} 绑定邮箱: {}", schoolAdmin.info(), email);
             return ResponseEntity.ok(new Message("成功"));
         } catch (Exception e) {
+            logger.error("学校管理员绑定邮箱出现问题 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
         }
 

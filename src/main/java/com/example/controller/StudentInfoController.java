@@ -17,6 +17,8 @@ import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,8 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/student")
 public class StudentInfoController {
+    private static final Logger logger = LoggerFactory.getLogger(StudentInfoController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("operations.student");
     private final StudentService studentService;
     private final EmailService emailService;
     private final ClassStudentService classStudentService;

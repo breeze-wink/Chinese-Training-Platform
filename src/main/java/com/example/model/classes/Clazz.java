@@ -13,4 +13,12 @@ public class Clazz {
     private Long creatorId;
     private Long schoolId;
 
+    public String info() {
+        String ret = "(id:" + id;
+        if (name != null && !name.isEmpty()) {
+            ret += ", 名字:" + name;
+        }
+        ret += ")";
+        return ret;
+    }
 }
