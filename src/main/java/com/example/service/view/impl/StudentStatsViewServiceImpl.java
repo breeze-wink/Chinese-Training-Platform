@@ -22,4 +22,10 @@ public class StudentStatsViewServiceImpl implements StudentStatsViewService {
     public List<StudentStatsView> selectByClassId(Long classId) {
         return studentStatsViewMapper.selectByClassId(classId);
     }
+
+    @Override
+    @Transactional
+    public List<StudentStatsView> selectByStudentId(Long studentId) {
+        return studentStatsViewMapper.selectByStudentId(studentId);
+    }
 }

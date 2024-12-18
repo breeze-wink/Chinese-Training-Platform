@@ -5,6 +5,7 @@ import com.example.dto.redis.SubQuestion;
 import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
 import com.example.dto.response.student.*;
+import com.example.dto.response.teacher.ClassKnowledgePointStatusResponse;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.GroupStudent;
@@ -15,6 +16,7 @@ import com.example.model.submission.PracticeAnswer;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.StatsStudent;
 import com.example.model.user.Student;
+import com.example.model.view.StudentStatsView;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.GroupStudentService;
@@ -31,6 +33,8 @@ import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
+import com.example.service.view.StudentStatsViewService;
+import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.submission.impl.PracticeAnswerServiceImpl;
@@ -43,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,6 +78,7 @@ public class StudentBusinessController {
     private final AssignmentService assignmentService;
     private final PaperQuestionService paperQuestionService;
     private final SubmissionAnswerService submissionAnswerService;
+    private final StudentStatsViewService studentStatsViewService;
 
     @Autowired
     public StudentBusinessController (PracticeServiceImpl practiceService,
@@ -90,7 +96,8 @@ public class StudentBusinessController {
                                       AssignmentServiceImpl assignmentService,
                                       PaperQuestionServiceImpl paperQuestionService,
                                       SubmissionAnswerServiceImpl submissionAnswerService,
-                                      StudentServiceImpl studentService
+                                      StudentServiceImpl studentService,
+                                      StudentStatsViewServiceImpl studentStatsViewService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -108,6 +115,7 @@ public class StudentBusinessController {
         this.paperQuestionService = paperQuestionService;
         this.submissionAnswerService = submissionAnswerService;
         this.studentService = studentService;
+        this.studentStatsViewService = studentStatsViewService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -775,39 +783,30 @@ public class StudentBusinessController {
         try {
             MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
             List<MultidimensionalScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                MultidimensionalScoresResponse.infoData infoData = new MultidimensionalScoresResponse.infoData();
-                infoData.setName(knowledgePoint.getType());
-                infoData.setScore(null);
-                boolean flag = false;
-                for (MultidimensionalScoresResponse.infoData datum : data) {
-                    if (datum.getName().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(id);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Double score = 0.0;
+                Double totalScore = 0.0;
+                MultidimensionalScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new MultidimensionalScoresResponse.infoData();
+                        infoData.setName(nameTemp);
+                        infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        score = 0.0;
+                        totalScore = 0.0;
                     }
+                    score += studentStatsViews.get(i).getScore();
+                    totalScore += studentStatsViews.get(i).getTotalScore();
                 }
-                if(!flag){
-                    long totalScore = 0L;
-                    long score = 0L;
-                    for(StatsStudent statsStudent : statsStudents) {
-                        if(knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId()).getType().equals(infoData.getName())){
-                            if(statsStudent.getTotalScore() != null){
-                                totalScore += statsStudent.getTotalScore();
-                            }
-                            if(statsStudent.getScore() != null){
-                                score += statsStudent.getScore();
-                            }
-                        }
-                    }
-                    if(totalScore != 0){
-                        double scorePercentage = 100 * (double) score / (double) totalScore;
-                        scorePercentage = Double.parseDouble(String.format("%.2f", scorePercentage));
-                        infoData.setScore(scorePercentage);
-                    }
-                    data.add(infoData);
-                }
+                infoData = new MultidimensionalScoresResponse.infoData();
+                infoData.setName(nameTemp);
+                infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("各项成绩获取成功");

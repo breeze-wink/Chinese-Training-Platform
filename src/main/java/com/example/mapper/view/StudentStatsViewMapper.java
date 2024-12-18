@@ -12,4 +12,7 @@ public interface StudentStatsViewMapper {
 
     @Select("select * from student_stats_view where classId = #{classId}")
     List<StudentStatsView> selectByClassId(Long classId);
+
+    @Select("select * from student_stats_view where studentId = #{studentId}")
+    List<StudentStatsView> selectByStudentId(Long studentId);
 }
