@@ -17,7 +17,6 @@ public class GeneratePaperWithTypesResponse {
     public static class QuestionInfo{
         private Long id;
         private String body;
-        private Double difficulty;
         private List<SubQuestion> subQuestions;
     }
 
@@ -29,6 +28,7 @@ public class GeneratePaperWithTypesResponse {
         private String explanation;
         private String type;
         private String knowledgePoint;
+        private Double difficulty;
         private List<String> options;
     }
 
