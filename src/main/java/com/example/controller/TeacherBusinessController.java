@@ -1661,63 +1661,6 @@ public class TeacherBusinessController {
                     subQuestionInfo.setType(question.getType());
                     if(question.getType().equals("CHOICE")){
                         subQuestionInfo.setOptions(drawOptionsNew(question.getOptions()));
-                        if(submissionAnswer.getScore() == null){
-                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, question.getKnowledgePointId());
-                            if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
-                                submissionAnswer.setScore(submissionAnswer.getQuestionScore());
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudent.setScore(statsStudent.getScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(100L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setTotalScore(questionStatistic.getTotalScore() + 1.0);
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setTotalScore(questionBodyStatistic.getTotalScore() + 1.0);
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            else {
-                                submissionAnswer.setScore(0);
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(0L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            submissionAnswerService.update(submissionAnswer);
-                        }
                     }
                     subQuestionInfo.setSubScore(submissionAnswer.getQuestionScore());
                     scoreTemp += submissionAnswer.getQuestionScore();
@@ -1752,63 +1695,6 @@ public class TeacherBusinessController {
                             subQuestionInfoTemp.setType(questionTemp.getType());
                             if(questionTemp.getType().equals("CHOICE")){
                                 subQuestionInfoTemp.setOptions(drawOptionsNew(questionTemp.getOptions()));
-                                if(submissionAnswer.getScore() == null){
-                                    StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, questionTemp.getKnowledgePointId());
-                                    if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
-                                        submissionAnswer.setScore(submissionAnswer.getQuestionScore());
-                                        if(statsStudent != null){
-                                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                            statsStudent.setScore(statsStudent.getScore() + 100);
-                                            statsStudentService.updateStatsStudent(statsStudent);
-                                        }
-                                        else{
-                                            StatsStudent statsStudentNew = new StatsStudent();
-                                            statsStudentNew.setStudentId(studentId);
-                                            statsStudentNew.setKnowledgePointId(questionTemp.getKnowledgePointId());
-                                            statsStudentNew.setTotalScore(100L);
-                                            statsStudentNew.setScore(100L);
-                                            statsStudentService.addStatsStudent(statsStudentNew);
-                                        }
-
-                                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(questionTemp.getId(), "small");
-                                        questionStatistic.setTotalScore(questionStatistic.getTotalScore() + 1.0);
-                                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                        questionStatisticService.update(questionStatistic);
-                                        if(questionTemp.getBodyId() != null){
-                                            QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(questionTemp.getBodyId(), "big");
-                                            questionBodyStatistic.setTotalScore(questionBodyStatistic.getTotalScore() + 1.0);
-                                            questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                            questionStatisticService.update(questionBodyStatistic);
-                                        }
-
-                                    }
-                                    else {
-                                        submissionAnswer.setScore(0);
-                                        if(statsStudent != null){
-                                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                            statsStudentService.updateStatsStudent(statsStudent);
-                                        }
-                                        else{
-                                            StatsStudent statsStudentNew = new StatsStudent();
-                                            statsStudentNew.setStudentId(studentId);
-                                            statsStudentNew.setKnowledgePointId(questionTemp.getKnowledgePointId());
-                                            statsStudentNew.setTotalScore(100L);
-                                            statsStudentNew.setScore(0L);
-                                            statsStudentService.addStatsStudent(statsStudentNew);
-                                        }
-
-                                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(questionTemp.getId(), "small");
-                                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                        questionStatisticService.update(questionStatistic);
-                                        if(questionTemp.getBodyId() != null){
-                                            QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(questionTemp.getBodyId(), "big");
-                                            questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                            questionStatisticService.update(questionBodyStatistic);
-                                        }
-
-                                    }
-                                    submissionAnswerService.update(submissionAnswer);
-                                }
                             }
                             subQuestionInfoTemp.setSubScore(submissionAnswer.getQuestionScore());
                             scoreTemp += submissionAnswer.getQuestionScore();
@@ -1846,63 +1732,6 @@ public class TeacherBusinessController {
                     questionInfo.setType(question.getType());
                     if(question.getType().equals("CHOICE")){
                         questionInfo.setOptions(drawOptionsNew(question.getOptions()));
-                        if(submissionAnswer.getScore() == null){
-                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, question.getKnowledgePointId());
-                            if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
-                                submissionAnswer.setScore(submissionAnswer.getQuestionScore());
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudent.setScore(statsStudent.getScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(100L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setTotalScore(questionStatistic.getTotalScore() + 1.0);
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setTotalScore(questionBodyStatistic.getTotalScore() + 1.0);
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            else {
-                                submissionAnswer.setScore(0);
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(0L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            submissionAnswerService.update(submissionAnswer);
-                        }
                     }
                     questionInfo.setStudentAnswer(submissionAnswer.getAnswerContent());
                     questionInfo.setScore(submissionAnswer.getQuestionScore());
