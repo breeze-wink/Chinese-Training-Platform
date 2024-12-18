@@ -3269,16 +3269,15 @@
   - 请求体(`JSON` 格式)：
     ```json
     {
+      "feedback" : "string",
       "data" : [
         {
           "submissionAnswerId" : "long",
-          "markScore" : "int",
-          "feedback" : "string"
+          "markScore" : "int"
         },
         {
           "submissionAnswerId" : "long",
-          "markScore" : "int",
-          "feedback" : "string"
+          "markScore" : "int"
         },
         ...
       ]

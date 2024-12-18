@@ -9,12 +9,12 @@ import java.util.List;
 @Setter
 public class MarkSubmissionRequest {
     private List<infoData> data;
+    private String feedback;
 
     @Getter
     @Setter
     public static class infoData {
         private Long submissionAnswerId;
         private Integer markScore;
-        private String feedback;
     }
 }

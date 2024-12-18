@@ -2145,9 +2145,6 @@ public class TeacherBusinessController {
                     if(infoData.getMarkScore() != null){
                         SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
                         submissionAnswer.setScore(infoData.getMarkScore());
-                        if(infoData.getFeedback() != null && !infoData.getFeedback().isEmpty()){
-                            submissionAnswer.setFeedback(infoData.getFeedback());
-                        }
                         submissionAnswerService.update(submissionAnswer);
                         Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
                         double scoreTempD = (double) submissionAnswer.getScore() / (double) submissionAnswer.getQuestionScore();
@@ -2192,6 +2189,7 @@ public class TeacherBusinessController {
                 }
             }
             assignmentSubmission.setTotalScore(score);
+            assignmentSubmission.setFeedback(request.getFeedback());
             assignmentSubmissionService.update(assignmentSubmission);
             response.setMessage("success");
             return ResponseEntity.ok(response);
