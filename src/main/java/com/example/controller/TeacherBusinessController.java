@@ -3,12 +3,11 @@ package com.example.controller;
 import com.example.dto.mapper.QuestionStatisticDTO;
 import com.example.dto.redis.PreAssembledQuestion;
 import com.example.dto.redis.SubQuestion;
+import com.example.dto.request.student.StudentChangeEmailRequest;
+import com.example.dto.request.student.StudentChangeEmailVerificationRequest;
 import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
-import com.example.dto.response.student.AvgScoreResponse;
-import com.example.dto.response.student.HistoryScoresResponse;
-import com.example.dto.response.student.MultidimensionalScoresResponse;
-import com.example.dto.response.student.WeaknessScoresResponse;
+import com.example.dto.response.student.*;
 import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
@@ -16,6 +15,7 @@ import com.example.model.course.KnowledgePoint;
 import com.example.model.question.*;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.BaseUser;
+import com.example.model.user.Student;
 import com.example.model.user.Teacher;
 import com.example.model.view.*;
 import com.example.service.cache.CacheRefreshService;
@@ -31,6 +31,7 @@ import com.example.service.question.*;
 import com.example.service.question.impl.*;
 import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
+import com.example.service.utils.EmailService;
 import com.example.service.view.*;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.view.impl.AssignmentScoresViewServiceImpl;
@@ -45,8 +46,11 @@ import com.example.service.user.impl.StudentServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -97,6 +101,7 @@ public class TeacherBusinessController {
     private final AssignmentStatsViewService assignmentStatsViewService;
     private final AssignmentScoresViewService assignmentScoresViewService;
     private final PreAssembledQuestionService preAssembledQuestionService;
+    private final EmailService emailService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -126,7 +131,8 @@ public class TeacherBusinessController {
                                      SubmissionAnswerServiceImpl submissionAnswerService,
                                      AssignmentStatsViewServiceImpl assignmentStatsViewService,
                                      AssignmentScoresViewServiceImpl assignmentScoresViewService,
-                                     PreAssembledQuestionService preAssembledQuestionService
+                                     PreAssembledQuestionService preAssembledQuestionService,
+                                     EmailService emailService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -157,6 +163,7 @@ public class TeacherBusinessController {
         this.assignmentStatsViewService = assignmentStatsViewService;
         this.assignmentScoresViewService = assignmentScoresViewService;
         this.preAssembledQuestionService = preAssembledQuestionService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -1938,71 +1945,70 @@ public class TeacherBusinessController {
     @PostMapping("/api/teacher/mark-submission")
     public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal BaseUser user, @RequestBody MarkSubmissionRequest request) throws JsonProcessingException{
         Message response = new Message();
-        int score = 0;
-        AssignmentSubmission assignmentSubmission = null;
         try {
-            for(MarkSubmissionRequest.infoData infoData : request.getData()){
-                if(infoData.getMarkScore() != null){
-                    SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
-                    if(assignmentSubmission == null){
-                        assignmentSubmission = assignmentSubmissionService.selectById(submissionAnswer.getSubmissionId());
-                        if(assignmentSubmission.getTotalScore() != null){
-                            response.setMessage("不允许重复提交");
-                            return ResponseEntity.ok(response);
+            AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectById(submissionAnswerService.selectById(request.getData().get(0).getSubmissionAnswerId()).getSubmissionId());
+            if(assignmentSubmission.getTotalScore() != null){
+                response.setMessage("不允许重复提交");
+                return ResponseEntity.ok(response);
+            }
+            if(request.getData() != null && !request.getData().isEmpty()){
+                for(MarkSubmissionRequest.infoData infoData : request.getData()){
+                    if(infoData.getMarkScore() != null){
+                        SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
+                        submissionAnswer.setScore(infoData.getMarkScore());
+                        if(infoData.getFeedback() != null && !infoData.getFeedback().isEmpty()){
+                            submissionAnswer.setFeedback(infoData.getFeedback());
                         }
-                    }
-                    submissionAnswer.setScore(infoData.getMarkScore());
-                    score += submissionAnswer.getScore();
-                    submissionAnswerService.update(submissionAnswer);
-                    Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
+                        submissionAnswerService.update(submissionAnswer);
+                        Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
+
+                        Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
+                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
+                        questionStatistic.setTotalScore(questionStatistic.getTotalScore() + scoreTemp);
+                        questionStatisticService.update(questionStatistic);
+                        if(question.getBodyId() != null){
+                            QuestionStatistic bodyQuestionStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
+                            bodyQuestionStatistic.setCompleteCount(bodyQuestionStatistic.getCompleteCount() + 1);
+                            bodyQuestionStatistic.setTotalScore(bodyQuestionStatistic.getTotalScore() + scoreTemp);
+                            questionStatisticService.update(bodyQuestionStatistic);
+                        }
 
 
-                    Question question = new Question();
-                    try {
-                        question = questionService.getQuestionById(submissionAnswer.getQuestionId());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                    questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                    questionStatistic.setTotalScore(questionStatistic.getTotalScore() + scoreTemp);
-                    questionStatisticService.update(questionStatistic);
-                    if(question.getBodyId() != null){
-                        QuestionStatistic bodyQuestionStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                        bodyQuestionStatistic.setCompleteCount(bodyQuestionStatistic.getCompleteCount() + 1);
-                        bodyQuestionStatistic.setTotalScore(bodyQuestionStatistic.getTotalScore() + scoreTemp);
-                        questionStatisticService.update(bodyQuestionStatistic);
-                    }
+                        AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
+                        if(assignmentStatsView.getStatsScore() != null){
+                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
+                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
+                            statsStudent.setScore(statsStudent.getScore() + scoreTemp);
+                            statsStudentService.updateStatsStudent(statsStudent);
+                        }
+                        else {
+                            StatsStudent statsStudent = new StatsStudent();
+                            statsStudent.setStudentId(assignmentStatsView.getStudentId());
+                            statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
+                            statsStudent.setTotalScore(100L);
+                            statsStudent.setScore(scoreTemp);
+                            statsStudentService.addStatsStudent(statsStudent);
+                        }
 
-
-                    AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
-                    if(assignmentStatsView.getStatsScore() != null){
-                        StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
-                        statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                        statsStudent.setScore(statsStudent.getScore() + scoreTemp);
-                        statsStudentService.updateStatsStudent(statsStudent);
                     }
-                    else {
-                        StatsStudent statsStudent = new StatsStudent();
-                        statsStudent.setStudentId(assignmentStatsView.getStudentId());
-                        statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
-                        statsStudent.setTotalScore(100L);
-                        statsStudent.setScore(scoreTemp);
-                        statsStudentService.addStatsStudent(statsStudent);
-                    }
-
                 }
             }
+            int score = 0;
+            List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
+            for(SubmissionAnswer submissionAnswer : submissionAnswers){
+                if(submissionAnswer.getScore() != null) {
+                    score += submissionAnswer.getScore();
+                }
+            }
+            assignmentSubmission.setTotalScore(score);
+            assignmentSubmissionService.update(assignmentSubmission);
+            response.setMessage("success");
+            return ResponseEntity.ok(response);
         }catch (Exception e){
             response.setMessage("error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        if (assignmentSubmission != null) {
-            assignmentSubmission.setTotalScore(score);
-            assignmentSubmissionService.update(assignmentSubmission);
-        }
-        response.setMessage("success");
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/class/historical-scores")
@@ -2185,5 +2191,34 @@ public class TeacherBusinessController {
         response.setData(data);
         response.setMessage("success");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/send-email-code")
+    public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
+        SendEmailCodeResponse response = new SendEmailCodeResponse();
+        if (teacherService.emailExist(email)) {
+            response.setMessage("邮箱已注册");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        String code = emailService.sendEmail(email);
+        response.setCode(code);
+        response.setMessage("验证码已发送");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+        ChangeEmailResponse response = new ChangeEmailResponse();
+        try {
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            teacher.setEmail(newEmail);
+            teacherService.updateTeacher(teacher);
+            response.setMessage("邮箱更换成功");
+            response.setNewEmail(newEmail);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("邮箱更换失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

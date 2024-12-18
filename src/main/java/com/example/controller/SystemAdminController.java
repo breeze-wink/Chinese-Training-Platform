@@ -8,6 +8,8 @@ import com.example.dto.response.system.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
 import com.example.model.user.BaseUser;
+
+import com.example.model.user.SchoolAdmin;
 import com.example.model.user.SystemAdmin;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.KnowledgePointService;
@@ -15,12 +17,23 @@ import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SystemAdminServiceImpl;
+import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
+
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,16 +54,20 @@ public class SystemAdminController {
     private final CourseStandardService courseStandardService;
     private final KnowledgePointService knowledgePointService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final EmailService emailService;
 
     @Autowired
     public SystemAdminController(SystemAdminServiceImpl systemAdminService,
                                  CourseStandardServiceImpl courseStandardService,
                                  KnowledgePointServiceImpl knowledgePointService,
-                                 JwtTokenUtil jwtTokenUtil) {
+                                 JwtTokenUtil jwtTokenUtil,
+                                 EmailService emailService
+                                 ) {
         this.systemAdminService = systemAdminService;
         this.courseStandardService = courseStandardService;
         this.knowledgePointService = knowledgePointService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -385,6 +402,35 @@ public class SystemAdminController {
             response.setMessage("密码修改失败");
             logger.error("密码修改失败 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/send-email-code")
+    public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
+        SendEmailCodeResponse response = new SendEmailCodeResponse();
+        if (systemAdminService.emailExist(email)) {
+            response.setMessage("邮箱已注册");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        String code = emailService.sendEmail(email);
+        response.setCode(code);
+        response.setMessage("验证码已发送");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+        ChangeEmailResponse response = new ChangeEmailResponse();
+        try {
+            SystemAdmin systemAdmin = systemAdminService.getSystemAdminById(user.getId());
+            systemAdmin.setEmail(newEmail);
+            systemAdminService.updateSystemAdmin(systemAdmin);
+            response.setMessage("邮箱更换成功");
+            response.setNewEmail(newEmail);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("邮箱更换失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

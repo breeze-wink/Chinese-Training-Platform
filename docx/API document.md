@@ -3272,11 +3272,13 @@
       "data" : [
         {
           "submissionAnswerId" : "long",
-          "markScore" : "int"
+          "markScore" : "int",
+          "feedback" : "string"
         },
         {
           "submissionAnswerId" : "long",
-          "markScore" : "int"
+          "markScore" : "int",
+          "feedback" : "string"
         },
         ...
       ]
@@ -3298,7 +3300,7 @@
     ```
 
 
-### Get Class Knowledge Point Status
+### Get Class Knowledge Point Status `finished`
 
 - **接口路径**：`/api/teacher/class/knowledge-point-status`
 - **请求方法**：`POST`
@@ -3328,6 +3330,60 @@
     {
       "message": "获取失败",
       "data": null
+    }
+    ```
+
+
+### Send Email Code
+
+- **接口路径**：`/api/teacher/send-email-code`
+- **请求方法**：`GET`
+- **接口说明**：老师获取邮箱验证码。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`email`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success",
+      "code": "string"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "code": null
+    }
+    ```
+
+
+### Change Email
+
+- **接口路径**：`/api/teacher/change-email`
+- **请求方法**：`GET`
+- **接口说明**：老师更换邮箱。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`newEmail`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
     }
     ```
 
@@ -3878,6 +3934,59 @@
     }
     ```
 
+
+### Send Email Code
+
+- **接口路径**：`/api/system-admin/send-email-code`
+- **请求方法**：`GET`
+- **接口说明**：获取邮箱验证码。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`email`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success",
+      "code": "string"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "code": null
+    }
+    ```
+
+
+### Change Email
+
+- **接口路径**：`/api/system-admin/change-email`
+- **请求方法**：`GET`
+- **接口说明**：更换邮箱。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`newEmail`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
+    }
+    ```
 
 
 ## SchoolAdmin
@@ -4534,6 +4643,60 @@
     ```json
     {
       "message" : "邮箱已注册" //or  "用户名已存在"
+    }
+    ```
+
+
+### Send Email Code
+
+- **接口路径**：`/api/school-admin/send-email-code`
+- **请求方法**：`GET`
+- **接口说明**：老师获取邮箱验证码。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`email`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success",
+      "code": "string"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "获取失败",
+      "code": null
+    }
+    ```
+
+
+### Change Email
+
+- **接口路径**：`/api/school-admin/change-email`
+- **请求方法**：`GET`
+- **接口说明**：老师更换邮箱。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`newEmail`//邮箱
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
     }
     ```
 
