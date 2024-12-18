@@ -15,6 +15,6 @@ public class HistoryScoresResponse {
     @Getter
     public static class infoData {
         private String date;
-        private Double score;
+        private Integer score;
     }
 }
