@@ -8,6 +8,7 @@ import com.example.dto.response.teacher.TeacherLoginResponse;
 import com.example.dto.response.teacher.TeacherRegisterResponse;
 import com.example.dto.response.teacher.TeacherVerifyResponse;
 import com.example.model.user.AuthorizationCode;
+import com.example.model.user.BaseUser;
 import com.example.model.user.Teacher;
 import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolService;
@@ -20,6 +21,7 @@ import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -204,6 +206,49 @@ public class TeacherManagementController {
         teacherService.updateTeacher(teacher);
         response.setMessage("密码修改成功");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/send-email-code")
+    public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
+        SendEmailCodeResponse response = new SendEmailCodeResponse();
+        if (teacherService.emailExist(email)) {
+            response.setMessage("邮箱已注册");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        String code = emailService.sendEmail(email);
+        response.setCode(code);
+        response.setMessage("验证码已发送");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/change-email")
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+        ChangeEmailResponse response = new ChangeEmailResponse();
+        try {
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            teacher.setEmail(newEmail);
+            teacherService.updateTeacher(teacher);
+            response.setMessage("邮箱更换成功");
+            response.setNewEmail(newEmail);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("邮箱更换失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/delete-account")
+    public ResponseEntity<Message> deleteAccount(@AuthenticationPrincipal BaseUser user) {
+        Message response = new Message();
+        try {
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            teacherService.removeTeacher(teacher.getId());
+            response.setMessage("删除成功");
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("删除失败");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
 }

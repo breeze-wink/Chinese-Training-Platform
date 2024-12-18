@@ -178,7 +178,7 @@ public class SchoolAdminManagementController {
 
     }
 
-    @PostMapping("/send-email-code")
+    @GetMapping("/send-email-code")
     public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
         SendEmailCodeResponse response = new SendEmailCodeResponse();
         if (schoolAdminService.emailExist(email)) {
@@ -191,7 +191,7 @@ public class SchoolAdminManagementController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/change-email")
+    @GetMapping("/change-email")
     public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {

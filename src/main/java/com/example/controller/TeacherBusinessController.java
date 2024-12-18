@@ -2189,32 +2189,4 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/send-email-code")
-    public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
-        SendEmailCodeResponse response = new SendEmailCodeResponse();
-        if (teacherService.emailExist(email)) {
-            response.setMessage("邮箱已注册");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        String code = emailService.sendEmail(email);
-        response.setCode(code);
-        response.setMessage("验证码已发送");
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/change-email")
-    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
-        ChangeEmailResponse response = new ChangeEmailResponse();
-        try {
-            Teacher teacher = teacherService.getTeacherById(user.getId());
-            teacher.setEmail(newEmail);
-            teacherService.updateTeacher(teacher);
-            response.setMessage("邮箱更换成功");
-            response.setNewEmail(newEmail);
-            return ResponseEntity.ok(response);
-        }catch (Exception e){
-            response.setMessage("邮箱更换失败");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
 }
