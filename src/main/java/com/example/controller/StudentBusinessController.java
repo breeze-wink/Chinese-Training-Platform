@@ -16,6 +16,7 @@ import com.example.model.submission.PracticeAnswer;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.StatsStudent;
 import com.example.model.user.Student;
+import com.example.model.view.AssignmentIdStudentIdScore;
 import com.example.model.view.StudentStatsView;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassStudentService;
@@ -33,7 +34,9 @@ import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
+import com.example.service.view.AssignmentScoresViewService;
 import com.example.service.view.StudentStatsViewService;
+import com.example.service.view.impl.AssignmentScoresViewServiceImpl;
 import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
@@ -79,6 +82,7 @@ public class StudentBusinessController {
     private final PaperQuestionService paperQuestionService;
     private final SubmissionAnswerService submissionAnswerService;
     private final StudentStatsViewService studentStatsViewService;
+    private final AssignmentScoresViewService assignmentScoresViewService;
 
     @Autowired
     public StudentBusinessController (PracticeServiceImpl practiceService,
@@ -97,7 +101,8 @@ public class StudentBusinessController {
                                       PaperQuestionServiceImpl paperQuestionService,
                                       SubmissionAnswerServiceImpl submissionAnswerService,
                                       StudentServiceImpl studentService,
-                                      StudentStatsViewServiceImpl studentStatsViewService
+                                      StudentStatsViewServiceImpl studentStatsViewService,
+                                      AssignmentScoresViewServiceImpl assignmentScoresViewService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -116,6 +121,7 @@ public class StudentBusinessController {
         this.submissionAnswerService = submissionAnswerService;
         this.studentService = studentService;
         this.studentStatsViewService = studentStatsViewService;
+        this.assignmentScoresViewService = assignmentScoresViewService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -824,39 +830,36 @@ public class StudentBusinessController {
         try {
             WeaknessScoresResponse response = new WeaknessScoresResponse();
             List<WeaknessScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                WeaknessScoresResponse.infoData infoData = new WeaknessScoresResponse.infoData();
-                infoData.setType(knowledgePoint.getType());
-                infoData.setWeaknessName(null);
-                infoData.setWeaknessScore(null);
-                boolean flag = false;
-                for (WeaknessScoresResponse.infoData datum : data) {
-                    if (datum.getType().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(id);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Long knowledgePointIdTemp = studentStatsViews.get(0).getKnowledgePointId();
+                double avgScore = 1.0;
+                WeaknessScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new WeaknessScoresResponse.infoData();
+                        infoData.setType(nameTemp);
+                        infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                        infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = 1.0;
+                    }
+                    StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(id, studentStatsViews.get(i).getKnowledgePointId());
+                    double scoreTemp = (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
+                    if(scoreTemp < avgScore){
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = scoreTemp;
                     }
                 }
-                if(!flag){
-                    for(StatsStudent statsStudent : statsStudents) {
-                        KnowledgePoint knowledgePointTemp = knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId());
-                        if(knowledgePointTemp.getType().equals(infoData.getType())){
-                            double scoreTemp;
-                            if(statsStudent.getTotalScore() != null && statsStudent.getScore() != null){
-                                scoreTemp = 100 * (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
-                            }
-                            else{
-                                scoreTemp = 0;
-                            }
-                            if(infoData.getWeaknessName() == null || infoData.getWeaknessScore() == null || scoreTemp < infoData.getWeaknessScore()){
-                                infoData.setWeaknessName(knowledgePointTemp.getName());
-                                infoData.setWeaknessScore(scoreTemp);
-                            }
-                        }
-                    }
-                    data.add(infoData);
-                }
+                infoData = new WeaknessScoresResponse.infoData();
+                infoData.setType(nameTemp);
+                infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("短板获取成功");
@@ -874,15 +877,16 @@ public class StudentBusinessController {
         try {
             HistoryScoresResponse response = new HistoryScoresResponse();
             List<HistoryScoresResponse.infoData> data = new ArrayList<>();
-            List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(id);
-            for(int i = 0; i < submissions.size() && i < 10; i++){
-                HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-                Assignment assignment = assignmentService.selectById(submissions.get(i).getAssignmentId());
-                infoData.setDate(assignment.getEndTime().toString());
-                if(submissions.get(i).getTotalScore() != null){
-                    infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(id);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    if(assignmentIdStudentIdScore.getScore() != null){
+                        HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
+                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().toString());
+                        infoData.setScore(assignmentIdStudentIdScore.getScore());
+                        data.add(infoData);
+                    }
                 }
-                data.add(infoData);
             }
             data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
             response.setData(data);

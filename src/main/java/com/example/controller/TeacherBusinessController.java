@@ -866,12 +866,6 @@ public class TeacherBusinessController {
             AvgScoreResponse.infoData data = new AvgScoreResponse.infoData();
             data.setAverageHomeworkScore(null);
             data.setClassRank(null);
-            Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
-            if(!Objects.equals(clazz.getCreatorId(), id)){
-                response.setMessage("无权限");
-                response.setData(null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
             List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
             if(statsStudents != null && (!statsStudents.isEmpty())){
                 long totalScore = 0L;
@@ -980,45 +974,40 @@ public class TeacherBusinessController {
         WeaknessScoresResponse response = new WeaknessScoresResponse();
         try {
             List<WeaknessScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                WeaknessScoresResponse.infoData infoData = new WeaknessScoresResponse.infoData();
-                infoData.setType(knowledgePoint.getType());
-                infoData.setWeaknessName(null);
-                infoData.setWeaknessScore(null);
-                boolean flag = false;
-                for (WeaknessScoresResponse.infoData datum : data) {
-                    if (datum.getType().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(studentId);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Long knowledgePointIdTemp = studentStatsViews.get(0).getKnowledgePointId();
+                double avgScore = 1.0;
+                WeaknessScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new WeaknessScoresResponse.infoData();
+                        infoData.setType(nameTemp);
+                        infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                        infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = 1.0;
+                    }
+                    StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, studentStatsViews.get(i).getKnowledgePointId());
+                    double scoreTemp = (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
+                    if(scoreTemp < avgScore){
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = scoreTemp;
                     }
                 }
-                if(!flag){
-                    for(StatsStudent statsStudent : statsStudents) {
-                        KnowledgePoint knowledgePointTemp = knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId());
-                        if(knowledgePointTemp.getType().equals(infoData.getType())){
-                            double scoreTemp;
-                            if(statsStudent.getTotalScore() != null && statsStudent.getScore() != null){
-                                scoreTemp = 100 * (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
-                            }
-                            else{
-                                scoreTemp = 0;
-                            }
-                            if(infoData.getWeaknessName() == null || infoData.getWeaknessScore() == null || scoreTemp < infoData.getWeaknessScore()){
-                                infoData.setWeaknessName(knowledgePointTemp.getName());
-                                infoData.setWeaknessScore(scoreTemp);
-                            }
-                        }
-                    }
-                    data.add(infoData);
-                }
+                infoData = new WeaknessScoresResponse.infoData();
+                infoData.setType(nameTemp);
+                infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("短板获取成功");
-            Teacher teacher = teacherService.getTeacherById(id);
-            Student student = studentService.getStudentById(studentId);
-            operationLogger.info("教师 {} 获取了学生 {} 的短板", teacher.info(), student.info());
+            operationLogger.info("老师{}获取学生{}获取短板", teacherService.getTeacherById(id).info(), studentService.getStudentById(studentId).info());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("获取短板出现问题 {}", e.getMessage(), e);
@@ -1035,14 +1024,16 @@ public class TeacherBusinessController {
         try {
             List<HistoryScoresResponse.infoData> data = new ArrayList<>();
             List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(studentId);
-            for(int i = 0; i < submissions.size() && i < 10; i++){
-                HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-                Assignment assignment = assignmentService.selectById(submissions.get(i).getAssignmentId());
-                infoData.setDate(assignment.getEndTime().toString());
-                if(submissions.get(i).getTotalScore() != null){
-                    infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(studentId);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    if(assignmentIdStudentIdScore.getScore() != null){
+                        HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
+                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().toString());
+                        infoData.setScore(assignmentIdStudentIdScore.getScore());
+                        data.add(infoData);
+                    }
                 }
-                data.add(infoData);
             }
             data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
             response.setData(data);
