@@ -1621,6 +1621,12 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    private static List<String> drawOptionsNew(String optionString) {
+        List<String> choices = new ArrayList<>(List.of(optionString.split("\\$\\$")));
+        return choices;
+    }
+
     @GetMapping("{id}/get-submission")
     public ResponseEntity<GetSubmissionResponse> getSubmission(@PathVariable Long id, @RequestParam Long assignmentId, @RequestParam Long studentId) {
         GetSubmissionResponse response = new GetSubmissionResponse();
@@ -1654,7 +1660,7 @@ public class TeacherBusinessController {
                     }
                     subQuestionInfo.setType(question.getType());
                     if(question.getType().equals("CHOICE")){
-                        subQuestionInfo.setOptions(drawOptions(question.getOptions()));
+                        subQuestionInfo.setOptions(drawOptionsNew(question.getOptions()));
                         if(submissionAnswer.getScore() == null){
                             StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, question.getKnowledgePointId());
                             if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
@@ -1745,7 +1751,7 @@ public class TeacherBusinessController {
                             }
                             subQuestionInfoTemp.setType(questionTemp.getType());
                             if(questionTemp.getType().equals("CHOICE")){
-                                subQuestionInfoTemp.setOptions(drawOptions(questionTemp.getOptions()));
+                                subQuestionInfoTemp.setOptions(drawOptionsNew(questionTemp.getOptions()));
                                 if(submissionAnswer.getScore() == null){
                                     StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, questionTemp.getKnowledgePointId());
                                     if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
@@ -1839,7 +1845,7 @@ public class TeacherBusinessController {
                     }
                     questionInfo.setType(question.getType());
                     if(question.getType().equals("CHOICE")){
-                        questionInfo.setOptions(drawOptions(question.getOptions()));
+                        questionInfo.setOptions(drawOptionsNew(question.getOptions()));
                         if(submissionAnswer.getScore() == null){
                             StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, question.getKnowledgePointId());
                             if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
