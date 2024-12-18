@@ -2131,7 +2131,7 @@ public class TeacherBusinessController {
         }
     }
 
-    @PostMapping("/api/teacher/mark-submission")
+    @PostMapping("/mark-submission")
     public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal BaseUser user, @RequestBody MarkSubmissionRequest request) {
         Message response = new Message();
         try {
@@ -2354,7 +2354,7 @@ public class TeacherBusinessController {
         ClassKnowledgePointStatusResponse response = new ClassKnowledgePointStatusResponse();
         List<ClassKnowledgePointStatusResponse.infoData> data = new ArrayList<>();
         List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByClassId(classId);
-        if(studentStatsViews != null){
+        if(studentStatsViews != null && !studentStatsViews.isEmpty()){
             studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
             String nameTemp = studentStatsViews.get(0).getType();
             int score = 0;
