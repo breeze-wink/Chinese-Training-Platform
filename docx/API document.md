@@ -2404,7 +2404,7 @@
 
 - **接口路径**：`/api/teacher/search-questions`
 - **请求方法**：POST
-- **接口说明**：教师查找题目。
+- **接口说明**：教师生成试卷。
 
 - **请求说明**
     - 请求头: `Content-Type` : `application/json`
@@ -2593,15 +2593,17 @@
       "questions": [
           {
            	"body": "题干， 单题为空",
-            "sequence": 12345, //题号
+            "sequence": 1, //题号
         	"score": 4, //分数
+            "sequence": 1 //题号（在试卷中的题号）
+        	"score": 4 //分数
             "subQuestions": [ //大题时不为空
                 {    
                     "question": "问题内容", 
                     "answer" : "答案", 
                     "explanation": "解析", 
-                    "options": ["选项1", "选项2"], 
-                    "type" : "选择、填空、简答、作文",
+                    "options": ["选项1", "选项2"], //选择题不为空
+                    "type" : "CHOICE', 'FILL_IN_BLANK', 'SHORT_ANSWER', 'ESSAY'",//（四选一）
                     "knowledge" : "知识点",
     				"score" : 1//小题分数
                 }
@@ -2610,7 +2612,7 @@
             "answer" : "答案", //小题时不为空
             "explanation": "解析", //小题时不为空
             "options": ["选项1", "选项2"], //小题且为选择时不为空
-            "type" : "选择、填空、简答、作文",//小题时不为空
+            "type" : "CHOICE', 'FILL_IN_BLANK', 'SHORT_ANSWER', 'ESSAY'",//（四选一）单题不为空
             "knowledge" : "知识点",
           }
       ]
@@ -3086,7 +3088,7 @@
               "answer" : "答案", 
               "explanation": "解析", 
               "options": ["选项1", "选项2"], 
-              "type" : "选择、填空、简答、作文",
+              "type" : "CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY",
     		  "subScore" : "int",//小题分数
               "studentAnswer": "string"
             },
@@ -3096,7 +3098,7 @@
           "answer" : "答案", //小题时不为空
           "explanation": "解析", //小题时不为空
           "options": ["选项1", "选项2"], //小题且为选择时不为空
-          "type" : "选择、填空、简答、作文",//小题时不为空
+          "type" : "CHOICE, FILL_IN_BLANK, SHORT_ANSWER, ESSAY",//小题时不为空
           "studentAnswer": "string"
         },
         ...
