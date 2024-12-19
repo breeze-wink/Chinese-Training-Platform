@@ -1,150 +1,85 @@
-2024-12-19 00:17:08 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:cez, 昵称:Aozora)获取历史成绩
-2024-12-19 00:17:17 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:84, 姓名:123456, 昵称:Sherlock)获取历史成绩
-2024-12-19 00:17:34 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:cez, 昵称:Aozora)获取历史成绩
-2024-12-19 00:18:22 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:cez, 昵称:Aozora)获取历史成绩
-2024-12-19 12:31:23 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:85, 昵称:bree)获取未截止作业
-2024-12-19 12:33:41 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 12:51:03 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 15:28:09 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 15:28:11 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 15:28:21 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 15:28:24 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 15:28:48 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了所有知识点
-2024-12-19 15:28:51 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 15:28:51 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 15:29:12 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 15:29:24 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 15:29:28 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)删除练习
-2024-12-19 15:31:17 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)删除练习
-2024-12-19 15:33:34 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取练习答案，练习id为549
-2024-12-19 15:34:21 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 15:34:21 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 15:34:25 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了所有知识点
-2024-12-19 15:34:26 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 15:34:26 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 15:34:31 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 15:34:31 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 15:34:34 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 15:34:41 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 15:35:01 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 15:35:17 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 15:35:22 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 15:35:36 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 15:35:46 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
-2024-12-19 16:04:50 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:04:50 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:04:56 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:04:59 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:05:08 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
-2024-12-19 16:05:21 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
-2024-12-19 16:05:21 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:05:21 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:05:28 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:05:30 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:06:05 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:06:05 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:06:08 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:06:09 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:06:12 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
-2024-12-19 16:07:28 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
-2024-12-19 16:07:43 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:07:43 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:08:00 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:08:00 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:08:04 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:08:05 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:08:08 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
-2024-12-19 16:08:16 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
-2024-12-19 16:08:17 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:08:17 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:08:23 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:08:26 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:08:35 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
-2024-12-19 16:09:38 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
-2024-12-19 16:09:39 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:09:39 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:09:46 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:09:48 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:12:03 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
-2024-12-19 16:12:23 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
-2024-12-19 16:12:24 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:12:24 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:12:30 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:12:32 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:14:40 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:14:40 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了所有知识点
-2024-12-19 16:14:40 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:14:47 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:14:50 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:24:21 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:24:21 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:24:23 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:24:23 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:25:45 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了所有知识点
-2024-12-19 16:25:47 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:25:47 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:25:49 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:25:49 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:27:00 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:27:00 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:27:01 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:27:01 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:28:55 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:28:55 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:28:56 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:30:09 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:30:09 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:30:10 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:30:10 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:30:21 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:31:21 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:31:21 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:31:23 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:31:23 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:32:10 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:34:18 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:34:41 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:35:15 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:36:36 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:37:57 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:38:21 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取作业答案
-2024-12-19 16:40:06 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:40:06 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:40:08 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:40:08 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:40:09 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:40:09 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:40:12 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:40:12 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:49:06 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:49:07 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:49:10 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:49:10 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:49:27 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:49:27 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:49:30 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:49:30 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:50:03 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:50:03 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:50:04 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:50:04 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:51:12 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
-2024-12-19 16:51:12 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
-2024-12-19 16:51:13 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
-2024-12-19 16:51:13 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
-2024-12-19 16:51:13 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:51:13 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:51:14 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:51:14 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:53:05 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:53:06 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:53:08 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:53:09 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:53:18 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:53:19 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:53:21 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:53:22 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
-2024-12-19 16:55:13 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取各项成绩
-2024-12-19 16:55:14 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取历史成绩
-2024-12-19 16:55:16 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取短板
-2024-12-19 16:55:16 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取平均分
+2024-12-20 00:16:57 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
+2024-12-20 00:16:57 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
+2024-12-20 00:16:58 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 00:16:58 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-20 00:18:05 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
+2024-12-20 00:18:11 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
+2024-12-20 00:18:12 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
+2024-12-20 00:18:12 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
+2024-12-20 00:18:12 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 00:18:12 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-20 00:19:00 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了所有知识点
+2024-12-20 00:19:01 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
+2024-12-20 00:19:01 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
+2024-12-20 00:19:02 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-20 00:19:02 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 00:19:05 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
+2024-12-20 00:19:33 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
+2024-12-20 00:19:33 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
+2024-12-20 00:19:33 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
+2024-12-20 00:19:34 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-20 00:19:34 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 00:20:12 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了所有知识点
+2024-12-20 00:20:12 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
+2024-12-20 00:20:12 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
+2024-12-20 00:20:13 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-20 00:20:13 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 00:20:17 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取了作业详情
+2024-12-20 00:20:33 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)提交了作业
+2024-12-20 00:20:33 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
+2024-12-20 00:20:33 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了作业列表
+2024-12-20 00:20:34 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-20 00:20:34 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 00:30:47 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了练习列表
+2024-12-20 00:30:47 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了作业列表
+2024-12-20 00:30:47 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取未截止作业
+2024-12-20 00:30:48 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取已截止作业
+2024-12-20 00:31:56 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了所有知识点
+2024-12-20 00:31:58 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了作业列表
+2024-12-20 00:31:58 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了练习列表
+2024-12-20 00:31:58 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取未截止作业
+2024-12-20 00:31:58 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取已截止作业
+2024-12-20 00:32:07 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取历史成绩
+2024-12-20 00:32:07 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取短板
+2024-12-20 00:32:07 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取各项成绩
+2024-12-20 00:32:08 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取平均分
+2024-12-20 00:32:09 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了练习列表
+2024-12-20 00:32:09 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了作业列表
+2024-12-20 00:32:09 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取已截止作业
+2024-12-20 00:32:09 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取未截止作业
+2024-12-20 00:32:52 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取了作业详情
+2024-12-20 00:33:16 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)提交了作业
+2024-12-20 00:33:16 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了作业列表
+2024-12-20 00:33:16 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四) 获取了练习列表
+2024-12-20 00:33:16 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取未截止作业
+2024-12-20 00:33:16 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:130, 姓名:李四, 昵称:李四)获取已截止作业
+2024-12-20 00:33:48 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三) 获取了作业列表
+2024-12-20 00:33:48 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三) 获取了练习列表
+2024-12-20 00:33:49 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三)获取已截止作业
+2024-12-20 00:33:49 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三)获取未截止作业
+2024-12-20 00:33:56 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三)获取了作业详情
+2024-12-20 00:34:16 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三)提交了作业
+2024-12-20 00:34:16 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三) 获取了作业列表
+2024-12-20 00:34:16 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三) 获取了练习列表
+2024-12-20 00:34:16 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三)获取已截止作业
+2024-12-20 00:34:17 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:132, 姓名:张三, 昵称:张三)获取未截止作业
+2024-12-20 00:34:50 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna) 获取了练习列表
+2024-12-20 00:34:50 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna) 获取了作业列表
+2024-12-20 00:34:51 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna)获取已截止作业
+2024-12-20 00:34:51 [http-nio-8081-exec-10] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna)获取未截止作业
+2024-12-20 00:34:55 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna)获取了作业详情
+2024-12-20 00:35:12 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna)提交了作业
+2024-12-20 00:35:12 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna) 获取了练习列表
+2024-12-20 00:35:12 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna) 获取了作业列表
+2024-12-20 00:35:13 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna)获取未截止作业
+2024-12-20 00:35:13 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:140, 姓名:李娜, 昵称:Anna)获取已截止作业
+2024-12-20 00:35:35 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma) 获取了作业列表
+2024-12-20 00:35:35 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma) 获取了练习列表
+2024-12-20 00:35:35 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma)获取已截止作业
+2024-12-20 00:35:35 [http-nio-8081-exec-1] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma)获取未截止作业
+2024-12-20 00:35:40 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma)获取了作业详情
+2024-12-20 00:35:58 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma)提交了作业
+2024-12-20 00:35:58 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma) 获取了作业列表
+2024-12-20 00:35:58 [http-nio-8081-exec-9] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma) 获取了练习列表
+2024-12-20 00:35:59 [http-nio-8081-exec-3] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma)获取已截止作业
+2024-12-20 00:35:59 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:166, 姓名:赵飞, 昵称:Emma)获取未截止作业
