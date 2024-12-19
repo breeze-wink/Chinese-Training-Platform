@@ -41,5 +41,8 @@ public interface QuestionMapper {
     @Select("SELECT status FROM question WHERE id = #{questionId}")
     Integer getStatus(Long questionId);
 
+    @Update("UPDATE question set status = 2 where id = #{id}")
+    void outDate(Long id);
+
 //    List<Question> getQuestionsByKnowledgePointIds(List<Long> knowledgePointIds);
 }

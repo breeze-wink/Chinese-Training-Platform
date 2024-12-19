@@ -1514,7 +1514,7 @@ public class TeacherBusinessController {
                         for (int j = 0; j < info.getChoices().size(); j ++ ){
                             choices.append(info.getChoices().get(j));
                             if (j!= info.getChoices().size() - 1) {
-                                choices.append("\\$\\$");
+                                choices.append("$$");
                             }
                         }
                         question.setOptions(choices.toString());
