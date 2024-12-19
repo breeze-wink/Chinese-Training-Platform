@@ -1993,16 +1993,16 @@ public class TeacherBusinessController {
                     AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
                     if(assignmentStatsView.getStatsScore() != null){
                         StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
-                        statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                        statsStudent.setScore(statsStudent.getScore() + scoreTemp);
+                        statsStudent.setTotalScore(statsStudent.getTotalScore() + submissionAnswer.getQuestionScore());
+                        statsStudent.setScore(statsStudent.getScore() + submissionAnswer.getScore());
                         statsStudentService.updateStatsStudent(statsStudent);
                     }
                     else {
                         StatsStudent statsStudent = new StatsStudent();
                         statsStudent.setStudentId(assignmentStatsView.getStudentId());
                         statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
-                        statsStudent.setTotalScore(100L);
-                        statsStudent.setScore(scoreTemp);
+                        statsStudent.setTotalScore((long)submissionAnswer.getQuestionScore());
+                        statsStudent.setScore((long)submissionAnswer.getScore());
                         statsStudentService.addStatsStudent(statsStudent);
                     }
                 }
