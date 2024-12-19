@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.question.PaperQuestionMapper">
+
+    <!-- 单条插入 -->
+    <insert id="insert" parameterType="com.example.model.question.PaperQuestion">
+        INSERT INTO paper_question(paperId, questionId, sequence, questionType, score)
+        VALUES(#{paperId}, #{questionId}, #{sequence}, #{questionType}, #{score})
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="delete">
+        DELETE FROM paper_question
+        WHERE paperId = #{paperId} AND questionId = #{questionId}
+    </delete>
+
+    <!-- 根据 paperId 查询 -->
+    <select id="selectByPaperId" parameterType="java.lang.Long" resultType="com.example.model.question.PaperQuestion">
+        SELECT * FROM paper_question WHERE paperId = #{paperId}
+    </select>
+
+    <!-- 根据 questionId 查询 -->
+    <select id="selectByQuestionId" parameterType="java.lang.Long" resultType="com.example.model.question.PaperQuestion">
+        SELECT * FROM paper_question WHERE questionId = #{questionId}
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO paper_question(paperId, questionId, sequence, questionType, score)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.paperId}, #{item.questionId}, #{item.sequence}, #{item.questionType}, #{item.score})
+        </foreach>
+    </insert>
+
+    <!-- 批量查询 -->
+    <select id="batchSelectByPaperId" parameterType="java.util.List" resultType="com.example.model.question.PaperQuestion">
+        SELECT * FROM paper_question
+        WHERE paperId IN
+        <foreach collection="list" item="paperId" open="(" separator="," close=")">
+            #{paperId}
+        </foreach>
+    </select>
+
+</mapper>

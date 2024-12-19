@@ -31,7 +31,7 @@ public class ClassStudentServiceImpl implements ClassStudentService {
 
     @Override
     @Transactional
-    public List<ClassStudent> getClassStudentByStudentId(Long studentId) {
+    public ClassStudent getClassStudentByStudentId(Long studentId) {
         return classStudentMapper.selectByStudentId(studentId);
     }
 
@@ -44,7 +44,7 @@ public class ClassStudentServiceImpl implements ClassStudentService {
     @Override
     @Transactional
     public List<ClassStudent> getClassStudentsByStudentId(Long studentId) {
-        return classStudentMapper.selectByStudentId(studentId);
+        return classStudentMapper.selectClassStudentsByStudentId(studentId);
     }
 
     @Override

@@ -1,7 +1,11 @@
 package com.example.service.question;
 
+import com.example.dto.redis.PreAssembledQuestion;
 import com.example.model.question.QuestionBody;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface QuestionBodyService {
@@ -9,6 +13,9 @@ public interface QuestionBodyService {
     // 插入一条题目记录
     int createQuestionBody(QuestionBody questionBody);
 
+    void access(QuestionBody questionBody);
+
+    void deny(QuestionBody questionBody);
     // 根据ID查询题目
     QuestionBody getQuestionBodyById(Long id);
 
@@ -19,5 +26,16 @@ public interface QuestionBodyService {
     int updateQuestionBody(QuestionBody questionBody);
 
     // 删除题目记录
-    int deleteQuestionBody(Long id);
+    int deleteQuestionBody(Long id) throws JsonProcessingException;
+
+    List<QuestionBody> getQuestionBodiesByType(String type);
+
+    List<String> getAllTypes();
+    void syncToRedis(QuestionBody questionBody);
+
+    void deleteFromRedis(Long id);
+
+    List<QuestionBody> getQuestionBodiesByIds(ArrayList<Long> longs);
+
+
 }

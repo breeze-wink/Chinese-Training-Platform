@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -19,8 +21,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/uploads")
+@RequestMapping("/api/uploads")
 public class ImageController {
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     private final String uploadDir = "uploads";  // 上传目录
 
@@ -44,7 +47,7 @@ public class ImageController {
             }
 
             // 生成图片文件名，并拼接路径
-            String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+            String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
             Path directoryPath = Paths.get(uploadDir, type);  // 根据类型选择文件夹
             Files.createDirectories(directoryPath);  // 创建分类目录
             Path path = directoryPath.resolve(fileName).normalize();
@@ -57,6 +60,7 @@ public class ImageController {
             response.put("imageUrl", "/uploads/" + type + "/" + fileName);
             return ResponseEntity.ok(response);
         } catch (IOException e) {
+            logger.error("图片上传失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -80,7 +84,34 @@ public class ImageController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
+            logger.error("获取图片失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 删除图片接口
+    @DeleteMapping("/image/{type}/{imageName}")
+    public ResponseEntity<String> deleteImage(@PathVariable String type, @PathVariable String imageName) {
+        try {
+            // 获取图片文件夹路径
+            Path path = Paths.get(uploadDir, type).resolve(imageName).normalize();
+
+            // 判断文件是否存在
+            File file = path.toFile();
+            if (file.exists() && file.isFile()) {
+                boolean deleted = file.delete();
+                if (deleted) {
+                    return ResponseEntity.ok("文件删除成功");
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("文件删除失败");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("文件未找到");
+            }
+        } catch (Exception e) {
+            logger.error("删除图片失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("删除文件时发生错误");
         }
     }
 
@@ -95,5 +126,4 @@ public class ImageController {
         }
         return MediaType.APPLICATION_OCTET_STREAM; // 默认返回二进制流
     }
-
 }

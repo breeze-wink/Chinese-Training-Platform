@@ -26,4 +26,10 @@ public interface SystemAdminMapper {
 
     @Select("SELECT * FROM system_admin")
     List<SystemAdmin> selectAll();
+
+    @Select("SELECT * FROM system_admin WHERE username = #{username}")
+    SystemAdmin findByUsername(String username);
+
+    @Select("SELECT * FROM system_admin WHERE email = #{email}")
+    SystemAdmin emailExist(String email);
 }

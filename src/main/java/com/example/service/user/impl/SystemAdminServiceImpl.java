@@ -53,4 +53,18 @@ public class SystemAdminServiceImpl implements SystemAdminService {
             return null;
         return systemAdmin;
     }
+
+    @Override
+    public SystemAdmin getSystemAdminByUsername(String username) {
+        return systemAdminMapper.findByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public boolean emailExist(String email) {
+        SystemAdmin systemAdmin = systemAdminMapper.emailExist(email);
+        return systemAdmin != null;
+    }
+
+
 }

@@ -1,7 +1,9 @@
 package com.example.controller;
 
-import com.example.dto.request.*;
-import com.example.dto.response.*;
+import com.example.dto.request.student.StudentLoginRequest;
+import com.example.dto.request.student.StudentRegisterRequest;
+import com.example.dto.request.student.StudentVerifyRequest;
+import com.example.dto.response.student.*;
 import com.example.model.classes.ClassStudent;
 import com.example.model.essay.Essay;
 import com.example.model.user.Student;
@@ -11,7 +13,10 @@ import com.example.service.essay.EssayService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
 import com.example.service.utils.EmailService;
+import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -27,12 +32,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/student")
 public class StudentController {
+    private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
+    private static final Logger operationLogger = LoggerFactory.getLogger("operations.student");
     private final StudentService studentService;
     private final EmailService emailService;
     private final SchoolService schoolService;
     private final EssayService essayService;
     private final ClassStudentService classStudentService;
     private final ClassService classService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public StudentController(StudentService studentService,
@@ -40,13 +48,15 @@ public class StudentController {
                              SchoolService schoolService,
                              EssayService essayService,
                              ClassStudentService classStudentService,
-                             ClassService classService) {
+                             ClassService classService,
+                             JwtTokenUtil jwtTokenUtil) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.schoolService = schoolService;
         this.essayService = essayService;
         this.classStudentService = classStudentService;
         this.classService = classService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @PostMapping("/login")
@@ -58,11 +68,13 @@ public class StudentController {
 
         StudentLoginResponse response = new StudentLoginResponse();
         if (student != null) {
+            // 生成JWT
+            String jwt = jwtTokenUtil.generateToken(student);
+            response.setToken(jwt);
             response.setMessage("success");
             response.setId(student.getId());
             return ResponseEntity.ok(response);
-        }
-        else {
+        } else {
             response.setMessage("用户名或密码错误");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
@@ -108,67 +120,80 @@ public class StudentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<StudentInfoResponse> getStudentInfo(@PathVariable Long id) {
-        StudentInfoResponse response = new StudentInfoResponse();
-        Student student = studentService.getStudentById(id);
-        List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(id);
-        ClassStudent classStudent = null;
-        if(classStudents.size() == 1){
-            classStudent = classStudents.get(0);
+        try {
+            StudentInfoResponse response = new StudentInfoResponse();
+            Student student = studentService.getStudentById(id);
+            List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(id);
+            ClassStudent classStudent = null;
+            if(classStudents.size() == 1){
+                classStudent = classStudents.get(0);
+            }
+            if (student == null) {
+                response.setMessage("用户未找到");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            response.setMessage("Success");
+            StudentInfoResponse.InfoData data = new StudentInfoResponse.InfoData();
+            data.setUsername(student.getUsername());
+            data.setEmail(student.getEmail());
+            data.setName(student.getName());
+            data.setGrade(student.getGrade());
+            data.setSchoolName(null);
+            data.setClassName(null);
+            if (student.getSchoolId() != null) {
+                data.setSchoolName(schoolService.getSchoolById(student.getSchoolId()).getName());
+            }
+            if(classStudent != null){
+                data.setClassName(classService.getClassById(classStudent.getClassId()).getName());
+            }
+            response.setData(data);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            logger.error("学生个人信息获取失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        if (student == null) {
-            response.setMessage("用户未找到");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-        response.setMessage("Success");
-        StudentInfoResponse.InfoData data = new StudentInfoResponse.InfoData();
-        data.setUsername(student.getUsername());
-        data.setEmail(student.getEmail());
-        data.setName(student.getName());
-        data.setGrade(student.getGrade());
-        data.setSchoolName(null);
-        data.setClassName(null);
-        if (student.getSchoolId() != null) {
-            data.setSchoolName(schoolService.getSchoolById(student.getSchoolId()).getName());
-        }
-        if(classStudent != null){
-            data.setClassName(classService.getClassById(classStudent.getClassId()).getName());
-        }
-
-        response.setData(data);
-
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}/view-essays")
     public ResponseEntity<GetEssaysResponse> getEssays(@PathVariable Long id) {
-        GetEssaysResponse response = new GetEssaysResponse();
-        List<Essay> essays = essayService.getAllEssays();
-        List<GetEssaysResponse.InfoData> data = new ArrayList<>();
-        for(Essay essay : essays){
-            GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
-            infoData.setId(essay.getId());
-            infoData.setTitle(essay.getTitle());
-            data.add(infoData);
+        try {
+            GetEssaysResponse response = new GetEssaysResponse();
+            List<Essay> essays = essayService.getAllEssays();
+            List<GetEssaysResponse.InfoData> data = new ArrayList<>();
+            for(Essay essay : essays){
+                GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
+                infoData.setId(essay.getId());
+                infoData.setTitle(essay.getTitle());
+                data.add(infoData);
+            }
+            response.setInfoData(data);
+            response.setMessage("作文查询成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            logger.error("学生作文获取失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        response.setInfoData(data);
-        response.setMessage("作文查询成功");
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}/essay/get-info/{essayId}")
     public ResponseEntity<InputStreamResource> getEssayInfo(@PathVariable Long id, @PathVariable Long essayId) {
-        Essay essay = essayService.getEssayById(essayId);
-        if (essay == null) {
-            return ResponseEntity.notFound().build();
-        }
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(essay.getContent());
-        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+        try {
+            Essay essay = essayService.getEssayById(essayId);
+            if (essay == null) {
+                return ResponseEntity.notFound().build();
+            }
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(essay.getContent());
+            InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
 
-        return ResponseEntity.ok()
+            return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + essay.getTitle())
                 .contentType(MediaType.APPLICATION_PDF)
                 .contentLength(essay.getContent().length)
                 .body(resource);
+        } catch (Exception e){
+            logger.error("获取作文文件失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 }

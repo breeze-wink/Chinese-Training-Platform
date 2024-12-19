@@ -12,9 +12,12 @@ public class Assignment {
     private Long id;
     private Long paperId;
     private String title;
-    private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Long creatorId; // 外键，关联Teacher表的id
+    private String description;
 
+    public String info() {
+        return "(id:" + id + ", title:" + title + ")";
+    }
 }

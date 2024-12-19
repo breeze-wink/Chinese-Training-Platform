@@ -8,14 +8,14 @@ import java.util.List;
 @Mapper
 public interface SchoolAdminMapper {
 
-    @Insert("INSERT INTO school_admin(username, password, email, schoolId) VALUES(#{username}, #{password}, #{email}, #{schoolId})")
+    @Insert("INSERT INTO school_admin(username, password, email, schoolId, name) VALUES(#{username}, #{password}, #{email}, #{schoolId}, #{name})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(SchoolAdmin admin);
 
     @Delete("DELETE FROM school_admin WHERE id = #{id}")
     int delete(Long id);
 
-    @Update("UPDATE school_admin SET username = #{username}, password = #{password}, email = #{email}, schoolId = #{schoolId} WHERE id = #{id}")
+    @Update("UPDATE school_admin SET username = #{username}, password = #{password}, email = #{email}, schoolId = #{schoolId}, name = #{name} WHERE id = #{id}")
     int update(SchoolAdmin admin);
 
     @Select("SELECT * FROM school_admin WHERE id = #{id}")
@@ -28,5 +28,8 @@ public interface SchoolAdminMapper {
     List<SchoolAdmin> selectAll();
 
     @Select("SELECT * FROM school_admin WHERE username = #{name}")
-    SchoolAdmin selectByName(String name);
+    SchoolAdmin selectByUsername(String name);
+
+    @Select("SELECT * FROM school_admin WHERE email = #{email}")
+    SchoolAdmin emailExist(String email);
 }

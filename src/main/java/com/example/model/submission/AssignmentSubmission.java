@@ -13,7 +13,7 @@ public class AssignmentSubmission {
     private Long assignmentId; // 外键，关联Assignment表的id
     private Long studentId; // 外键，关联Student表的id
     private LocalDateTime submitTime;
-    private BigDecimal totalScore;
+    private Integer totalScore;
     private Boolean graded;
 
 }

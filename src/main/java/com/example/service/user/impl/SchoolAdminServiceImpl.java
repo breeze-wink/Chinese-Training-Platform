@@ -59,7 +59,19 @@ public class SchoolAdminServiceImpl implements SchoolAdminService {
     }
 
     @Override
-    public boolean checkExistSchool(String name) {
-        return schoolAdminMapper.selectByName(name) != null;
+    public boolean checkExistUsername(String name) {
+        return schoolAdminMapper.selectByUsername(name) != null;
+    }
+
+    @Override
+    public SchoolAdmin getSchoolAdminByUsername(String username) {
+        return schoolAdminMapper.selectByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public boolean emailExist(String email) {
+        SchoolAdmin schoolAdmin = schoolAdminMapper.emailExist(email);
+        return schoolAdmin != null;
     }
 }

@@ -23,4 +23,10 @@ public interface AssignmentSubmissionMapper {
 
     @Select("SELECT * FROM assignment_submission")
     List<AssignmentSubmission> selectAll();
+
+    @Select("SELECT * FROM assignment_submission WHERE studentId = #{studentId}")
+    List<AssignmentSubmission> selectByStudentId(Long studentId);
+
+    @Select("SELECT * FROM assignment_submission WHERE assignmentId = #{assignmentId} AND studentId = #{studentId}")
+    AssignmentSubmission selectByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
 }

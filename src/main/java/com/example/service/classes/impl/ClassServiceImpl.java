@@ -106,7 +106,12 @@ public class ClassServiceImpl implements ClassService {
         for(ClassGroup classGroup : classGroups){
             classGroupService.removeStudentFromGroup(classGroup.getId(), studentId);
         }
-        return classStudentMapper.delete(classId, studentId);
+        Student student = studentMapper.selectById(studentId);
+        if(classStudentMapper.delete(classId, studentId) == 1){
+            student.setSchoolId(null);
+            return studentMapper.update(student);
+        }
+        return 0;
     }
 
     @Override
@@ -131,6 +136,12 @@ public class ClassServiceImpl implements ClassService {
     @Transactional
     public List<Clazz> getClassesByTeacherId(Long teacherId) {
         return classMapper.selectByCreatorId(teacherId);
+    }
+
+    @Override
+    @Transactional
+    public List<Clazz> selectBySchoolId(Long schoolId) {
+        return classMapper.selectBySchoolId(schoolId);
     }
 
 

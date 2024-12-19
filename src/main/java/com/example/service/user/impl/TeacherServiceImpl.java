@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
@@ -20,8 +21,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public int addTeacher(Teacher teacher) {
-        return teacherMapper.insert(teacher);
+    public void addTeacher(Teacher teacher) {
+        teacherMapper.insert(teacher);
     }
 
     @Override
@@ -32,8 +33,8 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public int updateTeacher(Teacher teacher) {
-        return teacherMapper.update(teacher);
+    public void updateTeacher(Teacher teacher) {
+        teacherMapper.update(teacher);
     }
 
     @Override
@@ -61,8 +62,9 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public boolean existTeacher(String email) {
-        return teacherMapper.findByEmail(email) != null;
+    public boolean existTeacher(Teacher teacher) {
+        Teacher checkTeacher = teacherMapper.findByEmail(teacher.getEmail());
+        return checkTeacher != null && Objects.equals(checkTeacher.getPermission(), teacher.getPermission());
     }
 
     @Override
@@ -70,15 +72,31 @@ public class TeacherServiceImpl implements TeacherService {
         return teacherMapper.findByUsername(username) != null;
     }
 
-    @Override
-    @Transactional
-    public Long getTeacherSchoolId(Long teacherId) {
-        Teacher teacher = getTeacherById(teacherId);
-        return teacher.getSchoolId();
-    }
 
     @Override
     public List<Teacher> getTeachersBySchoolId(Long schoolId) {
         return teacherMapper.selectBySchoolId(schoolId);
     }
+
+    @Override
+    public Teacher getTeacherByUsername(String username) {
+        return teacherMapper.findByUsername(username);
+    }
+
+    @Override
+    public String getTeacherNameById(Long teacherId) {
+        Teacher teacher =  teacherMapper.selectById(teacherId);
+        if (Objects.equals(teacher.getStatus(), Teacher.WORKING_STATUS)) {
+            return teacher.getName();
+        }
+        return teacher.getName() + "(已离职)";
+    }
+
+    @Override
+    @Transactional
+    public Boolean emailExist(String email) {
+        Teacher teacher = teacherMapper.emailExist(email);
+        return teacher != null;
+    }
+
 }

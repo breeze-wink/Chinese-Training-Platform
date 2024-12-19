@@ -12,7 +12,7 @@ public interface KnowledgePointMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(KnowledgePoint point);
 
-    @Delete("DELETE FROM knowledge_point WHERE id = #{id}")
+    @Update("UPDATE knowledge_point SET isHidden = true WHERE id = #{id}")
     int delete(Long id);
 
     @Update("UPDATE knowledge_point SET name = #{name}, description = #{description}, type = #{type} WHERE id = #{id}")
@@ -21,9 +21,12 @@ public interface KnowledgePointMapper {
     @Select("SELECT * FROM knowledge_point WHERE id = #{id}")
     KnowledgePoint selectById(Long id);
 
-    @Select("SELECT * FROM knowledge_point")
+    @Select("SELECT * FROM knowledge_point where isHidden = false")
     List<KnowledgePoint> selectAll();
 
-    @Select("SELECT * FROM knowledge_point order by type")
+    @Select("SELECT * FROM knowledge_point WHERE knowledge_point.isHidden = false order by type")
     List<KnowledgePoint> selectAllOrderByType();
+
+    @Select("SELECT DISTINCT type FROM knowledge_point WHERE knowledge_point.isHidden = false")
+    List<String> selectAllTypes();
 }
