@@ -911,71 +911,18 @@ public class StudentBusinessController {
             UnfinishedAssignmentResponse response = new UnfinishedAssignmentResponse();
             List<UnfinishedAssignmentResponse.infoData> data = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
-            List<AssignmentRecipient> assignmentsByStudentId = assignmentRecipientService.selectByRecipient("STUDENT", id);
-            if(assignmentsByStudentId != null){
-                for(AssignmentRecipient assignment : assignmentsByStudentId){
-                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                    if(assignmentTemp.getEndTime().isBefore(now)){
-                        continue;
-                    }
-                    UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
-                    infoData.setAssignmentId(assignmentTemp.getId());
-                    infoData.setTitle(assignmentTemp.getTitle());
-                    if(assignmentTemp.getDescription() != null){
-                        infoData.setDescription(assignmentTemp.getDescription());
-                    }
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
-                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
-                    data.add(infoData);
-                }
-            }
-            ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
-            if(classStudent != null){
-                Long classId = classStudent.getClassId();
-                if(classId != null){
-                    List<AssignmentRecipient> assignmentsByClassId = assignmentRecipientService.selectByRecipient("CLASS", classId);
-                    if(assignmentsByClassId != null){
-                        for(AssignmentRecipient assignment : assignmentsByClassId){
-                            Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                            if(assignmentTemp.getEndTime().isBefore(now)){
-                                continue;
-                            }
-                            UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
-                            infoData.setAssignmentId(assignmentTemp.getId());
-                            infoData.setTitle(assignmentTemp.getTitle());
-                            if(assignmentTemp.getDescription() != null){
-                                infoData.setDescription(assignmentTemp.getDescription());
-                            }
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                            infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
-                            infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
-                            data.add(infoData);
-                        }
-                    }
-                    List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByStudentId(id);
-                    if(groupStudents != null){
-                        for(GroupStudent groupStudent : groupStudents){
-                            List<AssignmentRecipient> assignmentsByGroupId = assignmentRecipientService.selectByRecipient("GROUP", groupStudent.getGroupId());
-                            if(assignmentsByGroupId != null){
-                                for(AssignmentRecipient assignment : assignmentsByGroupId){
-                                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                                    if(assignmentTemp.getEndTime().isBefore(now)){
-                                        continue;
-                                    }
-                                    UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
-                                    infoData.setAssignmentId(assignmentTemp.getId());
-                                    infoData.setTitle(assignmentTemp.getTitle());
-                                    if(assignmentTemp.getDescription() != null){
-                                        infoData.setDescription(assignmentTemp.getDescription());
-                                    }
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
-                                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
-                                    data.add(infoData);
-                                }
-                            }
-                        }
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(id);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    Assignment assignment = assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId());
+                    if(assignment.getEndTime().isAfter(now)){
+                        UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
+                        infoData.setAssignmentId(assignmentIdStudentIdScore.getAssignmentId());
+                        infoData.setTitle(assignment.getTitle());
+                        infoData.setDescription(assignment.getDescription());
+                        infoData.setStartTime(assignment.getStartTime().toString());
+                        infoData.setEndTime(assignment.getEndTime().toString());
+                        data.add(infoData);
                     }
                 }
             }
@@ -998,84 +945,21 @@ public class StudentBusinessController {
             FinishedAssignmentResponse response = new FinishedAssignmentResponse();
             List<FinishedAssignmentResponse.infoData> data = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
-            List<AssignmentRecipient> assignmentsByStudentId = assignmentRecipientService.selectByRecipient("STUDENT", id);
-            if(assignmentsByStudentId != null){
-                for(AssignmentRecipient assignment : assignmentsByStudentId){
-                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                    if(assignmentTemp.getEndTime().isAfter(now)){
-                        continue;
-                    }
-                    FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
-                    infoData.setAssignmentId(assignmentTemp.getId());
-                    infoData.setTitle(assignmentTemp.getTitle());
-                    if(assignmentTemp.getDescription() != null){
-                        infoData.setDescription(assignmentTemp.getDescription());
-                    }
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
-                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
-                    AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
-                    if(submission != null && submission.getTotalScore() != null){
-                        infoData.setTotalScore(submission.getTotalScore().doubleValue());
-                    }
-                    data.add(infoData);
-                }
-            }
-            ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
-            if(classStudent != null){
-                Long classId = classStudent.getClassId();
-                if(classId != null){
-                    List<AssignmentRecipient> assignmentsByClassId = assignmentRecipientService.selectByRecipient("CLASS", classId);
-                    if(assignmentsByClassId != null){
-                        for(AssignmentRecipient assignment : assignmentsByClassId){
-                            Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                            if(assignmentTemp.getEndTime().isAfter(now)){
-                                continue;
-                            }
-                            FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
-                            infoData.setAssignmentId(assignmentTemp.getId());
-                            infoData.setTitle(assignmentTemp.getTitle());
-                            if(assignmentTemp.getDescription() != null){
-                                infoData.setDescription(assignmentTemp.getDescription());
-                            }
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                            infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
-                            infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
-                            AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
-                            if(submission != null && submission.getTotalScore() != null){
-                                infoData.setTotalScore(submission.getTotalScore().doubleValue());
-                            }
-                            data.add(infoData);
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(id);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    Assignment assignment = assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId());
+                    if(assignment.getEndTime().isBefore(now)){
+                        FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
+                        infoData.setAssignmentId(assignmentIdStudentIdScore.getAssignmentId());
+                        infoData.setTitle(assignment.getTitle());
+                        infoData.setDescription(assignment.getDescription());
+                        infoData.setStartTime(assignment.getStartTime().toString());
+                        infoData.setEndTime(assignment.getEndTime().toString());
+                        if(assignmentIdStudentIdScore.getScore() != null){
+                            infoData.setTotalScore(Double.valueOf(assignmentIdStudentIdScore.getScore()));
                         }
-                    }
-                    List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByStudentId(id);
-                    if(groupStudents != null){
-                        for(GroupStudent groupStudent : groupStudents){
-                            List<AssignmentRecipient> assignmentsByGroupId = assignmentRecipientService.selectByRecipient("GROUP", groupStudent.getGroupId());
-                            if(assignmentsByGroupId != null){
-                                for(AssignmentRecipient assignment : assignmentsByGroupId){
-                                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                                    if(assignmentTemp.getEndTime().isAfter(now)){
-                                        continue;
-                                    }
-                                    FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
-                                    infoData.setAssignmentId(assignmentTemp.getId());
-                                    infoData.setTitle(assignmentTemp.getTitle());
-                                    if(assignmentTemp.getDescription() != null){
-                                        infoData.setDescription(assignmentTemp.getDescription());
-                                    }
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
-                                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
-                                    AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
-                                    if(submission != null && submission.getTotalScore() != null){
-                                        infoData.setTotalScore(submission.getTotalScore().doubleValue());
-                                    }
-                                    data.add(infoData);
-                                }
-                            }
-                        }
+                        data.add(infoData);
                     }
                 }
             }
@@ -1233,6 +1117,7 @@ public class StudentBusinessController {
             List<HomeworkAnswerResponse.infoData> data = new ArrayList<>();
             AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
             if(assignmentSubmission != null){
+                response.setTotalScore(assignmentSubmission.getTotalScore());
                 List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
                 for(SubmissionAnswer submissionAnswer : submissionAnswers){
                     HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
