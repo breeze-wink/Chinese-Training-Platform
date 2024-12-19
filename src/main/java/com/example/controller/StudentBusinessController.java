@@ -390,8 +390,7 @@ public class StudentBusinessController {
             GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
             List<GeneratePracticeDefineResponse.InfoData> data = new ArrayList<>();
             List<PracticeQuestion> practiceQuestions = new ArrayList<>();
-            final int QUESTION_NUM = 30;
-            AtomicInteger questionIndex = new AtomicInteger(1);
+            final int QUESTION_NUM = 20;
             Practice practice = new Practice();
             practice.setName(practiceName);
             practice.setStudentId(id);
@@ -415,21 +414,22 @@ public class StudentBusinessController {
                     }
                 }
             }
-            if(knowledgePoints.isEmpty()){
-                knowledgePoints = knowledgePointService.getAllKnowledgePoints();
+            List<Question> allQuestions;
+            if(!knowledgePoints.isEmpty()){
+                List<Long> knowledgePointIds = knowledgePoints.stream().limit(5)
+                    .filter(Objects::nonNull)
+                    .map(KnowledgePoint::getId)
+                    .toList();
+                // 假设已实现的批量获取题目方法
+                allQuestions = questionService.getQuestionsByKnowledgePointIds(knowledgePointIds);
+                // 高效随机抽取
+                Collections.shuffle(allQuestions);
             }
-            List<Long> knowledgePointIds = knowledgePoints.stream()
-                .filter(Objects::nonNull)
-                .map(KnowledgePoint::getId)
-                .collect(Collectors.toList());
-
-            // 假设已实现的批量获取题目方法
-            List<Question> allQuestions = questionService.getQuestionsByKnowledgePointIds(knowledgePointIds);
-
-            // 高效随机抽取
-            Collections.shuffle(allQuestions);
+            else{
+                allQuestions = questionService.getAllQuestions();
+                Collections.shuffle(allQuestions);
+            }
             List<Question> questions = allQuestions.stream().limit(QUESTION_NUM).toList();
-
             for (Question question : questions) {
                 PracticeQuestion practiceQuestion = new PracticeQuestion();
                 practiceQuestion.setPracticeId(practice.getId());
@@ -449,22 +449,17 @@ public class StudentBusinessController {
             List<QuestionBody> questionBodies = questionBodyService.getQuestionBodiesByIds(new ArrayList<>(questionBodyIds));
             Map<Long, QuestionBody> questionBodyMap = questionBodies.stream()
                 .collect(Collectors.toMap(QuestionBody::getId, qb -> qb));
-
-            practiceQuestionService.addPracticeQuestions(practiceQuestions);
             // 组装 InfoData
+            int index = 1;
             for (PracticeQuestion practiceQuestion : practiceQuestions) {
                 GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                 Question question = questions.stream()
                     .filter(q -> q.getId().equals(practiceQuestion.getQuestionId()))
                     .findFirst()
                     .orElse(null);
-
-                infoData.setQuestionBody(null);
-                QuestionBody questionBody = null;
                 if (question != null) {
-                    questionBody = questionBodyMap.get(question.getBodyId());
-                    infoData.setPracticeQuestionId(practiceQuestion.getId());
-                    if (questionBody != null) {
+                    if (question.getBodyId() != null) {
+                        QuestionBody questionBody = questionBodyMap.get(question.getBodyId());
                         infoData.setQuestionBody(questionBody.getBody());
                     }
                     infoData.setQuestionContent(question.getContent());
@@ -472,12 +467,15 @@ public class StudentBusinessController {
                     if (Objects.equals(infoData.getType(), "CHOICE")) {
                         infoData.setQuestionOptions(drawOptions(question.getOptions()));
                     }
+                    infoData.setPracticeQuestionId(practiceQuestion.getId());
+                    String sequence = String.valueOf(index);
+                    infoData.setSequence(sequence);
+                    practiceQuestion.setSequence(sequence);
+                    practiceQuestionService.addPracticeQuestion(practiceQuestion);
+                    infoData.setPracticeQuestionId(practiceQuestion.getId());
+                    data.add(infoData);
+                    index ++;
                 }
-                String sequence = String.valueOf(questionIndex.getAndIncrement());
-                infoData.setSequence(sequence);
-                practiceQuestion.setSequence(sequence);
-                infoData.setPracticeQuestionId(practiceQuestion.getId());
-                data.add(infoData);
             }
             response.setPracticeId(practice.getId());
             response.setData(data);
