@@ -59,6 +59,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public void outdateQuestion(Question question) {
+        questionMapper.outDate(question.getId());
+    }
+
+    @Override
     public void updateQuestion(Question question) {
         questionMapper.update(question);
     }
@@ -83,7 +88,7 @@ public class QuestionServiceImpl implements QuestionService {
     public int deleteQuestion(Question question) {
         Long id = question.getId();
         int result;
-        if (checkQuestionNotUsed(question)) {
+        if (question.getBodyId() != null || checkQuestionNotUsed(question)) {
             questionStatisticService.delete(id, "small");
             uploadQuestionService.delete(id, "small");
             rabbitMQProducer.sendQuestionSyncMessage(question, RabbitMQProducer.DELETE_OPERATION);

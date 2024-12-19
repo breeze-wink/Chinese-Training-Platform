@@ -32,7 +32,6 @@ public class AutoPaperResponse {
     public static class BigQuestion {
         private Long id;
         private String body;                   // 题干内容
-        private Double difficulty;
         private List<SubQuestion> subQuestions; // 子问题列表
     }
     @Getter
@@ -44,5 +43,6 @@ public class AutoPaperResponse {
         private List<String> options;    // 选项
         private String type;             // 题目类型
         private String knowledgePoint;   // 知识点
+        private Double difficulty;
     }
 }

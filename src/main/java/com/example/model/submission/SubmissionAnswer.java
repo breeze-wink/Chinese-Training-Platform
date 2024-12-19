@@ -16,6 +16,5 @@ public class SubmissionAnswer {
     private String answerContent;
     private Integer questionScore;
     private Integer score;
-    private String feedback;
 
 }

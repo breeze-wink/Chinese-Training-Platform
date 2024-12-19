@@ -5,6 +5,7 @@ import com.example.dto.redis.SubQuestion;
 import com.example.dto.request.student.*;
 import com.example.dto.response.Message;
 import com.example.dto.response.student.*;
+import com.example.dto.response.teacher.ClassKnowledgePointStatusResponse;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.GroupStudent;
@@ -15,6 +16,8 @@ import com.example.model.submission.PracticeAnswer;
 import com.example.model.submission.SubmissionAnswer;
 import com.example.model.user.StatsStudent;
 import com.example.model.user.Student;
+import com.example.model.view.AssignmentIdStudentIdScore;
+import com.example.model.view.StudentStatsView;
 import com.example.service.classes.ClassGroupService;
 import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.GroupStudentService;
@@ -31,6 +34,10 @@ import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
 import com.example.service.user.StudentService;
 import com.example.service.user.impl.StudentServiceImpl;
+import com.example.service.view.AssignmentScoresViewService;
+import com.example.service.view.StudentStatsViewService;
+import com.example.service.view.impl.AssignmentScoresViewServiceImpl;
+import com.example.service.view.impl.StudentStatsViewServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.example.service.submission.impl.AssignmentSubmissionServiceImpl;
 import com.example.service.submission.impl.PracticeAnswerServiceImpl;
@@ -43,6 +50,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,6 +82,8 @@ public class StudentBusinessController {
     private final AssignmentService assignmentService;
     private final PaperQuestionService paperQuestionService;
     private final SubmissionAnswerService submissionAnswerService;
+    private final StudentStatsViewService studentStatsViewService;
+    private final AssignmentScoresViewService assignmentScoresViewService;
 
     @Autowired
     public StudentBusinessController (PracticeServiceImpl practiceService,
@@ -90,7 +101,9 @@ public class StudentBusinessController {
                                       AssignmentServiceImpl assignmentService,
                                       PaperQuestionServiceImpl paperQuestionService,
                                       SubmissionAnswerServiceImpl submissionAnswerService,
-                                      StudentServiceImpl studentService
+                                      StudentServiceImpl studentService,
+                                      StudentStatsViewServiceImpl studentStatsViewService,
+                                      AssignmentScoresViewServiceImpl assignmentScoresViewService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -108,6 +121,8 @@ public class StudentBusinessController {
         this.paperQuestionService = paperQuestionService;
         this.submissionAnswerService = submissionAnswerService;
         this.studentService = studentService;
+        this.studentStatsViewService = studentStatsViewService;
+        this.assignmentScoresViewService = assignmentScoresViewService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -142,25 +157,28 @@ public class StudentBusinessController {
             GetFinishedPractices response = new GetFinishedPractices();
             List<Practice> practices = practiceService.getPracticesByStudentId(id);
             List<GetFinishedPractices.InfoData> data = new ArrayList<>();
-            for(Practice practice : practices){
-                if(practice.getPracticeTime() != null){
-                    GetFinishedPractices.InfoData infoData = new GetFinishedPractices.InfoData();
-                    infoData.setPracticeId(practice.getId());
-                    infoData.setPracticeName(practice.getName());
-                    infoData.setPracticeTime(practice.getPracticeTime().toString());
-                    infoData.setTotalScore(null);
-                    if(practice.getTotalScore() != null){
-                        infoData.setTotalScore(practice.getTotalScore().doubleValue());
+            if(practices != null && !practices.isEmpty()){
+                for(Practice practice : practices) {
+                    if (practice.getPracticeTime() != null) {
+                        GetFinishedPractices.InfoData infoData = new GetFinishedPractices.InfoData();
+                        infoData.setPracticeId(practice.getId());
+                        infoData.setPracticeName(practice.getName());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        infoData.setPracticeTime(practice.getPracticeTime().format(formatter));
+                        infoData.setTotalScore(null);
+                        if (practice.getTotalScore() != null) {
+                            infoData.setTotalScore(practice.getTotalScore().doubleValue());
+                        }
+                        data.add(infoData);
                     }
-                    data.add(infoData);
                 }
             }
             response.setData(data);
-            response.setMessage("已完成作业列表获取成功");
-            operationLogger.info("学生{} 获取了作业列表", studentService.getStudentById(id).info());
+            response.setMessage("已完成练习列表获取成功");
+            operationLogger.info("学生{} 获取了练习列表", studentService.getStudentById(id).info());
             return ResponseEntity.ok(response);
         } catch (Exception e){
-            logger.error("获取已完成作业列表失败，错误信息: {}", e.getMessage(), e);
+            logger.error("获取已完成练习列表失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -372,8 +390,7 @@ public class StudentBusinessController {
             GeneratePracticeDefineResponse response = new GeneratePracticeDefineResponse();
             List<GeneratePracticeDefineResponse.InfoData> data = new ArrayList<>();
             List<PracticeQuestion> practiceQuestions = new ArrayList<>();
-            final int QUESTION_NUM = 30;
-            AtomicInteger questionIndex = new AtomicInteger(1);
+            final int QUESTION_NUM = 20;
             Practice practice = new Practice();
             practice.setName(practiceName);
             practice.setStudentId(id);
@@ -397,21 +414,22 @@ public class StudentBusinessController {
                     }
                 }
             }
-            if(knowledgePoints.isEmpty()){
-                knowledgePoints = knowledgePointService.getAllKnowledgePoints();
+            List<Question> allQuestions;
+            if(!knowledgePoints.isEmpty()){
+                List<Long> knowledgePointIds = knowledgePoints.stream().limit(5)
+                    .filter(Objects::nonNull)
+                    .map(KnowledgePoint::getId)
+                    .toList();
+                // 假设已实现的批量获取题目方法
+                allQuestions = questionService.getQuestionsByKnowledgePointIds(knowledgePointIds);
+                // 高效随机抽取
+                Collections.shuffle(allQuestions);
             }
-            List<Long> knowledgePointIds = knowledgePoints.stream()
-                .filter(Objects::nonNull)
-                .map(KnowledgePoint::getId)
-                .collect(Collectors.toList());
-
-            // 假设已实现的批量获取题目方法
-            List<Question> allQuestions = questionService.getQuestionsByKnowledgePointIds(knowledgePointIds);
-
-            // 高效随机抽取
-            Collections.shuffle(allQuestions);
+            else{
+                allQuestions = questionService.getAllQuestions();
+                Collections.shuffle(allQuestions);
+            }
             List<Question> questions = allQuestions.stream().limit(QUESTION_NUM).toList();
-
             for (Question question : questions) {
                 PracticeQuestion practiceQuestion = new PracticeQuestion();
                 practiceQuestion.setPracticeId(practice.getId());
@@ -431,22 +449,17 @@ public class StudentBusinessController {
             List<QuestionBody> questionBodies = questionBodyService.getQuestionBodiesByIds(new ArrayList<>(questionBodyIds));
             Map<Long, QuestionBody> questionBodyMap = questionBodies.stream()
                 .collect(Collectors.toMap(QuestionBody::getId, qb -> qb));
-
-            practiceQuestionService.addPracticeQuestions(practiceQuestions);
             // 组装 InfoData
+            int index = 1;
             for (PracticeQuestion practiceQuestion : practiceQuestions) {
                 GeneratePracticeDefineResponse.InfoData infoData = new GeneratePracticeDefineResponse.InfoData();
                 Question question = questions.stream()
                     .filter(q -> q.getId().equals(practiceQuestion.getQuestionId()))
                     .findFirst()
                     .orElse(null);
-
-                infoData.setQuestionBody(null);
-                QuestionBody questionBody = null;
                 if (question != null) {
-                    questionBody = questionBodyMap.get(question.getBodyId());
-                    infoData.setPracticeQuestionId(practiceQuestion.getId());
-                    if (questionBody != null) {
+                    if (question.getBodyId() != null) {
+                        QuestionBody questionBody = questionBodyMap.get(question.getBodyId());
                         infoData.setQuestionBody(questionBody.getBody());
                     }
                     infoData.setQuestionContent(question.getContent());
@@ -454,12 +467,15 @@ public class StudentBusinessController {
                     if (Objects.equals(infoData.getType(), "CHOICE")) {
                         infoData.setQuestionOptions(drawOptions(question.getOptions()));
                     }
+                    infoData.setPracticeQuestionId(practiceQuestion.getId());
+                    String sequence = String.valueOf(index);
+                    infoData.setSequence(sequence);
+                    practiceQuestion.setSequence(sequence);
+                    practiceQuestionService.addPracticeQuestion(practiceQuestion);
+                    infoData.setPracticeQuestionId(practiceQuestion.getId());
+                    data.add(infoData);
+                    index ++;
                 }
-                String sequence = String.valueOf(questionIndex.getAndIncrement());
-                infoData.setSequence(sequence);
-                practiceQuestion.setSequence(sequence);
-                infoData.setPracticeQuestionId(practiceQuestion.getId());
-                data.add(infoData);
             }
             response.setPracticeId(practice.getId());
             response.setData(data);
@@ -634,8 +650,9 @@ public class StudentBusinessController {
                     Question question = questionService.getQuestionById(practiceQuestion.getQuestionId());
                     List<String> answerArray = drawOptions(question.getOptions());
                     infoData.setQuestionOptions(answerArray);
-                    if(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore() != null){
-                        infoData.setScore(practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId()).getScore().doubleValue());
+                    PracticeAnswer practiceAnswer = practiceAnswerService.getPracticeAnswerByPracticeQuestionId(practiceQuestion.getId());
+                    if(practiceAnswer != null && practiceAnswer.getScore() != null){
+                        infoData.setScore(practiceAnswer.getScore().doubleValue());
                     }
                 }
                 String [] answerAndAnalysis = questionService.getQuestionById(practiceQuestion.getQuestionId()).getAnswer().split("\\$\\$");
@@ -775,39 +792,30 @@ public class StudentBusinessController {
         try {
             MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
             List<MultidimensionalScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                MultidimensionalScoresResponse.infoData infoData = new MultidimensionalScoresResponse.infoData();
-                infoData.setName(knowledgePoint.getType());
-                infoData.setScore(null);
-                boolean flag = false;
-                for (MultidimensionalScoresResponse.infoData datum : data) {
-                    if (datum.getName().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(id);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Double score = 0.0;
+                Double totalScore = 0.0;
+                MultidimensionalScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new MultidimensionalScoresResponse.infoData();
+                        infoData.setName(nameTemp);
+                        infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        score = 0.0;
+                        totalScore = 0.0;
                     }
+                    score += studentStatsViews.get(i).getScore();
+                    totalScore += studentStatsViews.get(i).getTotalScore();
                 }
-                if(!flag){
-                    long totalScore = 0L;
-                    long score = 0L;
-                    for(StatsStudent statsStudent : statsStudents) {
-                        if(knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId()).getType().equals(infoData.getName())){
-                            if(statsStudent.getTotalScore() != null){
-                                totalScore += statsStudent.getTotalScore();
-                            }
-                            if(statsStudent.getScore() != null){
-                                score += statsStudent.getScore();
-                            }
-                        }
-                    }
-                    if(totalScore != 0){
-                        double scorePercentage = 100 * (double) score / (double) totalScore;
-                        scorePercentage = Double.parseDouble(String.format("%.2f", scorePercentage));
-                        infoData.setScore(scorePercentage);
-                    }
-                    data.add(infoData);
-                }
+                infoData = new MultidimensionalScoresResponse.infoData();
+                infoData.setName(nameTemp);
+                infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("各项成绩获取成功");
@@ -825,39 +833,36 @@ public class StudentBusinessController {
         try {
             WeaknessScoresResponse response = new WeaknessScoresResponse();
             List<WeaknessScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(id);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                WeaknessScoresResponse.infoData infoData = new WeaknessScoresResponse.infoData();
-                infoData.setType(knowledgePoint.getType());
-                infoData.setWeaknessName(null);
-                infoData.setWeaknessScore(null);
-                boolean flag = false;
-                for (WeaknessScoresResponse.infoData datum : data) {
-                    if (datum.getType().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(id);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Long knowledgePointIdTemp = studentStatsViews.get(0).getKnowledgePointId();
+                double avgScore = 1.0;
+                WeaknessScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new WeaknessScoresResponse.infoData();
+                        infoData.setType(nameTemp);
+                        infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                        infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = 1.0;
+                    }
+                    StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(id, studentStatsViews.get(i).getKnowledgePointId());
+                    double scoreTemp = (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
+                    if(scoreTemp < avgScore){
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = scoreTemp;
                     }
                 }
-                if(!flag){
-                    for(StatsStudent statsStudent : statsStudents) {
-                        KnowledgePoint knowledgePointTemp = knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId());
-                        if(knowledgePointTemp.getType().equals(infoData.getType())){
-                            double scoreTemp;
-                            if(statsStudent.getTotalScore() != null && statsStudent.getScore() != null){
-                                scoreTemp = 100 * (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
-                            }
-                            else{
-                                scoreTemp = 0;
-                            }
-                            if(infoData.getWeaknessName() == null || infoData.getWeaknessScore() == null || scoreTemp < infoData.getWeaknessScore()){
-                                infoData.setWeaknessName(knowledgePointTemp.getName());
-                                infoData.setWeaknessScore(scoreTemp);
-                            }
-                        }
-                    }
-                    data.add(infoData);
-                }
+                infoData = new WeaknessScoresResponse.infoData();
+                infoData.setType(nameTemp);
+                infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("短板获取成功");
@@ -875,15 +880,17 @@ public class StudentBusinessController {
         try {
             HistoryScoresResponse response = new HistoryScoresResponse();
             List<HistoryScoresResponse.infoData> data = new ArrayList<>();
-            List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(id);
-            for(int i = 0; i < submissions.size() && i < 10; i++){
-                HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-                Assignment assignment = assignmentService.selectById(submissions.get(i).getAssignmentId());
-                infoData.setDate(assignment.getEndTime().toString());
-                if(submissions.get(i).getTotalScore() != null){
-                    infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(id);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    if(assignmentIdStudentIdScore.getScore() != null){
+                        HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().format(formatter));
+                        infoData.setScore(assignmentIdStudentIdScore.getScore());
+                        data.add(infoData);
+                    }
                 }
-                data.add(infoData);
             }
             data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
             response.setData(data);
@@ -904,68 +911,18 @@ public class StudentBusinessController {
             UnfinishedAssignmentResponse response = new UnfinishedAssignmentResponse();
             List<UnfinishedAssignmentResponse.infoData> data = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
-            List<AssignmentRecipient> assignmentsByStudentId = assignmentRecipientService.selectByRecipient("STUDENT", id);
-            if(assignmentsByStudentId != null){
-                for(AssignmentRecipient assignment : assignmentsByStudentId){
-                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                    if(assignmentTemp.getEndTime().isBefore(now)){
-                        continue;
-                    }
-                    UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
-                    infoData.setAssignmentId(assignmentTemp.getId());
-                    infoData.setTitle(assignmentTemp.getTitle());
-                    if(assignmentTemp.getDescription() != null){
-                        infoData.setDescription(assignmentTemp.getDescription());
-                    }
-                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                    data.add(infoData);
-                }
-            }
-            ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
-            if(classStudent != null){
-                Long classId = classStudent.getClassId();
-                if(classId != null){
-                    List<AssignmentRecipient> assignmentsByClassId = assignmentRecipientService.selectByRecipient("CLASS", classId);
-                    if(assignmentsByClassId != null){
-                        for(AssignmentRecipient assignment : assignmentsByClassId){
-                            Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                            if(assignmentTemp.getEndTime().isBefore(now)){
-                                continue;
-                            }
-                            UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
-                            infoData.setAssignmentId(assignmentTemp.getId());
-                            infoData.setTitle(assignmentTemp.getTitle());
-                            if(assignmentTemp.getDescription() != null){
-                                infoData.setDescription(assignmentTemp.getDescription());
-                            }
-                            infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                            infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                            data.add(infoData);
-                        }
-                    }
-                    List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByStudentId(id);
-                    if(groupStudents != null){
-                        for(GroupStudent groupStudent : groupStudents){
-                            List<AssignmentRecipient> assignmentsByGroupId = assignmentRecipientService.selectByRecipient("GROUP", groupStudent.getGroupId());
-                            if(assignmentsByGroupId != null){
-                                for(AssignmentRecipient assignment : assignmentsByGroupId){
-                                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                                    if(assignmentTemp.getEndTime().isBefore(now)){
-                                        continue;
-                                    }
-                                    UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
-                                    infoData.setAssignmentId(assignmentTemp.getId());
-                                    infoData.setTitle(assignmentTemp.getTitle());
-                                    if(assignmentTemp.getDescription() != null){
-                                        infoData.setDescription(assignmentTemp.getDescription());
-                                    }
-                                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                                    data.add(infoData);
-                                }
-                            }
-                        }
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(id);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    Assignment assignment = assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId());
+                    if(assignment.getEndTime().isAfter(now)){
+                        UnfinishedAssignmentResponse.infoData infoData = new UnfinishedAssignmentResponse.infoData();
+                        infoData.setAssignmentId(assignmentIdStudentIdScore.getAssignmentId());
+                        infoData.setTitle(assignment.getTitle());
+                        infoData.setDescription(assignment.getDescription());
+                        infoData.setStartTime(assignment.getStartTime().toString());
+                        infoData.setEndTime(assignment.getEndTime().toString());
+                        data.add(infoData);
                     }
                 }
             }
@@ -988,80 +945,21 @@ public class StudentBusinessController {
             FinishedAssignmentResponse response = new FinishedAssignmentResponse();
             List<FinishedAssignmentResponse.infoData> data = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
-            List<AssignmentRecipient> assignmentsByStudentId = assignmentRecipientService.selectByRecipient("STUDENT", id);
-            if(assignmentsByStudentId != null){
-                for(AssignmentRecipient assignment : assignmentsByStudentId){
-                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                    if(assignmentTemp.getEndTime().isAfter(now)){
-                        continue;
-                    }
-                    FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
-                    infoData.setAssignmentId(assignmentTemp.getId());
-                    infoData.setTitle(assignmentTemp.getTitle());
-                    if(assignmentTemp.getDescription() != null){
-                        infoData.setDescription(assignmentTemp.getDescription());
-                    }
-                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                    AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
-                    if(submission != null && submission.getTotalScore() != null){
-                        infoData.setTotalScore(submission.getTotalScore().doubleValue());
-                    }
-                    data.add(infoData);
-                }
-            }
-            ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
-            if(classStudent != null){
-                Long classId = classStudent.getClassId();
-                if(classId != null){
-                    List<AssignmentRecipient> assignmentsByClassId = assignmentRecipientService.selectByRecipient("CLASS", classId);
-                    if(assignmentsByClassId != null){
-                        for(AssignmentRecipient assignment : assignmentsByClassId){
-                            Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                            if(assignmentTemp.getEndTime().isAfter(now)){
-                                continue;
-                            }
-                            FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
-                            infoData.setAssignmentId(assignmentTemp.getId());
-                            infoData.setTitle(assignmentTemp.getTitle());
-                            if(assignmentTemp.getDescription() != null){
-                                infoData.setDescription(assignmentTemp.getDescription());
-                            }
-                            infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                            infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                            AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
-                            if(submission != null && submission.getTotalScore() != null){
-                                infoData.setTotalScore(submission.getTotalScore().doubleValue());
-                            }
-                            data.add(infoData);
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(id);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    Assignment assignment = assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId());
+                    if(assignment.getEndTime().isBefore(now)){
+                        FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
+                        infoData.setAssignmentId(assignmentIdStudentIdScore.getAssignmentId());
+                        infoData.setTitle(assignment.getTitle());
+                        infoData.setDescription(assignment.getDescription());
+                        infoData.setStartTime(assignment.getStartTime().toString());
+                        infoData.setEndTime(assignment.getEndTime().toString());
+                        if(assignmentIdStudentIdScore.getScore() != null){
+                            infoData.setTotalScore(Double.valueOf(assignmentIdStudentIdScore.getScore()));
                         }
-                    }
-                    List<GroupStudent> groupStudents = groupStudentService.getGroupStudentsByStudentId(id);
-                    if(groupStudents != null){
-                        for(GroupStudent groupStudent : groupStudents){
-                            List<AssignmentRecipient> assignmentsByGroupId = assignmentRecipientService.selectByRecipient("GROUP", groupStudent.getGroupId());
-                            if(assignmentsByGroupId != null){
-                                for(AssignmentRecipient assignment : assignmentsByGroupId){
-                                    Assignment assignmentTemp = assignmentService.selectById(assignment.getAssignmentId());
-                                    if(assignmentTemp.getEndTime().isAfter(now)){
-                                        continue;
-                                    }
-                                    FinishedAssignmentResponse.infoData infoData = new FinishedAssignmentResponse.infoData();
-                                    infoData.setAssignmentId(assignmentTemp.getId());
-                                    infoData.setTitle(assignmentTemp.getTitle());
-                                    if(assignmentTemp.getDescription() != null){
-                                        infoData.setDescription(assignmentTemp.getDescription());
-                                    }
-                                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                                    AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
-                                    if(submission != null && submission.getTotalScore() != null){
-                                        infoData.setTotalScore(submission.getTotalScore().doubleValue());
-                                    }
-                                    data.add(infoData);
-                                }
-                            }
-                        }
+                        data.add(infoData);
                     }
                 }
             }
@@ -1219,6 +1117,7 @@ public class StudentBusinessController {
             List<HomeworkAnswerResponse.infoData> data = new ArrayList<>();
             AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
             if(assignmentSubmission != null){
+                response.setTotalScore(assignmentSubmission.getTotalScore());
                 List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
                 for(SubmissionAnswer submissionAnswer : submissionAnswers){
                     HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
@@ -1227,7 +1126,6 @@ public class StudentBusinessController {
                     }
                     infoData.setStudentAnswer(submissionAnswer.getAnswerContent());
                     infoData.setSequence(submissionAnswer.getSequence());
-                    infoData.setFeedback(submissionAnswer.getFeedback());
                     Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
                     if(question != null){
                         infoData.setQuestionContent(question.getContent());

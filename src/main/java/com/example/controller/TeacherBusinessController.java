@@ -866,12 +866,6 @@ public class TeacherBusinessController {
             AvgScoreResponse.infoData data = new AvgScoreResponse.infoData();
             data.setAverageHomeworkScore(null);
             data.setClassRank(null);
-            Clazz clazz = classService.getClassById(classStudentService.getClassStudentByStudentId(studentId).getClassId());
-            if(!Objects.equals(clazz.getCreatorId(), id)){
-                response.setMessage("无权限");
-                response.setData(null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
             List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
             if(statsStudents != null && (!statsStudents.isEmpty())){
                 long totalScore = 0L;
@@ -934,56 +928,42 @@ public class TeacherBusinessController {
 
 
     @GetMapping("{id}/get-student-multidimensional-scores")
-    public ResponseEntity<MultidimensionalScoresResponse> getMultidimensionalScores(@AuthenticationPrincipal BaseUser user,
-                                                                                    @PathVariable Long id,
-                                                                                    @RequestParam Long studentId) {
-        MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
+    public ResponseEntity<MultidimensionalScoresResponse> getMultidimensionalScores(@PathVariable Long id, @RequestParam Long studentId) {
         try {
+            MultidimensionalScoresResponse response = new MultidimensionalScoresResponse();
             List<MultidimensionalScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                MultidimensionalScoresResponse.infoData infoData = new MultidimensionalScoresResponse.infoData();
-                infoData.setName(knowledgePoint.getType());
-                infoData.setScore(null);
-                boolean flag = false;
-                for (MultidimensionalScoresResponse.infoData datum : data) {
-                    if (datum.getName().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(studentId);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Double score = 0.0;
+                Double totalScore = 0.0;
+                MultidimensionalScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new MultidimensionalScoresResponse.infoData();
+                        infoData.setName(nameTemp);
+                        infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        score = 0.0;
+                        totalScore = 0.0;
                     }
+                    score += studentStatsViews.get(i).getScore();
+                    totalScore += studentStatsViews.get(i).getTotalScore();
                 }
-                if(!flag){
-                    long totalScore = 0L;
-                    long score = 0L;
-                    for(StatsStudent statsStudent : statsStudents) {
-                        if(knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId()).getType().equals(infoData.getName())){
-                            if(statsStudent.getTotalScore() != null){
-                                totalScore += statsStudent.getTotalScore();
-                            }
-                            if(statsStudent.getScore() != null){
-                                score += statsStudent.getScore();
-                            }
-                        }
-                    }
-                    if(totalScore != 0){
-                        double scorePercentage = 100 * (double) score / (double) totalScore;
-                        scorePercentage = Double.parseDouble(String.format("%.2f", scorePercentage));
-                        infoData.setScore(scorePercentage);
-                    }
-                    data.add(infoData);
-                }
+                infoData = new MultidimensionalScoresResponse.infoData();
+                infoData.setName(nameTemp);
+                infoData.setScore(Double.parseDouble(String.format("%.2f", 100 * score / totalScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("各项成绩获取成功");
-            Teacher teacher = teacherService.getTeacherById(user.getId());
-            Student student = studentService.getStudentById(studentId);
-            operationLogger.info("教师 {} 获取了学生 {} 的多维数据得分率", teacher.info(), student.info());
+            operationLogger.info("老师{}获取学生{}各项成绩", teacherService.getTeacherById(id).info(), studentService.getStudentById(studentId).info());
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("获取各项成绩出现问题 {}", e.getMessage(), e);
-            response.setMessage("获取各项成绩失败：" + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e){
+            logger.error("老师获取学生各项成绩失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -994,45 +974,40 @@ public class TeacherBusinessController {
         WeaknessScoresResponse response = new WeaknessScoresResponse();
         try {
             List<WeaknessScoresResponse.infoData> data = new ArrayList<>();
-            List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
-            List<StatsStudent> statsStudents = statsStudentService.getStatsStudentByStudentId(studentId);
-            for(KnowledgePoint knowledgePoint : knowledgePoints) {
-                WeaknessScoresResponse.infoData infoData = new WeaknessScoresResponse.infoData();
-                infoData.setType(knowledgePoint.getType());
-                infoData.setWeaknessName(null);
-                infoData.setWeaknessScore(null);
-                boolean flag = false;
-                for (WeaknessScoresResponse.infoData datum : data) {
-                    if (datum.getType().equals(knowledgePoint.getType())) {
-                        flag = true;
-                        break;
+            List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByStudentId(studentId);
+            if(studentStatsViews != null && !studentStatsViews.isEmpty()){
+                studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
+                String nameTemp = studentStatsViews.get(0).getType();
+                Long knowledgePointIdTemp = studentStatsViews.get(0).getKnowledgePointId();
+                double avgScore = 1.0;
+                WeaknessScoresResponse.infoData infoData;
+                for(int i = 0; i < studentStatsViews.size(); i++){
+                    if(!Objects.equals(nameTemp, studentStatsViews.get(i).getType())){
+                        infoData = new WeaknessScoresResponse.infoData();
+                        infoData.setType(nameTemp);
+                        infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                        infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                        data.add(infoData);
+                        nameTemp = studentStatsViews.get(i).getType();
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = 1.0;
+                    }
+                    StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, studentStatsViews.get(i).getKnowledgePointId());
+                    double scoreTemp = (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
+                    if(scoreTemp < avgScore){
+                        knowledgePointIdTemp = studentStatsViews.get(i).getKnowledgePointId();
+                        avgScore = scoreTemp;
                     }
                 }
-                if(!flag){
-                    for(StatsStudent statsStudent : statsStudents) {
-                        KnowledgePoint knowledgePointTemp = knowledgePointService.getKnowledgePointById(statsStudent.getKnowledgePointId());
-                        if(knowledgePointTemp.getType().equals(infoData.getType())){
-                            double scoreTemp;
-                            if(statsStudent.getTotalScore() != null && statsStudent.getScore() != null){
-                                scoreTemp = 100 * (double) statsStudent.getScore() / (double) statsStudent.getTotalScore();
-                            }
-                            else{
-                                scoreTemp = 0;
-                            }
-                            if(infoData.getWeaknessName() == null || infoData.getWeaknessScore() == null || scoreTemp < infoData.getWeaknessScore()){
-                                infoData.setWeaknessName(knowledgePointTemp.getName());
-                                infoData.setWeaknessScore(scoreTemp);
-                            }
-                        }
-                    }
-                    data.add(infoData);
-                }
+                infoData = new WeaknessScoresResponse.infoData();
+                infoData.setType(nameTemp);
+                infoData.setWeaknessName(knowledgePointService.getKnowledgePointById(knowledgePointIdTemp).getName());
+                infoData.setWeaknessScore(Double.parseDouble(String.format("%.2f", 100 * avgScore)));
+                data.add(infoData);
             }
             response.setData(data);
             response.setMessage("短板获取成功");
-            Teacher teacher = teacherService.getTeacherById(id);
-            Student student = studentService.getStudentById(studentId);
-            operationLogger.info("教师 {} 获取了学生 {} 的短板", teacher.info(), student.info());
+            operationLogger.info("老师{}获取学生{}获取短板", teacherService.getTeacherById(id).info(), studentService.getStudentById(studentId).info());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("获取短板出现问题 {}", e.getMessage(), e);
@@ -1049,14 +1024,16 @@ public class TeacherBusinessController {
         try {
             List<HistoryScoresResponse.infoData> data = new ArrayList<>();
             List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(studentId);
-            for(int i = 0; i < submissions.size() && i < 10; i++){
-                HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-                Assignment assignment = assignmentService.selectById(submissions.get(i).getAssignmentId());
-                infoData.setDate(assignment.getEndTime().toString());
-                if(submissions.get(i).getTotalScore() != null){
-                    infoData.setScore(Double.valueOf(String.valueOf(submissions.get(i).getTotalScore())));
+            List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(studentId);
+            if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
+                for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
+                    if(assignmentIdStudentIdScore.getScore() != null){
+                        HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
+                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().toString());
+                        infoData.setScore(assignmentIdStudentIdScore.getScore());
+                        data.add(infoData);
+                    }
                 }
-                data.add(infoData);
             }
             data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
             response.setData(data);
@@ -1537,7 +1514,7 @@ public class TeacherBusinessController {
                         for (int j = 0; j < info.getChoices().size(); j ++ ){
                             choices.append(info.getChoices().get(j));
                             if (j!= info.getChoices().size() - 1) {
-                                choices.append("\\$\\$");
+                                choices.append("$$");
                             }
                         }
                         question.setOptions(choices.toString());
@@ -1644,6 +1621,12 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    private static List<String> drawOptionsNew(String optionString) {
+        List<String> choices = new ArrayList<>(List.of(optionString.split("\\$\\$")));
+        return choices;
+    }
+
     @GetMapping("{id}/get-submission")
     public ResponseEntity<GetSubmissionResponse> getSubmission(@PathVariable Long id, @RequestParam Long assignmentId, @RequestParam Long studentId) {
         GetSubmissionResponse response = new GetSubmissionResponse();
@@ -1677,64 +1660,7 @@ public class TeacherBusinessController {
                     }
                     subQuestionInfo.setType(question.getType());
                     if(question.getType().equals("CHOICE")){
-                        subQuestionInfo.setOptions(drawOptions(question.getOptions()));
-                        if(submissionAnswer.getScore() == null){
-                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, question.getKnowledgePointId());
-                            if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
-                                submissionAnswer.setScore(submissionAnswer.getQuestionScore());
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudent.setScore(statsStudent.getScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(100L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setTotalScore(questionStatistic.getTotalScore() + 100L);
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setTotalScore(questionBodyStatistic.getTotalScore() + 100L);
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            else {
-                                submissionAnswer.setScore(0);
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(0L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            submissionAnswerService.update(submissionAnswer);
-                        }
+                        subQuestionInfo.setOptions(drawOptionsNew(question.getOptions()));
                     }
                     subQuestionInfo.setSubScore(submissionAnswer.getQuestionScore());
                     scoreTemp += submissionAnswer.getQuestionScore();
@@ -1768,64 +1694,7 @@ public class TeacherBusinessController {
                             }
                             subQuestionInfoTemp.setType(questionTemp.getType());
                             if(questionTemp.getType().equals("CHOICE")){
-                                subQuestionInfoTemp.setOptions(drawOptions(questionTemp.getOptions()));
-                                if(submissionAnswer.getScore() == null){
-                                    StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, questionTemp.getKnowledgePointId());
-                                    if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
-                                        submissionAnswer.setScore(submissionAnswer.getQuestionScore());
-                                        if(statsStudent != null){
-                                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                            statsStudent.setScore(statsStudent.getScore() + 100);
-                                            statsStudentService.updateStatsStudent(statsStudent);
-                                        }
-                                        else{
-                                            StatsStudent statsStudentNew = new StatsStudent();
-                                            statsStudentNew.setStudentId(studentId);
-                                            statsStudentNew.setKnowledgePointId(questionTemp.getKnowledgePointId());
-                                            statsStudentNew.setTotalScore(100L);
-                                            statsStudentNew.setScore(100L);
-                                            statsStudentService.addStatsStudent(statsStudentNew);
-                                        }
-
-                                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(questionTemp.getId(), "small");
-                                        questionStatistic.setTotalScore(questionStatistic.getTotalScore() + 100L);
-                                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                        questionStatisticService.update(questionStatistic);
-                                        if(questionTemp.getBodyId() != null){
-                                            QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(questionTemp.getBodyId(), "big");
-                                            questionBodyStatistic.setTotalScore(questionBodyStatistic.getTotalScore() + 100L);
-                                            questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                            questionStatisticService.update(questionBodyStatistic);
-                                        }
-
-                                    }
-                                    else {
-                                        submissionAnswer.setScore(0);
-                                        if(statsStudent != null){
-                                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                            statsStudentService.updateStatsStudent(statsStudent);
-                                        }
-                                        else{
-                                            StatsStudent statsStudentNew = new StatsStudent();
-                                            statsStudentNew.setStudentId(studentId);
-                                            statsStudentNew.setKnowledgePointId(questionTemp.getKnowledgePointId());
-                                            statsStudentNew.setTotalScore(100L);
-                                            statsStudentNew.setScore(0L);
-                                            statsStudentService.addStatsStudent(statsStudentNew);
-                                        }
-
-                                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(questionTemp.getId(), "small");
-                                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                        questionStatisticService.update(questionStatistic);
-                                        if(questionTemp.getBodyId() != null){
-                                            QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(questionTemp.getBodyId(), "big");
-                                            questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                            questionStatisticService.update(questionBodyStatistic);
-                                        }
-
-                                    }
-                                    submissionAnswerService.update(submissionAnswer);
-                                }
+                                subQuestionInfoTemp.setOptions(drawOptionsNew(questionTemp.getOptions()));
                             }
                             subQuestionInfoTemp.setSubScore(submissionAnswer.getQuestionScore());
                             scoreTemp += submissionAnswer.getQuestionScore();
@@ -1862,64 +1731,7 @@ public class TeacherBusinessController {
                     }
                     questionInfo.setType(question.getType());
                     if(question.getType().equals("CHOICE")){
-                        questionInfo.setOptions(drawOptions(question.getOptions()));
-                        if(submissionAnswer.getScore() == null){
-                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(studentId, question.getKnowledgePointId());
-                            if(submissionAnswer.getAnswerContent().equals(answerAndExplanation[0])){
-                                submissionAnswer.setScore(submissionAnswer.getQuestionScore());
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudent.setScore(statsStudent.getScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(100L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setTotalScore(questionStatistic.getTotalScore() + 100L);
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setTotalScore(questionBodyStatistic.getTotalScore() + 100L);
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            else {
-                                submissionAnswer.setScore(0);
-                                if(statsStudent != null){
-                                    statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                                    statsStudentService.updateStatsStudent(statsStudent);
-                                }
-                                else{
-                                    StatsStudent statsStudentNew = new StatsStudent();
-                                    statsStudentNew.setStudentId(studentId);
-                                    statsStudentNew.setKnowledgePointId(question.getKnowledgePointId());
-                                    statsStudentNew.setTotalScore(100L);
-                                    statsStudentNew.setScore(0L);
-                                    statsStudentService.addStatsStudent(statsStudentNew);
-                                }
-
-                                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                                questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                                questionStatisticService.update(questionStatistic);
-                                if(question.getBodyId() != null){
-                                    QuestionStatistic questionBodyStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                                    questionBodyStatistic.setCompleteCount(questionBodyStatistic.getCompleteCount() + 1);
-                                    questionStatisticService.update(questionBodyStatistic);
-                                }
-
-                            }
-                            submissionAnswerService.update(submissionAnswer);
-                        }
+                        questionInfo.setOptions(drawOptionsNew(question.getOptions()));
                     }
                     questionInfo.setStudentAnswer(submissionAnswer.getAnswerContent());
                     questionInfo.setScore(submissionAnswer.getQuestionScore());
@@ -2000,15 +1812,16 @@ public class TeacherBusinessController {
                                 subInfo.setOptions(List.of(subQuestion.getQuestionOptions().split("\\$\\$")));
                             }
                             subInfo.setType(subQuestion.getType());
+                            QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(subQuestion.getQuestionId(), "small");
+                            if (questionStatistic.getCompleteCount() == 0) {
+                                subInfo.setDifficulty(-1.0);
+                            }
+                            else {
+                                subInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+                            }
                             subQuestions.add(subInfo);
                         }
-                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "big");
-                        if (questionStatistic.getCompleteCount() != 0) {
-                            info.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
-                        }
-                        else {
-                            info.setDifficulty(-1.0);
-                        }
+
                         info.setSubQuestions(subQuestions);
                         infos.add(info);
                     }
@@ -2098,17 +1911,17 @@ public class TeacherBusinessController {
                     if (subQ.getType().equals("CHOICE")) {
                         subInfo.setOptions(List.of(subQ.getQuestionOptions().split("\\$\\$")));
                     }
+                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(subQ.getQuestionId(), "small");
+                    if (questionStatistic.getCompleteCount() != 0) {
+                        subInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
+                    }
+                    else {
+                        subInfo.setDifficulty(-1.0);
+                    }
                     subInfo.setKnowledgePoint(subQ.getKnowledgePoint());
                     subQuestions.add(subInfo);
                 }
-                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "big");
 
-                if (questionStatistic.getCompleteCount() != 0) {
-                    bigQuestionInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
-                }
-                else {
-                    bigQuestionInfo.setDifficulty(-1.0);
-                }
                 bigQuestionInfos.add(bigQuestionInfo);
                 bigQuestionInfo.setSubQuestions(subQuestions);
             }
@@ -2147,71 +1960,70 @@ public class TeacherBusinessController {
         }
     }
 
-    @PostMapping("/api/teacher/mark-submission")
+    @PostMapping("/mark-submission")
     public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal BaseUser user, @RequestBody MarkSubmissionRequest request) {
         Message response = new Message();
         try {
-            AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectById(submissionAnswerService.selectById(request.getData().get(0).getSubmissionAnswerId()).getSubmissionId());
-            if(assignmentSubmission.getTotalScore() != null){
-                response.setMessage("不允许重复提交");
-                return ResponseEntity.ok(response);
-            }
             if(request.getData() != null && !request.getData().isEmpty()){
+                AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectById(submissionAnswerService.selectById(request.getData().get(0).getSubmissionAnswerId()).getSubmissionId());
+                if(assignmentSubmission.getTotalScore() != null){
+                    response.setMessage("不允许重复提交");
+                    return ResponseEntity.ok(response);
+                }
                 for(MarkSubmissionRequest.infoData infoData : request.getData()){
-                    if(infoData.getMarkScore() != null){
-                        SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
-                        submissionAnswer.setScore(infoData.getMarkScore());
-                        if(infoData.getFeedback() != null && !infoData.getFeedback().isEmpty()){
-                            submissionAnswer.setFeedback(infoData.getFeedback());
-                        }
-                        submissionAnswerService.update(submissionAnswer);
-                        Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
+                    SubmissionAnswer submissionAnswer = submissionAnswerService.selectById(infoData.getSubmissionAnswerId());
+                    submissionAnswer.setScore(infoData.getMarkScore());
+                    submissionAnswerService.update(submissionAnswer);
+                    Long scoreTemp = 100L * submissionAnswer.getScore() / submissionAnswer.getQuestionScore();
+                    double scoreTempD = (double) submissionAnswer.getScore() / (double) submissionAnswer.getQuestionScore();
 
-                        Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
-                        QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
-                        questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
-                        questionStatistic.setTotalScore(questionStatistic.getTotalScore() + scoreTemp);
-                        questionStatisticService.update(questionStatistic);
-                        if(question.getBodyId() != null){
-                            QuestionStatistic bodyQuestionStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
-                            bodyQuestionStatistic.setCompleteCount(bodyQuestionStatistic.getCompleteCount() + 1);
-                            bodyQuestionStatistic.setTotalScore(bodyQuestionStatistic.getTotalScore() + scoreTemp);
-                            questionStatisticService.update(bodyQuestionStatistic);
-                        }
+                    Question question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
+                    questionStatistic.setCompleteCount(questionStatistic.getCompleteCount() + 1);
+                    questionStatistic.setTotalScore(questionStatistic.getTotalScore() + scoreTempD);
+                    questionStatisticService.update(questionStatistic);
+                    if(question.getBodyId() != null){
+                        QuestionStatistic bodyQuestionStatistic = questionStatisticService.findByIdAndType(question.getBodyId(), "big");
+                        bodyQuestionStatistic.setCompleteCount(bodyQuestionStatistic.getCompleteCount() + 1);
+                        bodyQuestionStatistic.setTotalScore(bodyQuestionStatistic.getTotalScore() + scoreTempD);
+                        questionStatisticService.update(bodyQuestionStatistic);
+                    }
 
 
-                        AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
-                        if(assignmentStatsView.getStatsScore() != null){
-                            StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
-                            statsStudent.setTotalScore(statsStudent.getTotalScore() + 100);
-                            statsStudent.setScore(statsStudent.getScore() + scoreTemp);
-                            statsStudentService.updateStatsStudent(statsStudent);
-                        }
-                        else {
-                            StatsStudent statsStudent = new StatsStudent();
-                            statsStudent.setStudentId(assignmentStatsView.getStudentId());
-                            statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
-                            statsStudent.setTotalScore(100L);
-                            statsStudent.setScore(scoreTemp);
-                            statsStudentService.addStatsStudent(statsStudent);
-                        }
-
+                    AssignmentStatsView assignmentStatsView = assignmentStatsViewService.selectBySubmissionAnswerId(infoData.getSubmissionAnswerId());
+                    if(assignmentStatsView.getStatsScore() != null){
+                        StatsStudent statsStudent = statsStudentService.selectByStudentIdAndKnowledgePointId(assignmentStatsView.getStudentId(), assignmentStatsView.getKnowledgePointId());
+                        statsStudent.setTotalScore(statsStudent.getTotalScore() + submissionAnswer.getQuestionScore());
+                        statsStudent.setScore(statsStudent.getScore() + submissionAnswer.getScore());
+                        statsStudentService.updateStatsStudent(statsStudent);
+                    }
+                    else {
+                        StatsStudent statsStudent = new StatsStudent();
+                        statsStudent.setStudentId(assignmentStatsView.getStudentId());
+                        statsStudent.setKnowledgePointId(assignmentStatsView.getKnowledgePointId());
+                        statsStudent.setTotalScore((long)submissionAnswer.getQuestionScore());
+                        statsStudent.setScore((long)submissionAnswer.getScore());
+                        statsStudentService.addStatsStudent(statsStudent);
                     }
                 }
-            }
-            int score = 0;
-            List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
-            for(SubmissionAnswer submissionAnswer : submissionAnswers){
-                if(submissionAnswer.getScore() != null) {
-                    score += submissionAnswer.getScore();
+                int score = 0;
+                List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
+                for(SubmissionAnswer submissionAnswer : submissionAnswers){
+                    if(submissionAnswer.getScore() != null) {
+                        score += submissionAnswer.getScore();
+                    }
                 }
+                assignmentSubmission.setTotalScore(score);
+                assignmentSubmission.setFeedback(request.getFeedback());
+                assignmentSubmissionService.update(assignmentSubmission);
+                response.setMessage("success");
+                return ResponseEntity.ok(response);
             }
-            assignmentSubmission.setTotalScore(score);
-            assignmentSubmissionService.update(assignmentSubmission);
-            response.setMessage("success");
-            return ResponseEntity.ok(response);
+            response.setMessage("error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }catch (Exception e){
             response.setMessage("error");
+            logger.error("教师批改学生作业出现错误 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -2221,7 +2033,7 @@ public class TeacherBusinessController {
         HistoricalScoresResponse response = new HistoricalScoresResponse();
         List<HistoricalScoresResponse.infoData> data = new ArrayList<>();
         List<AssignmentScoresView> assignmentScoresViews = assignmentScoresViewService.selectAvgScoresByClassId(classId);
-        if(assignmentScoresViews != null){
+        if(assignmentScoresViews != null && !assignmentScoresViews.isEmpty()){
             assignmentScoresViews.sort(Comparator.comparing(AssignmentScoresView::getAssignmentId));
             Double totalScore = 0.0;
             int count = 0;
@@ -2295,7 +2107,7 @@ public class TeacherBusinessController {
         HistoricalScoresResponse response = new HistoricalScoresResponse();
         List<HistoricalScoresResponse.infoData> data = new ArrayList<>();
         List<AssignmentScoresView> assignmentScoresViews = assignmentScoresViewService.selectAvgScoresByClassId(groupId);
-        if(assignmentScoresViews != null){
+        if(assignmentScoresViews != null && !assignmentScoresViews.isEmpty()){
             assignmentScoresViews.sort(Comparator.comparing(AssignmentScoresView::getAssignmentId));
             Double totalScore = 0.0;
             int count = 0;
@@ -2369,7 +2181,7 @@ public class TeacherBusinessController {
         ClassKnowledgePointStatusResponse response = new ClassKnowledgePointStatusResponse();
         List<ClassKnowledgePointStatusResponse.infoData> data = new ArrayList<>();
         List<StudentStatsView> studentStatsViews = studentStatsViewService.selectByClassId(classId);
-        if(studentStatsViews != null){
+        if(studentStatsViews != null && !studentStatsViews.isEmpty()){
             studentStatsViews.sort(Comparator.comparing(StudentStatsView::getType));
             String nameTemp = studentStatsViews.get(0).getType();
             int score = 0;

@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class HomeworkAnswerResponse {
     private String message;
+    private Integer totalScore;
     private List<infoData> data;
 
     @Setter

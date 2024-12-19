@@ -137,14 +137,20 @@ public class QuestionBodyServiceImpl implements QuestionBodyService {
             questionStatisticService.delete(id, "big");
             result =  questionBodyMapper.reallyDelete(id);
             questionService.fileRemove(questionBody.getBody());
+
+            for (Question subQuestion : subQuestions) {
+                questionService.deleteQuestion(subQuestion);
+                rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
+            }
         }
         else {
             result = questionBodyMapper.delete(id);
+            for (Question subQuestion : subQuestions) {
+                questionService.outdateQuestion(subQuestion);
+                rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
+            }
         }
-        for (Question subQuestion : subQuestions) {
-            questionService.deleteQuestion(subQuestion);
-            rabbitMQProducer.sendQuestionSyncMessage(subQuestion, RabbitMQProducer.DELETE_OPERATION);
-        }
+
         rabbitMQProducer.sendQuestionBodySyncMessage(questionBody, RabbitMQProducer.DELETE_OPERATION);
         String cacheKey = "questions:questionBody:" + id;
         redisTemplate.delete(cacheKey);
