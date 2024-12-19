@@ -1230,6 +1230,7 @@
     ```json
     {
       "message" : "success",
+      "totalScora": "int",
       "data" : 
       [
         {
