@@ -51,6 +51,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -162,7 +163,8 @@ public class StudentBusinessController {
                         GetFinishedPractices.InfoData infoData = new GetFinishedPractices.InfoData();
                         infoData.setPracticeId(practice.getId());
                         infoData.setPracticeName(practice.getName());
-                        infoData.setPracticeTime(practice.getPracticeTime().toString());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        infoData.setPracticeTime(practice.getPracticeTime().format(formatter));
                         infoData.setTotalScore(null);
                         if (practice.getTotalScore() != null) {
                             infoData.setTotalScore(practice.getTotalScore().doubleValue());
@@ -885,7 +887,8 @@ public class StudentBusinessController {
                 for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
                     if(assignmentIdStudentIdScore.getScore() != null){
                         HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().toString());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().format(formatter));
                         infoData.setScore(assignmentIdStudentIdScore.getScore());
                         data.add(infoData);
                     }
@@ -923,8 +926,9 @@ public class StudentBusinessController {
                     if(assignmentTemp.getDescription() != null){
                         infoData.setDescription(assignmentTemp.getDescription());
                     }
-                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
+                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
                     data.add(infoData);
                 }
             }
@@ -945,8 +949,9 @@ public class StudentBusinessController {
                             if(assignmentTemp.getDescription() != null){
                                 infoData.setDescription(assignmentTemp.getDescription());
                             }
-                            infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                            infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                            infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
+                            infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
                             data.add(infoData);
                         }
                     }
@@ -966,8 +971,9 @@ public class StudentBusinessController {
                                     if(assignmentTemp.getDescription() != null){
                                         infoData.setDescription(assignmentTemp.getDescription());
                                     }
-                                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
+                                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
                                     data.add(infoData);
                                 }
                             }
@@ -1007,8 +1013,10 @@ public class StudentBusinessController {
                     if(assignmentTemp.getDescription() != null){
                         infoData.setDescription(assignmentTemp.getDescription());
                     }
-                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
+                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
                     AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
                     if(submission != null && submission.getTotalScore() != null){
                         infoData.setTotalScore(submission.getTotalScore().doubleValue());
@@ -1033,8 +1041,9 @@ public class StudentBusinessController {
                             if(assignmentTemp.getDescription() != null){
                                 infoData.setDescription(assignmentTemp.getDescription());
                             }
-                            infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                            infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                            infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
+                            infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
                             AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
                             if(submission != null && submission.getTotalScore() != null){
                                 infoData.setTotalScore(submission.getTotalScore().doubleValue());
@@ -1058,8 +1067,9 @@ public class StudentBusinessController {
                                     if(assignmentTemp.getDescription() != null){
                                         infoData.setDescription(assignmentTemp.getDescription());
                                     }
-                                    infoData.setStartTime(assignmentTemp.getStartTime().toString());
-                                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                    infoData.setStartTime(assignmentTemp.getStartTime().format(formatter));
+                                    infoData.setEndTime(assignmentTemp.getEndTime().format(formatter));
                                     AssignmentSubmission submission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignment.getAssignmentId(), id);
                                     if(submission != null && submission.getTotalScore() != null){
                                         infoData.setTotalScore(submission.getTotalScore().doubleValue());
