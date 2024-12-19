@@ -1,0 +1,4 @@
+2024-12-19 11:27:36 [http-nio-8081-exec-7] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取班级列表
+2024-12-19 11:27:37 [http-nio-8081-exec-8] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取小组列表
+2024-12-19 11:28:00 [http-nio-8081-exec-3] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取小组 (id:30, 名字:八年级四班一组) 的成员列表
+2024-12-19 12:49:25 [http-nio-8081-exec-5] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 查看知识点

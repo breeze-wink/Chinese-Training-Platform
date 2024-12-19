@@ -2,3 +2,6 @@
 2024-12-19 00:17:17 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:84, 姓名:123456, 昵称:Sherlock)获取历史成绩
 2024-12-19 00:17:34 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:cez, 昵称:Aozora)获取历史成绩
 2024-12-19 00:18:22 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:cez, 昵称:Aozora)获取历史成绩
+2024-12-19 12:31:23 [http-nio-8081-exec-4] INFO  operations.student - 学生(id:85, 昵称:bree)获取未截止作业
+2024-12-19 12:33:41 [http-nio-8081-exec-7] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
+2024-12-19 12:51:03 [http-nio-8081-exec-6] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
