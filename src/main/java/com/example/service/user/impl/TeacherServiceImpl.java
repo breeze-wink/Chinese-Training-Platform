@@ -113,4 +113,10 @@ public class TeacherServiceImpl implements TeacherService {
         teacherMapper.update(teacher);
     }
 
+    @Override
+    @Transactional
+    public Teacher selectByEmail(String email) {
+        return teacherMapper.selectByEmail(email);
+    }
+
 }

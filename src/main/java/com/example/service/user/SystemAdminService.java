@@ -20,4 +20,6 @@ public interface SystemAdminService {
     boolean emailExist(String email);
 
     void updatePassword(SystemAdmin systemAdmin);
+
+    SystemAdmin selectByEmail(String email);
 }

@@ -77,5 +77,11 @@ public class SystemAdminServiceImpl implements SystemAdminService {
         systemAdminMapper.update(systemAdmin);
     }
 
+    @Override
+    @Transactional
+    public SystemAdmin selectByEmail(String email) {
+        return systemAdminMapper.selectByEmail(email);
+    }
+
 
 }

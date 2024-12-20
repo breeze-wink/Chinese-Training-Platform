@@ -52,6 +52,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 .requestMatchers("/api/student/register").permitAll()
                                 .requestMatchers("/api/teacher/register").permitAll()
                                 .requestMatchers("/api/teacher/send-verification").permitAll()
+                                .requestMatchers("/api/find-password/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

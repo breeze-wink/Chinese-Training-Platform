@@ -85,4 +85,10 @@ public class SchoolAdminServiceImpl implements SchoolAdminService {
         admin.setPassword(passwordEncodeService.encode(admin.getPassword()));
         schoolAdminMapper.update(admin);
     }
+
+    @Override
+    @Transactional
+    public SchoolAdmin selectByEmail(String email) {
+        return schoolAdminMapper.selectByEmail(email);
+    }
 }

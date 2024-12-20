@@ -20,4 +20,6 @@ public interface SchoolAdminService {
     boolean emailExist(String email);
 
     void updatePassword(SchoolAdmin admin);
+
+    SchoolAdmin selectByEmail(String email);
 }

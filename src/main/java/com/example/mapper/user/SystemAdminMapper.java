@@ -32,4 +32,7 @@ public interface SystemAdminMapper {
 
     @Select("SELECT * FROM system_admin WHERE email = #{email}")
     SystemAdmin emailExist(String email);
+
+    @Select("SELECT * FROM system_admin WHERE email = #{email}")
+    SystemAdmin selectByEmail(String email);
 }
