@@ -15,4 +15,6 @@ public interface StudentService {
     boolean existStudent(String email);
     boolean existStudentUsername(String username);
     List<Student> getStudentsBySchoolId(Long schoolId);
+
+    void updatePassword(Student student);
 }

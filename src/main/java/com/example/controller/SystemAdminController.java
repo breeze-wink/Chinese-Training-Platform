@@ -19,6 +19,7 @@ import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SystemAdminServiceImpl;
 import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
+import com.example.service.utils.PasswordEncodeService;
 import com.example.util.JwtTokenUtil;
 
 import org.slf4j.Logger;
@@ -54,6 +55,8 @@ public class SystemAdminController {
     private final SystemAdminService systemAdminService;
     private final CourseStandardService courseStandardService;
     private final KnowledgePointService knowledgePointService;
+
+    private final PasswordEncodeService passwordEncodeService;
     private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
     private final EmailCodeService emailCodeService;
@@ -64,7 +67,8 @@ public class SystemAdminController {
                                  KnowledgePointServiceImpl knowledgePointService,
                                  JwtTokenUtil jwtTokenUtil,
                                  EmailService emailService,
-                                 EmailCodeService emailCodeService
+                                 EmailCodeService emailCodeService,
+                                 PasswordEncodeService passwordEncodeService
                                  ) {
         this.systemAdminService = systemAdminService;
         this.courseStandardService = courseStandardService;
@@ -72,6 +76,7 @@ public class SystemAdminController {
         this.jwtTokenUtil = jwtTokenUtil;
         this.emailService = emailService;
         this.emailCodeService = emailCodeService;
+        this.passwordEncodeService = passwordEncodeService;
     }
 
     @PostMapping("/login")
@@ -393,12 +398,12 @@ public class SystemAdminController {
                 response.setMessage("用户不存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            if (!systemAdmin.getPassword().equals(request.getPassword())) {
+            if (!passwordEncodeService.matches(request.getPassword(), systemAdmin.getPassword())) {
                 response.setMessage("旧密码错误");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             systemAdmin.setPassword(request.getNewPassword());
-            systemAdminService.updateSystemAdmin(systemAdmin);
+            systemAdminService.updatePassword(systemAdmin);
             response.setMessage("密码修改成功");
             operationLogger.info("系统管理员 {} 修改密码", systemAdmin.info());
             return ResponseEntity.ok(response);

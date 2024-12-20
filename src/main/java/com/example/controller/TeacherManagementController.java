@@ -17,6 +17,7 @@ import com.example.service.user.impl.AuthorizationCodeServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
 import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
+import com.example.service.utils.PasswordEncodeService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ public class TeacherManagementController {
     private final EmailService emailService;
     private final JwtTokenUtil jwtTokenUtil;
     private final EmailCodeService emailCodeService;
+    private final PasswordEncodeService passwordEncodeService;
+
 
     @Autowired
     public TeacherManagementController(TeacherServiceImpl teacherService,
@@ -47,7 +50,8 @@ public class TeacherManagementController {
                                        EmailService emailService,
                                        SchoolService schoolService,
                                        JwtTokenUtil jwtTokenUtil,
-                                       EmailCodeService emailCodeService
+                                       EmailCodeService emailCodeService,
+                                       PasswordEncodeService passwordEncodeService
                                        ) {
         this.teacherService = teacherService;
         this.authorizationCodeService = authorizationCodeService;
@@ -55,6 +59,8 @@ public class TeacherManagementController {
         this.schoolService = schoolService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.emailCodeService = emailCodeService;
+        this.passwordEncodeService = passwordEncodeService;
+
     }
 
     @PostMapping("/login")
@@ -253,12 +259,12 @@ public class TeacherManagementController {
                 response.setMessage("用户不存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            if (!teacher.getPassword().equals(request.getPassword())) {
+            if (!passwordEncodeService.matches(request.getPassword(), teacher.getPassword())) {
                 response.setMessage("旧密码错误");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             teacher.setPassword(request.getNewPassword());
-            teacherService.updateTeacher(teacher);
+            teacherService.updatePassword(teacher);
             response.setMessage("密码修改成功");
             operationLogger.info("老师 {} 修改密码", teacher.info());
             return ResponseEntity.ok(response);

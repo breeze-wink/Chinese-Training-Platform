@@ -4,6 +4,7 @@ import com.example.mapper.user.StudentMapper;
 import com.example.model.user.SchoolAdmin;
 import com.example.model.user.Student;
 import com.example.service.user.StudentService;
+import com.example.service.utils.PasswordEncodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,14 +14,18 @@ import java.util.List;
 @Service
 public class StudentServiceImpl implements StudentService {
     private final StudentMapper studentMapper;
+    private final PasswordEncodeService passwordEncodeService;
     @Autowired
-    public StudentServiceImpl (StudentMapper studentMapper) {
+    public StudentServiceImpl (StudentMapper studentMapper,
+                               PasswordEncodeService passwordEncodeService) {
         this.studentMapper = studentMapper;
+        this.passwordEncodeService = passwordEncodeService;
     }
 
     @Override
     @Transactional
     public int addStudent(Student student) {
+        student.setPassword(passwordEncodeService.encode(student.getPassword()));
         return studentMapper.insert(student);
     }
 
@@ -54,7 +59,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Student authenticate(String account, String password) {
         Student student = studentMapper.findByAccountOrEmail(account);
-        if (student != null && student.getPassword().equals(password)) {
+        if (student != null && passwordEncodeService.matches(password, student.getPassword())) {
             return student;
         }
         return null;
@@ -73,5 +78,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> getStudentsBySchoolId(Long schoolId) {
         return studentMapper.selectBySchoolId(schoolId);
+    }
+
+    @Override
+    public void updatePassword(Student student) {
+        student.setPassword(passwordEncodeService.encode(student.getPassword()));
+        studentMapper.update(student);
     }
 }

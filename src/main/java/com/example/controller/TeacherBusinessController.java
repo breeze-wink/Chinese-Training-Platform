@@ -32,6 +32,7 @@ import com.example.service.question.impl.*;
 import com.example.service.submission.SubmissionAnswerService;
 import com.example.service.submission.impl.SubmissionAnswerServiceImpl;
 import com.example.service.utils.EmailService;
+import com.example.service.utils.PasswordEncodeService;
 import com.example.service.view.*;
 import com.example.service.submission.AssignmentSubmissionService;
 import com.example.service.view.impl.AssignmentScoresViewServiceImpl;
@@ -104,6 +105,7 @@ public class TeacherBusinessController {
     private final AssignmentScoresViewService assignmentScoresViewService;
     private final PreAssembledQuestionService preAssembledQuestionService;
     private final EmailService emailService;
+
     private final EssayService essayService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
@@ -1767,6 +1769,7 @@ public class TeacherBusinessController {
                 // 作文特殊处理
                 if (knowledgeType.equals("作文")) {
                     List<PreAssembledQuestion> questions = preAssembledQuestionService.getPreAssembledQuestionsByType(knowledgeType);
+                    if (questions == null || questions.isEmpty()) continue;
                     int number = type.getNumber();
 
                     // 高效随机抽取题目 number道
@@ -1797,6 +1800,8 @@ public class TeacherBusinessController {
                 }
                 else {
                     List<PreAssembledQuestion> questions = preAssembledQuestionService.getPreAssembledQuestionsByType(knowledgeType);
+                    if (questions == null || questions.isEmpty()) continue;
+
                     int number = type.getNumber();
 
                     // 高效随机抽取题目 number道

@@ -17,6 +17,7 @@ import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
 import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
+import com.example.service.utils.PasswordEncodeService;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class StudentInfoController {
     private static final Logger logger = LoggerFactory.getLogger(StudentInfoController.class);
     private static final Logger operationLogger = LoggerFactory.getLogger("operations.student");
     private final StudentService studentService;
+
+    private final PasswordEncodeService passwordEncodeService;
     private final EmailService emailService;
     private final ClassStudentService classStudentService;
     private final ClassService classService;
@@ -48,7 +51,8 @@ public class StudentInfoController {
                                  ClassService classService,
                                  SchoolService schoolService,
                                  JoinClassService joinClassService,
-                                 EmailCodeService emailCodeService
+                                 EmailCodeService emailCodeService,
+                                 PasswordEncodeService passwordEncodeService
                                  ) {
         this.studentService = studentService;
         this.emailService = emailService;
@@ -57,6 +61,7 @@ public class StudentInfoController {
         this.schoolService = schoolService;
         this.joinClassService = joinClassService;
         this.emailCodeService = emailCodeService;
+        this.passwordEncodeService = passwordEncodeService;
     }
     @PostMapping("/{id}/editInformation")
     public ResponseEntity<StudentEditInformationResponse> studentEditInformation(@PathVariable Long id, @RequestBody StudentEditInformationRequest request) {
@@ -144,12 +149,12 @@ public class StudentInfoController {
         try {
             Student student = studentService.getStudentById(id);
             Message response = new Message();
-            if(!Objects.equals(student.getPassword(), request.getOldPassword())){
+            if(!passwordEncodeService.matches(request.getOldPassword(), student.getPassword())){
                 response.setMessage("旧密码错误");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             student.setPassword(request.getNewPassword());
-            studentService.updateStudent(student);
+            studentService.updatePassword(student);
             response.setMessage("密码修改成功");
             operationLogger.info("学生 {} 修改密码", student.info());
             return ResponseEntity.ok(response);

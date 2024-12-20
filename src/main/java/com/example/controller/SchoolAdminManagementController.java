@@ -18,6 +18,7 @@ import com.example.service.user.SchoolService;
 
 import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
+import com.example.service.utils.PasswordEncodeService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
 
@@ -42,13 +43,16 @@ public class SchoolAdminManagementController {
     private final EmailService emailService;
     private final EmailCodeService emailCodeService;
 
+    private final PasswordEncodeService passwordEncodeService;
+
     @Autowired
     public SchoolAdminManagementController(SchoolAdminService schoolAdminService,
                                            SchoolService schoolService,
                                            AuthorizationCodeService authorizationCodeService,
                                            EmailService emailService,
                                            JwtTokenUtil jwtTokenUtil,
-                                           EmailCodeService emailCodeService
+                                           EmailCodeService emailCodeService,
+                                           PasswordEncodeService passwordEncodeService
                                            ) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
@@ -56,6 +60,7 @@ public class SchoolAdminManagementController {
         this.emailService = emailService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.emailCodeService = emailCodeService;
+        this.passwordEncodeService = passwordEncodeService;
     }
 
     @PostMapping("/login")
@@ -128,12 +133,12 @@ public class SchoolAdminManagementController {
                response.setMessage("用户未找到");
                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
            }
-           if(!admin.getPassword().equals(request.getPassword())){
+           if(!passwordEncodeService.matches(request.getPassword(), admin.getPassword())){
                response.setMessage("旧密码错误");
                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
            }
            admin.setPassword(request.getNewPassword());
-           schoolAdminService.updateSchoolAdmin(admin);
+           schoolAdminService.updatePassword(admin);
            response.setMessage("密码修改成功");
            operationLogger.info("学校管理员 {} 修改密码", admin.info());
            return ResponseEntity.ok(response);

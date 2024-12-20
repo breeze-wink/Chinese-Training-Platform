@@ -3,6 +3,7 @@ package com.example.service.user.impl;
 import com.example.mapper.user.SchoolAdminMapper;
 import com.example.model.user.SchoolAdmin;
 import com.example.service.user.SchoolAdminService;
+import com.example.service.utils.PasswordEncodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +13,17 @@ import java.util.List;
 @Service
 public class SchoolAdminServiceImpl implements SchoolAdminService {
     private final SchoolAdminMapper schoolAdminMapper;
+    private final PasswordEncodeService passwordEncodeService;
     @Autowired
-    public SchoolAdminServiceImpl (SchoolAdminMapper schoolAdminMapper) {
+    public SchoolAdminServiceImpl (SchoolAdminMapper schoolAdminMapper,
+                                   PasswordEncodeService passwordEncodeService) {
         this.schoolAdminMapper = schoolAdminMapper;
+        this.passwordEncodeService = passwordEncodeService;
     }
     @Override
     @Transactional
     public int addSchoolAdmin(SchoolAdmin schoolAdmin) {
+        schoolAdmin.setPassword(passwordEncodeService.encode(schoolAdmin.getPassword()));
         return schoolAdminMapper.insert(schoolAdmin);
     }
 
@@ -52,7 +57,7 @@ public class SchoolAdminServiceImpl implements SchoolAdminService {
     @Override
     public SchoolAdmin authenticate(String account, String password) {
         SchoolAdmin schoolAdmin = schoolAdminMapper.findByAccountOrEmail(account);
-        if (schoolAdmin != null && schoolAdmin.getPassword().equals(password)) {
+        if (schoolAdmin != null && passwordEncodeService.matches(password, schoolAdmin.getPassword())) {
             return schoolAdmin;
         }
         return null;
@@ -73,5 +78,11 @@ public class SchoolAdminServiceImpl implements SchoolAdminService {
     public boolean emailExist(String email) {
         SchoolAdmin schoolAdmin = schoolAdminMapper.emailExist(email);
         return schoolAdmin != null;
+    }
+
+    @Override
+    public void updatePassword(SchoolAdmin admin) {
+        admin.setPassword(passwordEncodeService.encode(admin.getPassword()));
+        schoolAdminMapper.update(admin);
     }
 }

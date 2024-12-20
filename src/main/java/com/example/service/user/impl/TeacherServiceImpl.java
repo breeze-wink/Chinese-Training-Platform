@@ -3,6 +3,7 @@ package com.example.service.user.impl;
 import com.example.mapper.user.TeacherMapper;
 import com.example.model.user.Teacher;
 import com.example.service.user.TeacherService;
+import com.example.service.utils.PasswordEncodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,15 +14,19 @@ import java.util.Objects;
 @Service
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherMapper teacherMapper;
+    private final PasswordEncodeService passwordEncodeService;
 
     @Autowired
-    public TeacherServiceImpl(TeacherMapper teacherMapper) {
+    public TeacherServiceImpl(TeacherMapper teacherMapper,
+                              PasswordEncodeService passwordEncodeService) {
         this.teacherMapper = teacherMapper;
+        this.passwordEncodeService = passwordEncodeService;
     }
 
     @Override
     @Transactional
     public void addTeacher(Teacher teacher) {
+        teacher.setPassword(passwordEncodeService.encode(teacher.getPassword()));
         teacherMapper.insert(teacher);
     }
 
@@ -54,7 +59,7 @@ public class TeacherServiceImpl implements TeacherService {
         List<Teacher> teachers = teacherMapper.findByAccount(email);
 
         for (Teacher teacher : teachers) {
-            if (teacher.getPassword().equals(password)) {
+            if (passwordEncodeService.matches(password, teacher.getPassword())) {
                 return teacher;
             }
         }
@@ -100,6 +105,12 @@ public class TeacherServiceImpl implements TeacherService {
             return 1;
         }
         return 0;
+    }
+
+    @Override
+    public void updatePassword(Teacher teacher) {
+        teacher.setPassword(passwordEncodeService.encode(teacher.getPassword()));
+        teacherMapper.update(teacher);
     }
 
 }

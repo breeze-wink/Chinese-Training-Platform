@@ -14,5 +14,4 @@ public interface AuthorizationCodeService {
     Boolean schoolIsExist(Long schoolId);
 
     AuthorizationCode getAuthorizationCodeByCode(String code);
-
 }

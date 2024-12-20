@@ -18,4 +18,6 @@ public interface SchoolAdminService {
     SchoolAdmin getSchoolAdminByUsername(String username);
 
     boolean emailExist(String email);
+
+    void updatePassword(SchoolAdmin admin);
 }

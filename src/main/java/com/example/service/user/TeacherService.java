@@ -23,4 +23,5 @@ public interface TeacherService {
     String getTeacherNameById(Long teacherId);
     int emailExist(String email);
 
+    void updatePassword(Teacher teacher);
 }
