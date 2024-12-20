@@ -20,13 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -196,8 +194,13 @@ public class StudentController {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(essay.getContent());
             InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
 
+            ContentDisposition contentDisposition = ContentDisposition
+                .inline()
+                .filename(essay.getTitle(), StandardCharsets.UTF_8)
+                .build();
+
             return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + essay.getTitle())
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
                 .contentType(MediaType.APPLICATION_PDF)
                 .contentLength(essay.getContent().length)
                 .body(resource);

@@ -2708,7 +2708,7 @@
         {
           "id": "long", // 对应数据库中的 id 字段
           "questionId" : 123,
-          "type" : "small" or "big"
+          "type" : "small" or "big",
           "uploadTime": "string",
           "uploadTeacher" : "老师名字"
         },
@@ -3234,7 +3234,7 @@
               ]
           },
                   ...
-      ]
+      ],
       "essay" : {
           "id" : 123, 
           "content": "问题",  
@@ -3403,6 +3403,45 @@
     ```json
     {
       "message": "error"
+    }
+    ```
+
+
+### Upload Essay `finished`
+
+- **接口路径**：`/api/teacher/upload-essay`
+
+- **请求方法**：POST
+
+- **接口说明**：老师上传作文，传输PDF文件。
+
+- **请求说明**：
+
+  - 请求参数：
+    - `executedDate` (必填) - 操作执行的时间。示例: `2024-11-11`
+
+  - 请求体：
+    - 文件 (`Multipart/Form-Data`)：`file` - 课标的 PDF 文件
+
+- **响应说明**：
+
+  - 响应格式：`JSON`
+
+  - **成功响应** (`200 OK`):
+
+    ```json
+    {
+      "message": "作文上传成功",
+      "essayId": 12345 // 新创建的作文ID
+    }
+    ```
+
+  - **失败响应** (`400 Bad Request`):
+
+    ```json
+    {
+      "message": "作文上传失败",
+      "essayId": null
     }
     ```
 
