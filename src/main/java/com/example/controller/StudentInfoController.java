@@ -15,6 +15,7 @@ import com.example.service.classes.ClassStudentService;
 import com.example.service.classes.JoinClassService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
+import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ public class StudentInfoController {
     private final ClassService classService;
     private final SchoolService schoolService;
     private final JoinClassService joinClassService;
+    private final EmailCodeService emailCodeService;
 
     @Autowired
     public StudentInfoController(StudentService studentService,
@@ -45,7 +47,8 @@ public class StudentInfoController {
                                  ClassStudentService classStudentService,
                                  ClassService classService,
                                  SchoolService schoolService,
-                                 JoinClassService joinClassService
+                                 JoinClassService joinClassService,
+                                 EmailCodeService emailCodeService
                                  ) {
         this.studentService = studentService;
         this.emailService = emailService;
@@ -53,6 +56,7 @@ public class StudentInfoController {
         this.classService = classService;
         this.schoolService = schoolService;
         this.joinClassService = joinClassService;
+        this.emailCodeService = emailCodeService;
     }
     @PostMapping("/{id}/editInformation")
     public ResponseEntity<StudentEditInformationResponse> studentEditInformation(@PathVariable Long id, @RequestBody StudentEditInformationRequest request) {
@@ -92,16 +96,14 @@ public class StudentInfoController {
     @PostMapping("/{id}/change-email/send-verification")
     public ResponseEntity<StudentChangeEmailVerificationResponse> studentChangeEmailVerification(@PathVariable Long id, @RequestBody StudentChangeEmailVerificationRequest request) throws MessagingException {
         try {
-            String email = request.getEmail();
             StudentChangeEmailVerificationResponse response = new StudentChangeEmailVerificationResponse();
+            String email = request.getEmail();
             if (studentService.existStudent(email)) {
                 response.setMessage("邮箱已注册");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             String verificationCode = emailService.sendEmail(email);
-            StudentChangeEmailVerificationResponse.InfoData data = new StudentChangeEmailVerificationResponse.InfoData();
-            data.setVerificationCode(verificationCode);
-            response.setData(data);
+            emailCodeService.setCode("student", email, verificationCode);
             response.setMessage("验证码已发送");
             return ResponseEntity.ok(response);
         } catch (Exception e){
@@ -113,6 +115,11 @@ public class StudentInfoController {
     public ResponseEntity<StudentChangeEmailResponse> studentChangeEmail(@PathVariable Long id, @RequestBody StudentChangeEmailRequest request) {
         try {
             StudentChangeEmailResponse response = new StudentChangeEmailResponse();
+            String code = emailCodeService.getCode("student", request.getEmail());
+            if(!Objects.equals(code, request.getVerificationCode())){
+                response.setMessage("验证码错误或已失效");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             Student student = studentService.getStudentById(id);
             student.setEmail(request.getEmail());
             int result = studentService.updateStudent(student);

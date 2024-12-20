@@ -15,6 +15,7 @@ import com.example.service.user.SchoolService;
 import com.example.service.user.TeacherService;
 import com.example.service.user.impl.AuthorizationCodeServiceImpl;
 import com.example.service.user.impl.TeacherServiceImpl;
+import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
@@ -26,6 +27,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/teacher")
 public class TeacherManagementController {
@@ -33,22 +36,25 @@ public class TeacherManagementController {
     private static final Logger operationLogger = LoggerFactory.getLogger("operations.teacher");
     private final TeacherService teacherService;
     private final AuthorizationCodeService authorizationCodeService;
-
     private final SchoolService schoolService;
     private final EmailService emailService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final EmailCodeService emailCodeService;
 
     @Autowired
     public TeacherManagementController(TeacherServiceImpl teacherService,
                                        AuthorizationCodeServiceImpl authorizationCodeService,
                                        EmailService emailService,
                                        SchoolService schoolService,
-                                       JwtTokenUtil jwtTokenUtil) {
+                                       JwtTokenUtil jwtTokenUtil,
+                                       EmailCodeService emailCodeService
+                                       ) {
         this.teacherService = teacherService;
         this.authorizationCodeService = authorizationCodeService;
         this.emailService = emailService;
         this.schoolService = schoolService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.emailCodeService = emailCodeService;
     }
 
     @PostMapping("/login")
@@ -97,7 +103,7 @@ public class TeacherManagementController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             String verificationCode = emailService.sendEmail(email);
-            response.setVerificationCode(verificationCode);
+            emailCodeService.setCode("teacher", email, verificationCode);
             response.setSchoolId(authorizationCode.getSchoolId());
             response.setMessage("验证码已发送");
             return ResponseEntity.ok(response);
@@ -112,6 +118,11 @@ public class TeacherManagementController {
         try {
             TeacherRegisterResponse response = new TeacherRegisterResponse();
             String email = request.getEmail();
+            String code = emailCodeService.getCode("teacher", email);
+            if(!code.equals(request.getVerificationCode())){
+                response.setMessage("验证码错误或已失效");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             String password = request.getPassword();
             String confirmPassword = request.getConfirmPassword();
             if (!password.equals(confirmPassword)) {
@@ -260,20 +271,25 @@ public class TeacherManagementController {
     @GetMapping("/send-email-code")
     public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
         SendEmailCodeResponse response = new SendEmailCodeResponse();
-        if (teacherService.emailExist(email)) {
+        if (teacherService.emailExist(email) == 1) {
             response.setMessage("邮箱已注册");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         String code = emailService.sendEmail(email);
-        response.setCode(code);
+        emailCodeService.setCode("teacher", email, code);
         response.setMessage("验证码已发送");
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/change-email")
-    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {
+            String verificationCode = emailCodeService.getCode("teacher", newEmail);
+            if(!Objects.equals(verificationCode, code)){
+                response.setMessage("验证码错误或已失效");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             Teacher teacher = teacherService.getTeacherById(user.getId());
             teacher.setEmail(newEmail);
             teacherService.updateTeacher(teacher);

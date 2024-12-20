@@ -16,6 +16,7 @@ import com.example.service.user.AuthorizationCodeService;
 import com.example.service.user.SchoolAdminService;
 import com.example.service.user.SchoolService;
 
+import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
@@ -37,21 +38,24 @@ public class SchoolAdminManagementController {
     private final SchoolAdminService schoolAdminService;
     private final SchoolService schoolService;
     private final AuthorizationCodeService authorizationCodeService;
-
     private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
+    private final EmailCodeService emailCodeService;
 
     @Autowired
     public SchoolAdminManagementController(SchoolAdminService schoolAdminService,
                                            SchoolService schoolService,
                                            AuthorizationCodeService authorizationCodeService,
                                            EmailService emailService,
-                                           JwtTokenUtil jwtTokenUtil) {
+                                           JwtTokenUtil jwtTokenUtil,
+                                           EmailCodeService emailCodeService
+                                           ) {
         this.schoolAdminService = schoolAdminService;
         this.schoolService = schoolService;
         this.authorizationCodeService = authorizationCodeService;
         this.emailService = emailService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.emailCodeService = emailCodeService;
     }
 
     @PostMapping("/login")
@@ -216,15 +220,20 @@ public class SchoolAdminManagementController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         String code = emailService.sendEmail(email);
-        response.setCode(code);
+        emailCodeService.setCode("schoolAdmin", email, code);
         response.setMessage("验证码已发送");
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/change-email")
-    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {
+            String verificationCode = emailCodeService.getCode("schoolAdmin", newEmail);
+            if(!verificationCode.equals(code)){
+                response.setMessage("验证码错误或已失效");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(user.getId());
             schoolAdmin.setEmail(newEmail);
             schoolAdminService.updateSchoolAdmin(schoolAdmin);

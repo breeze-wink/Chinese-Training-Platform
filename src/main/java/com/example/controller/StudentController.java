@@ -12,6 +12,7 @@ import com.example.service.classes.ClassStudentService;
 import com.example.service.essay.EssayService;
 import com.example.service.user.SchoolService;
 import com.example.service.user.StudentService;
+import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
 import jakarta.mail.MessagingException;
@@ -41,6 +42,7 @@ public class StudentController {
     private final ClassStudentService classStudentService;
     private final ClassService classService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final EmailCodeService emailCodeService;
 
     @Autowired
     public StudentController(StudentService studentService,
@@ -49,7 +51,9 @@ public class StudentController {
                              EssayService essayService,
                              ClassStudentService classStudentService,
                              ClassService classService,
-                             JwtTokenUtil jwtTokenUtil) {
+                             JwtTokenUtil jwtTokenUtil,
+                             EmailCodeService EmailCodeService
+                             ) {
         this.studentService = studentService;
         this.emailService = emailService;
         this.schoolService = schoolService;
@@ -57,6 +61,7 @@ public class StudentController {
         this.classStudentService = classStudentService;
         this.classService = classService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.emailCodeService = EmailCodeService;
     }
 
     @PostMapping("/login")
@@ -88,8 +93,8 @@ public class StudentController {
             response.setMessage("邮箱已注册");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        String verificationCode = emailService.sendEmail(email);
-        response.setVerificationCode(verificationCode);
+        String code = emailService.sendEmail(email);
+        emailCodeService.setCode("student", email, code);
         response.setMessage("验证码已发送");
         return ResponseEntity.ok(response);
     }
@@ -97,6 +102,12 @@ public class StudentController {
     @PostMapping("/register")
     public ResponseEntity<StudentRegisterResponse> studentRegister(@RequestBody StudentRegisterRequest request) {
         StudentRegisterResponse response = new StudentRegisterResponse();
+        String email = request.getEmail();
+        String code = emailCodeService.getCode("student", email);
+        if(!code.equals(request.getVerificationCode())){
+            response.setMessage("验证码错误或已失效");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
         String password = request.getPassword();
         String confirmPassword = request.getConfirmPassword();
         if (studentService.existStudentUsername(request.getUsername())) {

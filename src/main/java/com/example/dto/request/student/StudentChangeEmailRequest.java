@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class StudentChangeEmailRequest {
     private String email;
+    private String verificationCode;
 }

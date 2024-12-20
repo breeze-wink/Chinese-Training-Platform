@@ -17,6 +17,7 @@ import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
 import com.example.service.user.SystemAdminService;
 import com.example.service.user.impl.SystemAdminServiceImpl;
+import com.example.service.utils.EmailCodeService;
 import com.example.service.utils.EmailService;
 import com.example.util.JwtTokenUtil;
 
@@ -55,19 +56,22 @@ public class SystemAdminController {
     private final KnowledgePointService knowledgePointService;
     private final JwtTokenUtil jwtTokenUtil;
     private final EmailService emailService;
+    private final EmailCodeService emailCodeService;
 
     @Autowired
     public SystemAdminController(SystemAdminServiceImpl systemAdminService,
                                  CourseStandardServiceImpl courseStandardService,
                                  KnowledgePointServiceImpl knowledgePointService,
                                  JwtTokenUtil jwtTokenUtil,
-                                 EmailService emailService
+                                 EmailService emailService,
+                                 EmailCodeService emailCodeService
                                  ) {
         this.systemAdminService = systemAdminService;
         this.courseStandardService = courseStandardService;
         this.knowledgePointService = knowledgePointService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.emailService = emailService;
+        this.emailCodeService = emailCodeService;
     }
 
     @PostMapping("/login")
@@ -413,15 +417,20 @@ public class SystemAdminController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         String code = emailService.sendEmail(email);
-        response.setCode(code);
+        emailCodeService.setCode("systemAdmin", email, code);
         response.setMessage("验证码已发送");
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/change-email")
-    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail) {
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {
+            String verifyCode = emailCodeService.getCode("systemAdmin", newEmail);
+            if (!verifyCode.equals(code)) {
+                response.setMessage("验证码错误或已失效");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             SystemAdmin systemAdmin = systemAdminService.getSystemAdminById(user.getId());
             systemAdmin.setEmail(newEmail);
             systemAdminService.updateSystemAdmin(systemAdmin);
@@ -430,6 +439,7 @@ public class SystemAdminController {
             return ResponseEntity.ok(response);
         }catch (Exception e){
             response.setMessage("邮箱更换失败");
+            logger.error("邮箱更换失败 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }

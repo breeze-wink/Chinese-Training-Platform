@@ -110,3 +110,4 @@
 2024-12-20 01:59:45 [http-nio-8081-exec-8] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora) 获取了练习列表
 2024-12-20 01:59:45 [http-nio-8081-exec-2] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取未截止作业
 2024-12-20 01:59:45 [http-nio-8081-exec-5] INFO  operations.student - 学生(id:1, 姓名:小美, 昵称:Aozora)获取已截止作业
+2024-12-20 21:50:31 [http-nio-8081-exec-6] INFO  operations.student - 学生 (id:1, 姓名:小美, 昵称:Aozora) 更改邮箱

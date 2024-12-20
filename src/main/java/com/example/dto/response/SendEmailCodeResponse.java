@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class SendEmailCodeResponse {
     private String message;
-    private String code;
 }

@@ -94,9 +94,12 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public Boolean emailExist(String email) {
+    public int emailExist(String email) {
         Teacher teacher = teacherMapper.emailExist(email);
-        return teacher != null;
+        if(teacher != null){
+            return 1;
+        }
+        return 0;
     }
 
 }

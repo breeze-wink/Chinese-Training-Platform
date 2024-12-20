@@ -1349,7 +1349,7 @@
     ```json
     {
       "email" : "string", // 教师的邮箱地址
-      "authorizationCode": "string",
+      "verificationCode": "string",
       "password" : "string", // 密码
       "confirmPassword" : "string",
       "schoolId" : 12345

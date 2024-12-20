@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class StudentVerifyResponse {
     private String message;
-    private String verificationCode;
 }
