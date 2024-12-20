@@ -55,15 +55,13 @@
   - **成功响应** (`200 OK`):
     ```json
     {
-      "message" : "验证码已发送",
-      "verificationCode" : "string"
+      "message" : "验证码已发送"
     }
     ```
   - **失败响应** (`400 Bad Request`):
     ```json
     {
-      "message" : "string", // 邮箱已注册
-      "verificationCode" : null
+      "message" : "string"
     }
     ```
 
@@ -79,6 +77,7 @@
     ```json
     {
       "email" : "string", // 学生的邮箱地址
+      "verificationCode" : "string",
       "username" : "string",
       "password" : "string", // 密码
       "confirmPassword" : "string"
@@ -182,7 +181,8 @@
 - 请求体(`JSON` 格式)：
 ```json
 {
-  "email": "string"
+  "email": "string",
+  "verificationCode": "string"
 }
 ```
 - **响应说明**
@@ -194,7 +194,7 @@
       "message": "邮箱更换成功",
       "data": {
           "email": "string"
-         },
+         }
     }
     ```
   - **失败响应** (`400 Bad Request`):
@@ -223,17 +223,13 @@
   - **成功响应** (`200 OK`):
   ```json
   {
-    "message": "验证码发送成功",
-    "data": {
-    "verificationCode" : "string"
-    }
+    "message": "验证码发送成功"
   }
   ```
   - **失败响应** (`400 Bad Request`):
   ```json
   {
-    "message": "验证码发送失败",
-    "data": null
+    "message": "验证码发送失败"
   }
   ```
 
@@ -325,7 +321,7 @@
 
 
 
-### Join Class `new` `finished
+### Join Class `finished`
 - **接口路径**：`/api/student/{id}/join-class`
 - **请求方法**：`POST`
 - **接口说明**：学生加入一个班级。
@@ -1329,7 +1325,6 @@
     ```json
     {
       "message" : "验证码已发送",
-      "verificationCode" : "string",
       "schoolId": 12345
     }
     ```
@@ -1337,7 +1332,6 @@
     ```json
     {
       "message" : "String", // 授权码不可用 or 邮箱已注册 
-      "verificationCode" : null,
       "schoolId": null
     }
     ```
@@ -1355,6 +1349,7 @@
     ```json
     {
       "email" : "string", // 教师的邮箱地址
+      "authorizationCode": "string",
       "password" : "string", // 密码
       "confirmPassword" : "string",
       "schoolId" : 12345
@@ -3349,15 +3344,13 @@
   - 成功响应（200 OK）：
     ```json
     {
-      "message": "success",
-      "code": "string"
+      "message": "success"
     }
     ```
   - 失败响应（400 Bad Request）：
     ```json
     {
-      "message": "获取失败",
-      "code": null
+      "message": "获取失败"
     }
     ```
 
@@ -3371,6 +3364,7 @@
   - 请求头: `Content-Type` : `application/json`
   - 请求参数：
     - 查询参数：`newEmail`//邮箱
+    - 查询参数：`code`//验证码
   - 请求体(`JSON` 格式)：无
 - **响应说明**：
   - 响应格式：`JSON`
@@ -3975,15 +3969,13 @@
   - 成功响应（200 OK）：
     ```json
     {
-      "message": "success",
-      "code": "string"
+      "message": "success"
     }
     ```
   - 失败响应（400 Bad Request）：
     ```json
     {
-      "message": "获取失败",
-      "code": null
+      "message": "获取失败"
     }
     ```
 
@@ -3997,6 +3989,7 @@
   - 请求头: `Content-Type` : `application/json`
   - 请求参数：
     - 查询参数：`newEmail`//邮箱
+    - 查询参数：`code`//验证码
   - 请求体(`JSON` 格式)：无
 - **响应说明**：
   - 响应格式：`JSON`
@@ -4687,15 +4680,13 @@
   - 成功响应（200 OK）：
     ```json
     {
-      "message": "success",
-      "code": "string"
+      "message": "success"
     }
     ```
   - 失败响应（400 Bad Request）：
     ```json
     {
-      "message": "获取失败",
-      "code": null
+      "message": "获取失败"
     }
     ```
 
@@ -4709,6 +4700,7 @@
   - 请求头: `Content-Type` : `application/json`
   - 请求参数：
     - 查询参数：`newEmail`//邮箱
+    - 查询参数：`code`//验证码
   - 请求体(`JSON` 格式)：无
 - **响应说明**：
   - 响应格式：`JSON`
