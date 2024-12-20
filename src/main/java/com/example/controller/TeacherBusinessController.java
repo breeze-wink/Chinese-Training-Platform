@@ -2223,7 +2223,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/upload-essay")
-    public ResponseEntity<UploadEssayResponse> createStandard(@AuthenticationPrincipal BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
+    public ResponseEntity<UploadEssayResponse> uploadEssay(@AuthenticationPrincipal BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
         UploadEssayResponse response = new UploadEssayResponse();
         if (file.isEmpty()) {
             response.setMessage("作文上传失败, 文件为空");
