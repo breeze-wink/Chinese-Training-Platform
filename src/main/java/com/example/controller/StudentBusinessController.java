@@ -920,8 +920,9 @@ public class StudentBusinessController {
                         infoData.setAssignmentId(assignmentIdStudentIdScore.getAssignmentId());
                         infoData.setTitle(assignment.getTitle());
                         infoData.setDescription(assignment.getDescription());
-                        infoData.setStartTime(assignment.getStartTime().toString());
-                        infoData.setEndTime(assignment.getEndTime().toString());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        infoData.setStartTime(assignment.getStartTime().format(formatter));
+                        infoData.setEndTime(assignment.getEndTime().format(formatter));
                         data.add(infoData);
                     }
                 }
@@ -954,8 +955,9 @@ public class StudentBusinessController {
                         infoData.setAssignmentId(assignmentIdStudentIdScore.getAssignmentId());
                         infoData.setTitle(assignment.getTitle());
                         infoData.setDescription(assignment.getDescription());
-                        infoData.setStartTime(assignment.getStartTime().toString());
-                        infoData.setEndTime(assignment.getEndTime().toString());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        infoData.setStartTime(assignment.getStartTime().format(formatter));
+                        infoData.setEndTime(assignment.getEndTime().format(formatter));
                         if(assignmentIdStudentIdScore.getScore() != null){
                             infoData.setTotalScore(Double.valueOf(assignmentIdStudentIdScore.getScore()));
                         }
