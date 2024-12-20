@@ -54,7 +54,7 @@ public class SystemAdminServiceImpl implements SystemAdminService {
     @Override
     public SystemAdmin authenticate(String account, String password) {
         SystemAdmin systemAdmin = systemAdminMapper.findByAccountOrEmail(account);
-        if (systemAdmin == null || passwordEncodeService.matches(password, systemAdmin.getPassword()))
+        if (systemAdmin == null || !passwordEncodeService.matches(password, systemAdmin.getPassword()))
             return null;
         return systemAdmin;
     }
@@ -65,13 +65,13 @@ public class SystemAdminServiceImpl implements SystemAdminService {
     }
 
     @Override
-    @Transactional
     public boolean emailExist(String email) {
         SystemAdmin systemAdmin = systemAdminMapper.emailExist(email);
         return systemAdmin != null;
     }
 
     @Override
+    @Transactional
     public void updatePassword(SystemAdmin systemAdmin) {
         systemAdmin.setPassword(passwordEncodeService.encode(systemAdmin.getPassword()));
         systemAdminMapper.update(systemAdmin);

@@ -321,9 +321,10 @@ public class TeacherBusinessController {
     public ResponseEntity<Message> disbandClass(@PathVariable Long teacherId, @RequestParam Long classId) {
         try {
             Message response = new Message();
+            Clazz clazz = classService.getClassById(classId);
             if (classService.removeClass(classId) == 1) {
                 response.setMessage("班级解散成功");
-                operationLogger.info("教师 {} 解散班级 {}", teacherService.getTeacherById(teacherId).info(), classService.getClassById(classId).info());
+                operationLogger.info("教师 {} 解散班级 {}", teacherService.getTeacherById(teacherId).info(), clazz.info());
                 return ResponseEntity.ok(response);
             } else {
                 response.setMessage("班级解散失败");
@@ -1200,7 +1201,7 @@ public class TeacherBusinessController {
                         if (question.getType().equals("FILL_IN_BLANK")) {
                             answer = answer.replaceAll("##", ";");
                         }
-                        subQuestion.setAnswer(question.getAnswer());
+                        subQuestion.setAnswer(answer);
                         if (temps.length > 1) {
                             String explanation = temps[1];
                             subQuestion.setExplanation(explanation);
@@ -1238,7 +1239,7 @@ public class TeacherBusinessController {
                     if (question.getType().equals("FILL_IN_BLANK")) {
                         answer = answer.replaceAll("##", ";");
                     }
-                    info.setAnswer(question.getAnswer());
+                    info.setAnswer(answer);
                     if (temps.length > 1) {
                         String explanation = temps[1];
                         info.setExplanation(explanation);
