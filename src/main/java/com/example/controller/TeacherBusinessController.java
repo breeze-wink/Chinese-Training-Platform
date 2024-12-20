@@ -2222,7 +2222,7 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/create-course-standard")
+    @PostMapping("/upload-essay")
     public ResponseEntity<UploadEssayResponse> createStandard(@AuthenticationPrincipal BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
         UploadEssayResponse response = new UploadEssayResponse();
         if (file.isEmpty()) {
@@ -2248,6 +2248,56 @@ public class TeacherBusinessController {
             response.setMessage("服务器文件读取失败");
             logger.error("文件读取失败 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/view-essays")
+    public ResponseEntity<GetEssaysResponse> getEssays(@AuthenticationPrincipal BaseUser user) {
+        try {
+            GetEssaysResponse response = new GetEssaysResponse();
+            List<GetEssaysResponse.InfoData> data = new ArrayList<>();
+            List<Essay> essays = essayService.getAllEssays();
+            if(essays != null && !essays.isEmpty()){
+                for(Essay essay : essays){
+                    GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
+                    infoData.setId(essay.getId());
+                    infoData.setTitle(essay.getTitle());
+                    infoData.setDate(essay.getSubmitDate());
+                    data.add(infoData);
+                }
+            }
+            response.setInfoData(data);
+            response.setMessage("作文列表获取成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            logger.error("老师获取作文失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/get-essay")
+    public ResponseEntity<InputStreamResource> getEssayInfo(@AuthenticationPrincipal BaseUser user, @RequestParam Long essayId) {
+        try {
+            Essay essay = essayService.getEssayById(essayId);
+            if (essay == null) {
+                return ResponseEntity.notFound().build();
+            }
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(essay.getContent());
+            InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+
+            ContentDisposition contentDisposition = ContentDisposition
+                .inline()
+                .filename(essay.getTitle(), StandardCharsets.UTF_8)
+                .build();
+
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(essay.getContent().length)
+                .body(resource);
+        } catch (Exception e){
+            logger.error("获取作文文件失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
