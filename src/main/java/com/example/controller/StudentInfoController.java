@@ -98,7 +98,7 @@ public class StudentInfoController {
         }
     }
 
-    @PostMapping("/{id}/change-email/send-verification")
+    @PostMapping("/{id}/change-email/send-code")
     public ResponseEntity<StudentChangeEmailVerificationResponse> studentChangeEmailVerification(@PathVariable Long id, @RequestBody StudentChangeEmailVerificationRequest request) throws MessagingException {
         try {
             StudentChangeEmailVerificationResponse response = new StudentChangeEmailVerificationResponse();
