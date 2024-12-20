@@ -8,25 +8,25 @@ import com.example.dto.request.student.StudentChangeEmailVerificationRequest;
 import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
 import com.example.dto.response.student.*;
+import com.example.dto.response.system.CreateStandardResponse;
 import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
 import com.example.model.course.KnowledgePoint;
+import com.example.model.essay.Essay;
 import com.example.model.question.*;
 import com.example.model.submission.SubmissionAnswer;
-import com.example.model.user.BaseUser;
-import com.example.model.user.Student;
-import com.example.model.user.Teacher;
+import com.example.model.user.*;
 import com.example.model.view.*;
 import com.example.service.cache.CacheRefreshService;
 import com.example.model.submission.AssignmentSubmission;
-import com.example.model.user.StatsStudent;
 import com.example.service.classes.*;
 import com.example.service.classes.impl.*;
 import com.example.service.course.CourseStandardService;
 import com.example.service.course.KnowledgePointService;
 import com.example.service.course.impl.CourseStandardServiceImpl;
 import com.example.service.course.impl.KnowledgePointServiceImpl;
+import com.example.service.essay.EssayService;
 import com.example.service.question.*;
 import com.example.service.question.impl.*;
 import com.example.service.submission.SubmissionAnswerService;
@@ -56,11 +56,15 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -100,6 +104,7 @@ public class TeacherBusinessController {
     private final AssignmentScoresViewService assignmentScoresViewService;
     private final PreAssembledQuestionService preAssembledQuestionService;
     private final EmailService emailService;
+    private final EssayService essayService;
     @Autowired
     public TeacherBusinessController(CourseStandardServiceImpl courseStandardService,
                                      ClassServiceImpl classService,
@@ -130,7 +135,8 @@ public class TeacherBusinessController {
                                      AssignmentStatsViewServiceImpl assignmentStatsViewService,
                                      AssignmentScoresViewServiceImpl assignmentScoresViewService,
                                      PreAssembledQuestionService preAssembledQuestionService,
-                                     EmailService emailService
+                                     EmailService emailService,
+                                     EssayService essayService
                                      ) {
         this.courseStandardService = courseStandardService;
         this.classService = classService;
@@ -162,6 +168,7 @@ public class TeacherBusinessController {
         this.assignmentScoresViewService = assignmentScoresViewService;
         this.preAssembledQuestionService = preAssembledQuestionService;
         this.emailService = emailService;
+        this.essayService = essayService;
     }
 
     @GetMapping("/{id}/view-curriculum-standard")
@@ -2210,4 +2217,32 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/create-course-standard")
+    public ResponseEntity<UploadEssayResponse> createStandard(@AuthenticationPrincipal BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
+        UploadEssayResponse response = new UploadEssayResponse();
+        if (file.isEmpty()) {
+            response.setMessage("作文上传失败, 文件为空");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        try {
+            Essay essay = new Essay();
+            String originalFilename = file.getOriginalFilename();
+            String title = originalFilename != null ? originalFilename.replaceAll("\\.[^.]*$", "") : "";
+            essay.setTitle(title);
+            essay.setContent(file.getBytes());
+            essay.setSubmitDate(executedDate);
+            essayService.createEssay(essay);
+
+            response.setMessage("作文上传成功");
+            response.setEssayId(essay.getId());
+
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            operationLogger.info("教师{}上传了作文", teacher.info());
+            return ResponseEntity.ok(response);
+        } catch (IOException e) {
+            response.setMessage("服务器文件读取失败");
+            logger.error("文件读取失败 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 }
