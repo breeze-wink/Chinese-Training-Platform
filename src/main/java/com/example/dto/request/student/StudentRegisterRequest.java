@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class StudentRegisterRequest {
     private String email;
+    private String verificationCode;
     private String username;
     private String password;
     private String confirmPassword;

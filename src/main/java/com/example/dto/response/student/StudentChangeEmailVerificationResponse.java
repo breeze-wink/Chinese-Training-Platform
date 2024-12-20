@@ -7,10 +7,4 @@ import lombok.Setter;
 @Setter
 public class StudentChangeEmailVerificationResponse {
     private String message;
-    private InfoData data;
-    @Getter
-    @Setter
-    public static class InfoData {
-        private String verificationCode;
-    }
 }
