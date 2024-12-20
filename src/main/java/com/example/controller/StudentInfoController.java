@@ -63,7 +63,7 @@ public class StudentInfoController {
         this.emailCodeService = emailCodeService;
         this.passwordEncodeService = passwordEncodeService;
     }
-    @PostMapping("/{id}/editInformation")
+    @PostMapping("/{id}/edit-information")
     public ResponseEntity<StudentEditInformationResponse> studentEditInformation(@PathVariable Long id, @RequestBody StudentEditInformationRequest request) {
         try {
             StudentEditInformationResponse response = new StudentEditInformationResponse();
@@ -116,7 +116,7 @@ public class StudentInfoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    @PostMapping("/{id}/changeEmail")
+    @PostMapping("/{id}/change-email")
     public ResponseEntity<StudentChangeEmailResponse> studentChangeEmail(@PathVariable Long id, @RequestBody StudentChangeEmailRequest request) {
         try {
             StudentChangeEmailResponse response = new StudentChangeEmailResponse();
