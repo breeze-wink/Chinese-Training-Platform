@@ -29,4 +29,19 @@ public class EmailCodeService {
         String cacheKey = type + "Email:" + email;
         redisTemplate.opsForValue().set(cacheKey, code, 5, TimeUnit.MINUTES);
     }
+
+    public String getFindPasswordCode(String type, String email) {
+        String cacheKey = type + "FindPasswordCode:" + email;
+        Object object = redisTemplate.opsForValue().get(cacheKey);
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (object != null) {
+            return objectMapper.convertValue(object, String.class);
+        }
+        return null;
+    }
+
+    public void setFindPasswordCode(String type, String email, String code) {
+        String cacheKey = type + "FindPasswordCode:" + email;
+        redisTemplate.opsForValue().set(cacheKey, code, 5, TimeUnit.MINUTES);
+    }
 }

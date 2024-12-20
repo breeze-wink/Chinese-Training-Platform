@@ -167,13 +167,15 @@ public class StudentController {
     public ResponseEntity<GetEssaysResponse> getEssays(@PathVariable Long id) {
         try {
             GetEssaysResponse response = new GetEssaysResponse();
-            List<Essay> essays = essayService.getAllEssays();
             List<GetEssaysResponse.InfoData> data = new ArrayList<>();
-            for(Essay essay : essays){
-                GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
-                infoData.setId(essay.getId());
-                infoData.setTitle(essay.getTitle());
-                data.add(infoData);
+            List<Essay> essays = essayService.getAllEssays();
+            if(essays != null && !essays.isEmpty()){
+                for(Essay essay : essays){
+                    GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
+                    infoData.setId(essay.getId());
+                    infoData.setTitle(essay.getTitle());
+                    data.add(infoData);
+                }
             }
             response.setInfoData(data);
             response.setMessage("作文查询成功");

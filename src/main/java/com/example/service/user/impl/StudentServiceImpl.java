@@ -82,6 +82,12 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
+    public Student selectByEmail(String email) {
+        return studentMapper.selectByEmail(email);
+    }
+
+    @Override
+    @Transactional
     public void updatePassword(Student student) {
         student.setPassword(passwordEncodeService.encode(student.getPassword()));
         studentMapper.update(student);

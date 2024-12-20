@@ -3,6 +3,7 @@ package com.example.dto.response.student;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -16,5 +17,6 @@ public class GetEssaysResponse {
     public static class InfoData {
         private Long id;
         private String title;
+        private LocalDate date;
     }
 }
