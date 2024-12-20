@@ -24,4 +24,6 @@ public interface TeacherService {
     int emailExist(String email);
 
     void updatePassword(Teacher teacher);
+
+    Teacher selectByEmail(String email);
 }

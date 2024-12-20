@@ -32,4 +32,7 @@ public interface SchoolAdminMapper {
 
     @Select("SELECT * FROM school_admin WHERE email = #{email}")
     SchoolAdmin emailExist(String email);
+
+    @Select("SELECT * FROM school_admin WHERE email = #{email}")
+    SchoolAdmin selectByEmail(String email);
 }

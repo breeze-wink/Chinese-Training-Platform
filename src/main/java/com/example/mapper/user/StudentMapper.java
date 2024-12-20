@@ -37,4 +37,7 @@ public interface StudentMapper {
 
     @Select("SELECT * FROM student WHERE schoolId = #{schoolId}")
     List<Student> selectBySchoolId(Long schoolId);
+
+    @Select("SELECT * FROM student WHERE email = #{email}")
+    Student selectByEmail(String email);
 }
