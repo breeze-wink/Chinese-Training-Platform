@@ -4861,3 +4861,68 @@
       "message": "Failed to delete the file."
     }
     ```
+
+
+## Find Password
+
+
+### Send Email Code `finished`
+
+- **接口路径**：`/api/find-password/send-code`
+- **请求方法**：`POST`
+- **接口说明**：找回密码
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "type": "string", //student or teacher or schoolAdmin or systemAdmin
+      "email": "string"
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
+    }
+    ```
+
+
+### Reset Password `finished`
+
+- **接口路径**：`/api/find-password/reset-password`
+- **请求方法**：`POST`
+- **接口说明**：找回密码
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求体(`JSON` 格式)：
+    ```json
+    {
+      "type": "string", //student or teacher or schoolAdmin or systemAdmin
+      "email": "string",
+      "code": "string",
+      "password": "string"
+    }
+    ```
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
+    }
+    ```
