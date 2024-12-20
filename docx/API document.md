@@ -206,7 +206,7 @@
     ```
 
 ### Send Verification Code To Change Student’s Email `finished`
-- **接口路径**：`/api/student/{id}/change-email/send-verification`
+- **接口路径**：`/api/student/{id}/change-email/send-code`
 - **请求方法**：`POST`
 - **接口说明**：学生用户点击账号信息管理的更换绑定邮箱中发送验证码。
 - **请求说明**
