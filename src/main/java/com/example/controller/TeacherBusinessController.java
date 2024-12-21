@@ -174,7 +174,7 @@ public class TeacherBusinessController {
         this.essayService = essayService;
     }
 
-    @GetMapping("/{id}/query-course-standard/{id}")
+    @GetMapping("/query-course-standard/{id}")
     public ResponseEntity<InputStreamResource> getCourseStandard(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
         try {
             CourseStandard courseStandard = courseStandardService.getCourseStandardById(id);
