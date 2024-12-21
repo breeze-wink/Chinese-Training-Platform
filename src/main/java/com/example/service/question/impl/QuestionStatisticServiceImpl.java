@@ -99,4 +99,5 @@ public class QuestionStatisticServiceImpl implements QuestionStatisticService {
             return status == QuestionBody.STATUS_NOT_ACCESS;
         }
     }
+
 }

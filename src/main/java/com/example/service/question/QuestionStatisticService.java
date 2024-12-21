@@ -20,4 +20,5 @@ public interface QuestionStatisticService {
     boolean checkQuestionPassed(Long questionId, String type);
 
     boolean checkQuestionWaiting(Long questionId, String type);
+
 }
