@@ -3,3 +3,6 @@
 2024-12-21 19:39:25 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
 2024-12-21 19:42:04 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministra) 修改了用户名为 SystemAdministra
 2024-12-21 19:42:50 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 修改了用户名为 SystemAdministrator
+2024-12-21 23:44:33 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 23:44:34 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 23:44:36 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了课标 (id:144, 标题:课程标准, 执行日期:2024-11-29)

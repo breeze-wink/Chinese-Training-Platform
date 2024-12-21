@@ -1,1 +1,7 @@
-2024-12-20 21:46:53 [http-nio-8081-exec-5] INFO  operations.teacher - 老师 (id:320) 注册成功
+2024-12-22 00:15:15 [http-nio-8081-exec-8] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取知识点列表
+2024-12-22 00:15:40 [http-nio-8081-exec-5] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取班级列表
+2024-12-22 00:15:41 [http-nio-8081-exec-6] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取小组列表
+2024-12-22 00:16:28 [http-nio-8081-exec-8] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取知识点列表
+2024-12-22 00:22:44 [http-nio-8081-exec-3] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取知识点列表
+2024-12-22 00:27:04 [http-nio-8081-exec-6] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取班级列表
+2024-12-22 00:27:05 [http-nio-8081-exec-7] INFO  operations.teacher - 教师 (id:77, 姓名:周旭豪, 昵称:logic) 获取小组列表

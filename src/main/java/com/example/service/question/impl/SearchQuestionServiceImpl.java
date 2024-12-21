@@ -67,7 +67,7 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
                     bigQuestion.setBodyId(result.getBodyId());
                     bigQuestion.setBody(result.getBody());
                     if (result.getCompleteCount() == 0) {
-                        bigQuestion.setDifficulty(-1.0);
+                        bigQuestion.setDifficulty(null);
                     }
                     else {
                         bigQuestion.setDifficulty(result.getTotalScore() / result.getCompleteCount());
@@ -100,7 +100,7 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
         else {
             // 查询小题
             List<QuestionResult> questionResults = searchQuestionMapper.searchSmallQuestions(
-                    type2enum(request.getType()),
+                    request.getType(),
                     request.getKnowledgeId(),
                     request.getDifficulty(),
                     request.getMode(),
@@ -128,7 +128,7 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
                     question.setExplanation(temps[1]); // 需要根据实际数据填充
                 }
                 if (result.getCompleteCount() == 0) {
-                    question.setDifficulty(-1.0);
+                    question.setDifficulty(null);
                 }
                 else {
                     question.setDifficulty(result.getTotalScore() / result.getCompleteCount());
@@ -144,7 +144,7 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
 
             // 获取总记录数
             long totalCount = searchQuestionMapper.countSmallQuestions(
-                    type2enum(request.getType()),
+                    request.getType(),
                     request.getKnowledgeId(),
                     request.getDifficulty(),
                     request.getSearch()
@@ -208,14 +208,6 @@ public class SearchQuestionServiceImpl implements SearchQuestionService {
         }
     }
 
-    private String type2enum(String type) {
-        return switch (type) {
-            case "选择" -> "CHOICE";
-            case "填空" -> "FILL_IN_BLANK";
-            case "简答" -> "SHORT_ANSWER";
-            case "作文" -> "ESSAY";
-            default -> "";
-        };
-    }
+
 
 }

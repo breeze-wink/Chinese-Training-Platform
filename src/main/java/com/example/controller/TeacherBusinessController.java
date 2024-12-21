@@ -9,6 +9,7 @@ import com.example.dto.request.teacher.*;
 import com.example.dto.response.*;
 import com.example.dto.response.student.*;
 import com.example.dto.response.system.CreateStandardResponse;
+import com.example.dto.response.system.GetAllCourseStandardResponse;
 import com.example.dto.response.teacher.*;
 import com.example.model.classes.*;
 import com.example.model.course.CourseStandard;
@@ -173,22 +174,24 @@ public class TeacherBusinessController {
         this.essayService = essayService;
     }
 
-    @GetMapping("/{id}/view-curriculum-standard")
-    public ResponseEntity<InputStreamResource> viewCurriculumStandard(@PathVariable Long id) {
+    @GetMapping("/{id}/query-course-standard/{id}")
+    public ResponseEntity<InputStreamResource> getCourseStandard(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
         try {
-            CourseStandard courseStandard = courseStandardService.getCourseStandardAhead();
-            if (courseStandard == null || courseStandard.getContent() == null) {
-                return ResponseEntity.status(404).body(null);
+            CourseStandard courseStandard = courseStandardService.getCourseStandardById(id);
+            if (courseStandard == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(courseStandard.getContent());
             InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            // 使用 ContentDisposition 构建符合 RFC 5987 的头部
             ContentDisposition contentDisposition = ContentDisposition
                     .inline()
                     .filename(courseStandard.getTitle(), StandardCharsets.UTF_8)
                     .build();
-            Teacher teacher = teacherService.getTeacherById(id);
-            operationLogger.info("教师 {} 查看课标 {}", teacher.info(), courseStandard.info());
+            operationLogger.info("老师 {} 查询了课标 {}", teacher.info(), courseStandard.info());
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
                     .contentType(MediaType.APPLICATION_PDF)
@@ -196,11 +199,35 @@ public class TeacherBusinessController {
                     .body(resource);
         } catch (Exception e) {
             logger.error("获取课标文件失败 {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/get-all-course-standards")
+    public ResponseEntity<GetAllCourseStandardResponse> getAllCourseStandard(@AuthenticationPrincipal BaseUser user) {
+        List<CourseStandard> courseStandards = courseStandardService.getAllCourseStandards();
+        GetAllCourseStandardResponse response = new GetAllCourseStandardResponse();
+        response.setCourseStandardInfos(new ArrayList<>());
+        try {
+            for (CourseStandard courseStandard : courseStandards) {
+                GetAllCourseStandardResponse.CourseStandardInfo info = new GetAllCourseStandardResponse.CourseStandardInfo();
+                info.setId(courseStandard.getId());
+                info.setTitle(courseStandard.getTitle());
+                info.setExecutedDate(courseStandard.getExecutedDate().toString());
+                response.getCourseStandardInfos().add(info);
+            }
+            response.setMessage("课标获取成功");
+
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            operationLogger.info("老师 {} 获取了全部课标", teacher.info());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("课标获取失败，服务器出错" + e.getMessage());
+            logger.error("获取全部课标失败 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
     }
-
     @PostMapping("/{id}/create-class")
     public ResponseEntity<TeacherCreateClassResponse> createClass(@PathVariable Long id, @RequestBody TeacherCreateClassRequest request) {
         try {
@@ -1790,7 +1817,7 @@ public class TeacherBusinessController {
 
                         QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
                         if (questionStatistic.getCompleteCount() == 0) {
-                            essay.setDifficulty(-1.0);
+                            essay.setDifficulty(null);
                         }
                         else {
                             essay.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
@@ -1827,7 +1854,7 @@ public class TeacherBusinessController {
                             subInfo.setType(subQuestion.getType());
                             QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(subQuestion.getQuestionId(), "small");
                             if (questionStatistic.getCompleteCount() == 0) {
-                                subInfo.setDifficulty(-1.0);
+                                subInfo.setDifficulty(null);
                             }
                             else {
                                 subInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
@@ -1901,7 +1928,7 @@ public class TeacherBusinessController {
                     questionInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
                 }
                 else {
-                    questionInfo.setDifficulty(-1.0);
+                    questionInfo.setDifficulty(null);
                 }
                 questionInfos.add(questionInfo);
             }
@@ -1929,7 +1956,7 @@ public class TeacherBusinessController {
                         subInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
                     }
                     else {
-                        subInfo.setDifficulty(-1.0);
+                        subInfo.setDifficulty(null);
                     }
                     subInfo.setKnowledgePoint(subQ.getKnowledgePoint());
                     subQuestions.add(subInfo);
@@ -1955,7 +1982,7 @@ public class TeacherBusinessController {
                 essayInfo.setDifficulty(questionStatistic.getTotalScore() / questionStatistic.getCompleteCount());
             }
             else {
-                essayInfo.setDifficulty(-1.0);
+                essayInfo.setDifficulty(null);
             }
             String knowledgePoint = knowledgePointService.getKnowledgePointNameById(essay.getKnowledgePointId());
             essayInfo.setKnowledgePoint(knowledgePoint);
