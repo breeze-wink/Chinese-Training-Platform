@@ -1,6 +1,7 @@
 package com.example.controller;
 
 
+import com.example.dto.request.UpdateUsernameRequest;
 import com.example.dto.request.system.CreateSchoolAdminRequest;
 import com.example.dto.request.system.CreateSystemAdminRequest;
 import com.example.dto.response.Message;
@@ -188,6 +189,35 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("创建系统管理员失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/{id}/update-username")
+    public ResponseEntity<Message> updateUsername(@AuthenticationPrincipal BaseUser user, @PathVariable Long id, @RequestBody UpdateUsernameRequest request){
+        try {
+            Message response = new Message();
+            String username = request.getUsername();
+            SystemAdmin systemAdmin = systemAdminService.getSystemAdminById(id);
+            if (systemAdmin == null) {
+                response.setMessage("Id错误");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if(username.contains("@")){
+                response.setMessage("用户名不能包含@");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if (systemAdminService.selectByUsername(username) != null) {
+                response.setMessage("用户名已存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            systemAdmin.setUsername(username);
+            systemAdminService.updateSystemAdmin(systemAdmin);
+            operationLogger.info("系统管理员 {} 修改了用户名为 {}", systemAdmin.info(), username);
+            response.setMessage("修改成功");
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            logger.error("修改系统管理员用户名失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
