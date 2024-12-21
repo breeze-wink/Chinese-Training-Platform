@@ -1169,7 +1169,9 @@ public class TeacherBusinessController {
                 GetPapersResponse.PaperInfo info = new GetPapersResponse.PaperInfo();
                 info.setId(paper.getId());
                 info.setName(paper.getName());
-                info.setDifficulty(paper.getDifficulty());
+
+                //重新计算试卷难度
+                info.setDifficulty(computePaperDifficulty(paper.getId()));
                 info.setTotalScore(paper.getTotalScore());
                 LocalDateTime createTime = paper.getCreateTime();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -1188,6 +1190,37 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
+    private Double computePaperDifficulty(Long id) {
+        List<PaperQuestion> questionStatistics = paperQuestionService.selectByPaperId(id);
+        double totalScore = 0.0;
+        double accumulateScore = 0.0;
+        for (PaperQuestion question : questionStatistics) {
+            if (question.getQuestionType().equals("big")) {
+                //第一个是总分，后续是小题分数
+                String[] scores = question.getScore().split("#");
+                totalScore += Integer.parseInt(scores[0]) * 1.0;
+
+                List<Question> subQuestions = questionService.getQuestionsByQuestionBodyId(question.getQuestionId());
+                for (int i = 0; i < subQuestions.size(); i ++ ){
+                    double score = Integer.parseInt(scores[i + 1]) * 1.0;
+                    QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(subQuestions.get(i).getId(), "small");
+                    double questionDifficulty = questionStatistic.getCompleteCount() == 0 ?
+                                                0 : questionStatistic.getTotalScore() / questionStatistic.getCompleteCount();
+                    accumulateScore += questionDifficulty * score;
+                }
+            } else {
+                double score = Integer.parseInt(question.getScore()) * 1.0;
+                totalScore += score;
+                QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getQuestionId(), "small");
+                double questionDifficulty = questionStatistic.getCompleteCount() == 0 ?
+                                            0 : questionStatistic.getTotalScore() / questionStatistic.getCompleteCount();
+                accumulateScore += questionDifficulty * score;
+            }
+        }
+        return accumulateScore / totalScore;
+    }
+
     @GetMapping("/paper")
     public ResponseEntity<GetPaperDetailResponse> getPaper(@RequestParam Long id) throws JsonProcessingException {
         GetPaperDetailResponse response = new GetPaperDetailResponse();

@@ -36,4 +36,7 @@ public interface QuestionStatisticMapper {
 
     @Select("SELECT uploadTime from question_statistic where id = #{id} and type = #{type}")
     LocalDateTime selectUploadTime(Long id, String type);
+
+    @Select("SELECT * FROM question_statistic WHERE id = #{id}")
+    List<QuestionStatistic> findByPaperId(Long id);
 }
