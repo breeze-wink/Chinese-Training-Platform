@@ -67,7 +67,7 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
 
     @Override
     public KnowledgePoint getKnowledgePointById(Long id) {
-        String cacheKey = "knowledgePoint" + id;
+        String cacheKey = "knowledgePoint:" + id;
         Object object = redisTemplate.opsForValue().get(cacheKey);
         KnowledgePoint knowledgePoint;
         if (object == null) {

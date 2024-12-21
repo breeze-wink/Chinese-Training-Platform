@@ -72,6 +72,12 @@ public class SystemAdminServiceImpl implements SystemAdminService {
 
     @Override
     @Transactional
+    public boolean usernameExist(String username) {
+        return systemAdminMapper.findByUsername(username) != null;
+    }
+
+    @Override
+    @Transactional
     public void updatePassword(SystemAdmin systemAdmin) {
         systemAdmin.setPassword(passwordEncodeService.encode(systemAdmin.getPassword()));
         systemAdminMapper.update(systemAdmin);
