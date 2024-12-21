@@ -21,7 +21,7 @@ public interface TeacherService {
     Teacher getTeacherByUsername(String username);
 
     String getTeacherNameById(Long teacherId);
-    int emailExist(String email);
+    boolean ManagerEmailExist(String email);
 
     void updatePassword(Teacher teacher);
 

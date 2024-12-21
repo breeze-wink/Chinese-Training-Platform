@@ -103,7 +103,6 @@ public class TeacherManagementController {
             }
             Teacher teacher = new Teacher();
             teacher.setEmail(email);
-            teacher.setPermission(0);
             if (teacherService.existTeacher(teacher)) {
                 response.setMessage("邮箱已注册");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -277,7 +276,7 @@ public class TeacherManagementController {
     @GetMapping("/send-email-code")
     public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
         SendEmailCodeResponse response = new SendEmailCodeResponse();
-        if (teacherService.emailExist(email) == 1) {
+        if (teacherService.ManagerEmailExist(email)) {
             response.setMessage("邮箱已注册");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }

@@ -383,32 +383,6 @@ public class SchoolAdminBusinessController {
         }
     }
 
-    @PostMapping("/create-manager")
-    public ResponseEntity<Message> createManager(@AuthenticationPrincipal BaseUser user, @RequestBody CreateManagerRequest request) {
-        try {
-            String email = request.getEmail();
-            String password = request.getPassword();
-            Teacher teacher = new Teacher();
-            teacher.setPermission(1);
-            teacher.setEmail(email);
-            if (teacherService.existTeacher(teacher)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Message("邮箱已存在"));
-            }
-
-            Long schoolAdminId = user.getId();
-            teacher.setSchoolId(schoolAdminService.getSchoolAdminById(schoolAdminId).getSchoolId());
-            teacher.setPassword(password);
-
-            teacherService.addTeacher(teacher);
-
-            String schoolName = schoolService.getSchoolById(teacher.getSchoolId()).getName();
-            operationLogger.info("{} 的管理员{} 创建审核老师{}", schoolName, schoolAdminService.getSchoolAdminById(schoolAdminId).info(), teacher.info());
-            return ResponseEntity.ok(new Message("创建成功"));
-        } catch (Exception e) {
-            logger.error("创建管理员失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
-        }
-    }
     @GetMapping("/class/knowledge-point-status")
     public ResponseEntity<ClassKnowledgePointStatusResponse> getClassKnowledgePointStatus(@RequestParam Long classId){
         ClassKnowledgePointStatusResponse response = new ClassKnowledgePointStatusResponse();
@@ -490,6 +464,45 @@ public class SchoolAdminBusinessController {
         }catch (Exception e){
             logger.error("更改班级老师失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    @PutMapping("/level-up")
+    public ResponseEntity<Message> levelUpTeacher(@AuthenticationPrincipal BaseUser user, @RequestParam Long id){
+        Message response = new Message();
+
+        try {
+            Teacher teacher = teacherService.getTeacherById(id);
+            teacher.setPermission(Teacher.Leader);
+            teacherService.updateTeacher(teacher);
+            String schoolName = schoolService.getSchoolById(teacher.getSchoolId()).getName();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(user.getId());
+            operationLogger.info("{} 的管理员{} 将 {} 升级为 组长,", schoolName, schoolAdmin.info(), teacher.info());
+            response.setMessage("success");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("升级老师失败，错误信息: {}", e.getMessage(), e);
+            response.setMessage("fail");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PutMapping("/level-down")
+    public ResponseEntity<Message> levelDownTeacher(@AuthenticationPrincipal BaseUser user, @RequestParam Long id){
+        Message response = new Message();
+
+        try {
+            Teacher teacher = teacherService.getTeacherById(id);
+            teacher.setPermission(Teacher.TEACHER);
+            teacherService.updateTeacher(teacher);
+            String schoolName = schoolService.getSchoolById(teacher.getSchoolId()).getName();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(user.getId());
+            operationLogger.info("{} 的管理员{} 将 {} 降级为 普通老师,", schoolName, schoolAdmin.info(), teacher.info());
+            response.setMessage("success");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("降级老师失败，错误信息: {}", e.getMessage(), e);
+            response.setMessage("fail");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }
