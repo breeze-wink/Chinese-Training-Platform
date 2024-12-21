@@ -21,7 +21,7 @@ public class JwtTokenUtil {
 
     // 生成 Token
     public String generateToken(BaseUser user) {
-        String subject = user.getId() + ":" + user.getUsername() + ":" + user.getClass().getSimpleName();
+        String subject = user.getId() + ":" + user.getClass().getSimpleName();
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date())
@@ -30,26 +30,16 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    // 从 Token 中获取用户名
-    public String getUsernameFromToken(String token) {
 
-        Claims claims;
-        SecretKey key = SECRET_KEY;
-        try {
-        claims = Jwts.parserBuilder()
+    public Long getIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        } catch (ExpiredJwtException e) {
-            claims = e.getClaims();
-        }
-
         String subject = claims.getSubject();
-
-        return subject.split(":")[1]; // 返回复合标识符中的username部分
+        return Long.parseLong(subject.split(":")[0]);
     }
-
     public String getClassNameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
@@ -57,7 +47,7 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
         String subject = claims.getSubject();
-        return subject.split(":")[2]; // 返回复合标识符中的className部分
+        return subject.split(":")[1]; // 返回复合标识符中的className部分
     }
 
     // 验证 Token 是否有效

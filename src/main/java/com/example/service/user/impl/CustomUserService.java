@@ -22,16 +22,16 @@ public class CustomUserService implements UserService {
     }
 
     @Override
-    public BaseUser loadUserByUsernameAndClassName(String username, String className) {
+    public BaseUser loadUserByUsernameAndClassName(Long id, String className) {
         // 根据用户名和类名获取不同类型的用户
         if ("Student".equals(className)) {
-            return studentService.getStudentByUsername(username);
+            return studentService.getStudentById(id);
         } else if ("Teacher".equals(className)) {
-            return teacherService.getTeacherByUsername(username);
+            return teacherService.getTeacherById(id);
         } else if ("SchoolAdmin".equals(className)) {
-            return schoolAdminService.getSchoolAdminByUsername(username);
+            return schoolAdminService.getSchoolAdminById(id);
         } else if ("SystemAdmin".equals(className)) {
-            return systemAdminService.getSystemAdminByUsername(username);
+            return systemAdminService.getSystemAdminById(id);
         } else {
             // 如果类名不匹配任何已知类型，返回null或抛出异常
             return null;
