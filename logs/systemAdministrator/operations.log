@@ -3,3 +3,76 @@
 2024-12-21 19:39:25 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
 2024-12-21 19:42:04 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministra) 修改了用户名为 SystemAdministra
 2024-12-21 19:42:50 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 修改了用户名为 SystemAdministrator
+2024-12-21 20:08:41 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:10:07 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:10:23 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员147创建了课标 (id:1, 昵称:SystemAdministrator)
+2024-12-21 20:10:31 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:10:50 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了课标 (id:147, 标题:《计算机网络自顶向下方法第7版》课后习题答案中文版, 执行日期:2024-12-21)
+2024-12-21 20:11:09 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:11:25 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:11:28 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:11:40 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:12:31 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:12:55 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)更新了课标 (id:147, 标题:511陈恩展_实验1, 执行日期:2024-12-21)
+2024-12-21 20:13:02 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:13:10 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了课标 (id:147, 标题:511陈恩展_实验1, 执行日期:2024-12-21)
+2024-12-21 20:13:41 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 删除了课标 (id:147, 标题:511陈恩展_实验1, 执行日期:2024-12-21)
+2024-12-21 20:13:48 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:13:59 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:1, 名字:书法鉴赏, 类型:积累与运用)
+2024-12-21 20:14:33 [http-nio-8081-exec-10] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 创建了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:14:33 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:14:42 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:14:53 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 更新了知识点 (id:151, 名字:test3, 类型:test2)
+2024-12-21 20:14:53 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:14:56 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:14:58 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:15:17 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 更新了知识点 (id:151, 名字:test3, 类型:test2)
+2024-12-21 20:15:17 [http-nio-8081-exec-10] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:15:19 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:15:26 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:15:26 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:15:29 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:15:41 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 更新了知识点 (id:151, 名字:test3, 类型:test2)
+2024-12-21 20:15:41 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:15:45 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:15:54 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:15:55 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:16:20 [http-nio-8081-exec-10] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:16:49 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:16:58 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:17:05 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:17:09 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:17:14 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:17:24 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:18:02 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:18:27 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:18:45 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:18:45 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:18:48 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:18:57 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test2, 类型:test)
+2024-12-21 20:19:01 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:138, 名字:作文, 类型:作文)
+2024-12-21 20:19:32 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 更新了知识点 (id:151, 名字:test3, 类型:test2)
+2024-12-21 20:19:33 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:19:47 [http-nio-8081-exec-10] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 更新了知识点 (id:151, 名字:test3, 类型:test2)
+2024-12-21 20:19:47 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:25:22 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:25:40 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 更新了知识点 (id:151, 名字:test4, 类型:test5)
+2024-12-21 20:25:41 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:25:44 [http-nio-8081-exec-8] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test4, 类型:test5)
+2024-12-21 20:26:12 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 查询了知识点 (id:151, 名字:test4, 类型:test5)
+2024-12-21 20:26:19 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 删除了知识点 (id:151, 名字:test4, 类型:test5)
+2024-12-21 20:26:19 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:26:24 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:26:25 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了所有知识点
+2024-12-21 20:26:28 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员 (id:1, 昵称:SystemAdministrator) 获取了全部课标
+2024-12-21 20:26:30 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:27:01 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)生成了学校管理员账号，学校管理员信息为：(id:70, 昵称:test)
+2024-12-21 20:27:02 [http-nio-8081-exec-10] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:27:11 [http-nio-8081-exec-2] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:27:13 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)删除学校管理员账号，学校管理员信息为：(id:70, 昵称:test)
+2024-12-21 20:27:14 [http-nio-8081-exec-5] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:27:17 [http-nio-8081-exec-7] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 20:43:06 [http-nio-8081-exec-1] INFO  operations.systemAdministrator - 系统管理员(id:15, 昵称:Aozora)了 创建了新的系统管理员账户 (id:15, 昵称:Aozora)
+2024-12-21 20:56:46 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 21:00:49 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 21:01:36 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员(id:20, 昵称:Aozora)了 创建了新的系统管理员账户 (id:20, 昵称:Aozora)

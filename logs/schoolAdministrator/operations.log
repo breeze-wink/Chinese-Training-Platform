@@ -1,5 +1,4 @@
-2024-12-18 19:58:34 [http-nio-8081-exec-2] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 查询全校教师信息
-2024-12-18 19:59:16 [http-nio-8081-exec-6] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 删除了教师(id:312, 姓名:杨洁, 昵称:yangjie)的账号
-2024-12-18 20:00:39 [http-nio-8081-exec-4] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 查询全校教师信息
-2024-12-18 20:03:55 [http-nio-8081-exec-3] INFO  operations.schoolAdministrator - 启明中学 的管理员(id:26, 姓名:李飞, 昵称:启明中学管理员) 查询全校教师信息
-2024-12-18 21:51:33 [http-nio-8081-exec-2] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:69, 昵称:Sherman) 获取班级列表
+2024-12-21 20:29:06 [http-nio-8081-exec-5] INFO  operations.schoolAdministrator - 学校管理员 (id:68, 姓名:陈恩展, 昵称:Aozora) 修改姓名
+2024-12-21 20:29:32 [http-nio-8081-exec-7] INFO  operations.schoolAdministrator - 学校管理员 (id:68, 姓名:陈恩展, 昵称:Aozora) 修改密码
+2024-12-21 20:30:41 [http-nio-8081-exec-6] INFO  operations.schoolAdministrator - 学校管理员 (id:68, 姓名:陈恩展, 昵称:Aozora) 修改密码
+2024-12-21 20:31:06 [http-nio-8081-exec-8] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
