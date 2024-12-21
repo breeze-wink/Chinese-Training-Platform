@@ -22,4 +22,5 @@ public interface SystemAdminService {
     void updatePassword(SystemAdmin systemAdmin);
 
     SystemAdmin selectByEmail(String email);
+    SystemAdmin selectByUsername(String username);
 }
