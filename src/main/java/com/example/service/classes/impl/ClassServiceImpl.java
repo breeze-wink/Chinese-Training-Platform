@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -90,8 +91,7 @@ public class ClassServiceImpl implements ClassService {
         ClassStudent classStudent = new ClassStudent();
         classStudent.setClassId(classMapper.selectIdByInviteCode(inviteCode));
         classStudent.setStudentId(studentId);
-        Date now = new Date();
-        now.setTime(now.getTime() + 28800000);
+        LocalDateTime now = LocalDateTime.now();
         classStudent.setJoinDate(now);
         classStudentMapper.insert(classStudent);
         Student student = studentMapper.selectById(studentId);

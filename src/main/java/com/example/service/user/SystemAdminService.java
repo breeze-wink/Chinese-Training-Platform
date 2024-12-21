@@ -18,6 +18,7 @@ public interface SystemAdminService {
     SystemAdmin getSystemAdminByUsername(String username);
 
     boolean emailExist(String email);
+    boolean usernameExist(String username);
 
     void updatePassword(SystemAdmin systemAdmin);
 

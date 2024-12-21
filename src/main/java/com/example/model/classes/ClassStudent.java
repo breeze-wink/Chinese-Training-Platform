@@ -3,6 +3,7 @@ package com.example.model.classes;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -10,6 +11,6 @@ import java.util.Date;
 public class ClassStudent {
     private Long classId;
     private Long studentId;
-    private Date joinDate;
+    private LocalDateTime joinDate;
 
 }

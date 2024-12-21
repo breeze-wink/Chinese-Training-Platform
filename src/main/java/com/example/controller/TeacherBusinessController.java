@@ -625,7 +625,8 @@ public class TeacherBusinessController {
                 ClassStudent classStudent = new ClassStudent();
                 classStudent.setClassId(joinClass.getClassId());
                 classStudent.setStudentId(joinClass.getStudentId());
-                classStudent.setJoinDate(new Date());
+                LocalDateTime now = LocalDateTime.now();
+                classStudent.setJoinDate(now);
                 classStudentService.addClassStudent(classStudent);
                 joinClassService.removeJoinClassByStudentId(joinClass.getStudentId());
             }

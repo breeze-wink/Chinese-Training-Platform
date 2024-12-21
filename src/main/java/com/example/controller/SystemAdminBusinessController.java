@@ -89,7 +89,7 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("获取学校管理员账号列表失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -130,7 +130,7 @@ public class SystemAdminBusinessController {
         } catch (Exception  e) {
             response.setMessage("生成失败：" + e.getMessage());
             logger.error("生成学校管理员账号失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -155,20 +155,22 @@ public class SystemAdminBusinessController {
             }
         } catch (Exception e) {
             logger.error("删除学校管理员账号失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping("/create")
     public ResponseEntity<Message> register(@AuthenticationPrincipal BaseUser user, @RequestBody CreateSystemAdminRequest request) {
-        Message response = new Message();
-
         try {
+            Message response = new Message();
             if (systemAdminService.emailExist(request.getEmail())) {
                 response.setMessage("邮箱已存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-
+            if(systemAdminService.usernameExist(request.getUsername())){
+                response.setMessage("用户名已存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             String code = emailCodeService.getCode("systemAdmin", request.getEmail());
 
             if (code == null || !code.equals(request.getCode())) {
@@ -189,7 +191,7 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("创建系统管理员失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -218,7 +220,7 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         }catch (Exception e){
             logger.error("修改系统管理员用户名失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }

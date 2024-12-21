@@ -30,4 +30,7 @@ public interface AssignmentMapper {
 
     @Select("SELECT * FROM assignment WHERE creatorId = #{creatorId}")
     List<Assignment> selectByTeacherId(Long creatorId);
+
+    @Delete("DELETE FROM assignment WHERE creatorId = #{creatorId}")
+    void deleteByCreatorId(Long id);
 }

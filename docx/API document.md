@@ -4829,6 +4829,65 @@
     ```
 
 
+### Get Teachers To Change
+
+- **接口路径**：`/api/school-admin/get-teachers-to-change`
+- **请求方法**：`GET`
+- **接口说明**：学校管理员获取用来继承班级的老师。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success",
+      "data": [
+        {
+          "teacherId": "number",
+          "teacherName": "string"
+        },
+        ...
+      ]
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error",
+      "data": null
+    }
+    ```
+
+
+### Change Teacher Of Class
+
+- **接口路径**：`/api/school-admin/change-teacher-of-class`
+- **请求方法**：`GET`
+- **接口说明**：学校管理员替换班级老师。
+- **请求说明**：
+  - 请求头: `Content-Type` : `application/json`
+  - 请求参数：
+    - 查询参数：`classId`//老师ID
+    - 查询参数：`teacherId`//老师ID
+  - 请求体(`JSON` 格式)：无
+- **响应说明**：
+  - 响应格式：`JSON`
+  - 成功响应（200 OK）：
+    ```json
+    {
+      "message": "success"
+    }
+    ```
+  - 失败响应（400 Bad Request）：
+    ```json
+    {
+      "message": "error"
+    }
+    ```
+
+
 ## Image
 
 ### 图片上传接口
