@@ -442,5 +442,55 @@ public class SchoolAdminBusinessController {
         response.setMessage("success");
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/get-teachers-to-change")
+    public ResponseEntity<GetTeachersToChangeResponse> getTeachersToChange(@AuthenticationPrincipal BaseUser user){
+        try {
+            GetTeachersToChangeResponse response = new GetTeachersToChangeResponse();
+            List<GetTeachersToChangeResponse.infoData> data = new ArrayList<>();
+            Long schoolAdminId = user.getId();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(schoolAdminId);
+            List<Teacher> teachers = teacherService.getTeachersBySchoolId(schoolAdmin.getSchoolId());
+            if(teachers != null && !teachers.isEmpty()){
+                for(Teacher teacher : teachers){
+                    GetTeachersToChangeResponse.infoData infoData = new GetTeachersToChangeResponse.infoData();
+                    infoData.setTeacherId(teacher.getId());
+                    infoData.setTeacherName(teacher.getName());
+                    data.add(infoData);
+                }
+            }
+            response.setData(data);
+            response.setMessage("success");
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            logger.error("获取老师失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/change-teacher-of-class")
+    public ResponseEntity<Message> changeTeacherOfClass(@AuthenticationPrincipal BaseUser user,@RequestParam Long classId, @RequestParam Long teacherId){
+        try {
+            Message response = new Message();
+            SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(user.getId());
+            Clazz clazz = classService.getClassById(classId);
+            Teacher teacher = teacherService.getTeacherById(teacherId);
+            Teacher oldTeacher = teacherService.getTeacherById(clazz.getCreatorId());
+            if(Objects.equals(schoolAdmin.getSchoolId(), teacher.getSchoolId()) && Objects.equals(schoolAdmin.getSchoolId(), oldTeacher.getSchoolId())){
+                clazz.setCreatorId(teacherId);
+                classService.updateClass(clazz);
+                operationLogger.info("{} 的管理员{} 更改班级{} 老师为{}", schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName(), schoolAdmin.info(), clazz.info(), teacher.info());
+                response.setMessage("success");
+                return ResponseEntity.ok(response);
+            }
+            else{
+                response.setMessage("无权限");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        }catch (Exception e){
+            logger.error("更改班级老师失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }
 

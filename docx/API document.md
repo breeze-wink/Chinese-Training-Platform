@@ -4869,7 +4869,7 @@
 - **请求说明**：
   - 请求头: `Content-Type` : `application/json`
   - 请求参数：
-    - 查询参数：`classId`//老师ID
+    - 查询参数：`classId`//班级ID
     - 查询参数：`teacherId`//老师ID
   - 请求体(`JSON` 格式)：无
 - **响应说明**：
