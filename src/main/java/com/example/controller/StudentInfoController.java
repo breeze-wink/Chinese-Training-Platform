@@ -6,6 +6,7 @@ import com.example.dto.response.*;
 import com.example.dto.response.student.StudentChangeEmailResponse;
 import com.example.dto.response.student.StudentChangeEmailVerificationResponse;
 import com.example.dto.response.student.StudentEditInformationResponse;
+import com.example.dto.response.student.StudentJoinClassResponse;
 import com.example.model.classes.ClassStudent;
 import com.example.model.classes.Clazz;
 import com.example.model.classes.JoinClass;
@@ -26,6 +27,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -182,35 +185,32 @@ public class StudentInfoController {
     }
 
     @PostMapping("/{id}/join-class")
-    public ResponseEntity<Message> studentJoinClass(@PathVariable Long id, @RequestBody StudentJoinClassRequest request) {
+    public ResponseEntity<StudentJoinClassResponse> studentJoinClass(@PathVariable Long id, @RequestBody StudentJoinClassRequest request) {
         try {
-            Message response = new Message();
+            StudentJoinClassResponse response = new StudentJoinClassResponse();
             String inviteCode = request.getInviteCode();
             Clazz clazz = classService.getClassByInviteCode(inviteCode);
             if(clazz == null){
                 response.setMessage("邀请码错误");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            JoinClass joinClass = joinClassService.selectJoinClassByStudentIdAndClassId(id, clazz.getId());
-            List<ClassStudent> classStudent = classStudentService.getClassStudentsByStudentId(id);
-            if(classStudent != null && !classStudent.isEmpty()){
+            ClassStudent classStudent = classStudentService.getClassStudentByStudentId(id);
+            if(classStudent != null){
                 response.setMessage("请勿重复加入班级");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            if(joinClass != null){
-                response.setMessage("请勿重复发送申请");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            else{
-                joinClass = new JoinClass();
-                joinClass.setClassId(clazz.getId());
-                joinClass.setStudentId(id);
-                int result = joinClassService.addJoinClass(joinClass);
-            }
-            response.setMessage("申请已发送");
+            ClassStudent newClassStudent = new ClassStudent();
+            newClassStudent.setClassId(clazz.getId());
+            newClassStudent.setStudentId(id);
+            LocalDateTime now = LocalDateTime.now();
+            newClassStudent.setJoinDate(now);
+            classStudentService.addClassStudent(newClassStudent);
+            response.setMessage("加入成功");
+            response.setClassName(clazz.getName());
+            response.setSchoolName(schoolService.getSchoolById(clazz.getSchoolId()).getName());
             return ResponseEntity.ok(response);
         } catch (Exception e){
-            logger.error("学生发起加入班级申请失败，错误信息: {}", e.getMessage(), e);
+            logger.error("学生加入班级失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

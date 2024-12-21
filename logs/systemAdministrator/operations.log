@@ -76,3 +76,5 @@
 2024-12-21 20:56:46 [http-nio-8081-exec-4] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
 2024-12-21 21:00:49 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
 2024-12-21 21:01:36 [http-nio-8081-exec-6] INFO  operations.systemAdministrator - 系统管理员(id:20, 昵称:Aozora)了 创建了新的系统管理员账户 (id:20, 昵称:Aozora)
+2024-12-21 22:24:36 [http-nio-8081-exec-3] INFO  operations.systemAdministrator - 系统管理员(id:1, 昵称:SystemAdministrator)获取了学校管理员账号列表
+2024-12-21 22:26:04 [http-nio-8081-exec-9] INFO  operations.systemAdministrator - 系统管理员(id:21, 昵称:Aozora)了 创建了新的系统管理员账户 (id:21, 昵称:Aozora)
