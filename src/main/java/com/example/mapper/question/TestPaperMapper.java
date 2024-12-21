@@ -32,4 +32,7 @@ public interface TestPaperMapper {
 
     @Select("SELECT * FROM test_paper WHERE creatorId = #{creatorId}")
     List<TestPaper> selectByCreatorId(Long creatorId);
+
+    @Delete("DELETE FROM test_paper WHERE creatorId = #{id}")
+    void deleteByCreatorId(Long id);
 }

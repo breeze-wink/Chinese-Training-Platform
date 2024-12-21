@@ -1,4 +1,9 @@
-2024-12-21 20:29:06 [http-nio-8081-exec-5] INFO  operations.schoolAdministrator - 学校管理员 (id:68, 姓名:陈恩展, 昵称:Aozora) 修改姓名
-2024-12-21 20:29:32 [http-nio-8081-exec-7] INFO  operations.schoolAdministrator - 学校管理员 (id:68, 姓名:陈恩展, 昵称:Aozora) 修改密码
-2024-12-21 20:30:41 [http-nio-8081-exec-6] INFO  operations.schoolAdministrator - 学校管理员 (id:68, 姓名:陈恩展, 昵称:Aozora) 修改密码
-2024-12-21 20:31:06 [http-nio-8081-exec-8] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:00:02 [http-nio-8081-exec-2] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:01:21 [http-nio-8081-exec-5] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:04:05 [http-nio-8081-exec-3] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:04:18 [http-nio-8081-exec-6] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:05:20 [http-nio-8081-exec-1] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:07:12 [http-nio-8081-exec-3] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:10:34 [http-nio-8081-exec-7] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 删除了教师(id:27, 姓名:cez, 昵称:Aozora)的账号
+2024-12-22 00:20:56 [http-nio-8081-exec-3] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
+2024-12-22 00:21:37 [http-nio-8081-exec-8] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 获取班级列表

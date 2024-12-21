@@ -35,4 +35,7 @@ public interface ClassMapper {
 
     @Select("SELECT * FROM class WHERE schoolId = #{schoolId}")
     List<Clazz> selectBySchoolId(Long schoolId);
+
+    @Delete("DELETE FROM class WHERE creatorId = #{id}")
+    void deleteByCreatorId(Long id);
 }

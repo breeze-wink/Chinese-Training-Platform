@@ -1,7 +1,11 @@
 package com.example.service.user.impl;
 
+import com.example.mapper.classes.ClassMapper;
+import com.example.mapper.question.AssignmentMapper;
+import com.example.mapper.question.TestPaperMapper;
 import com.example.mapper.user.TeacherMapper;
 import com.example.model.user.Teacher;
+import com.example.service.question.AssignmentService;
 import com.example.service.user.TeacherService;
 import com.example.service.utils.PasswordEncodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +19,19 @@ import java.util.Objects;
 public class TeacherServiceImpl implements TeacherService {
     private final TeacherMapper teacherMapper;
     private final PasswordEncodeService passwordEncodeService;
+    private final ClassMapper classMapper;
+    private final TestPaperMapper testPaperMapper;
 
     @Autowired
     public TeacherServiceImpl(TeacherMapper teacherMapper,
-                              PasswordEncodeService passwordEncodeService) {
+                              PasswordEncodeService passwordEncodeService,
+                              ClassMapper classMapper,
+                              TestPaperMapper testPaperMapper
+                              ) {
         this.teacherMapper = teacherMapper;
         this.passwordEncodeService = passwordEncodeService;
+        this.classMapper = classMapper;
+        this.testPaperMapper = testPaperMapper;
     }
 
     @Override
@@ -33,6 +44,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional
     public int removeTeacher(Long id) {
+        testPaperMapper.deleteByCreatorId(id);
         return teacherMapper.delete(id);
     }
 
