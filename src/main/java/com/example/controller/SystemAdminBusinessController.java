@@ -89,7 +89,7 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("获取学校管理员账号列表失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -130,15 +130,15 @@ public class SystemAdminBusinessController {
         } catch (Exception  e) {
             response.setMessage("生成失败：" + e.getMessage());
             logger.error("生成学校管理员账号失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
 
     @DeleteMapping("/delete-school-admin-account/{id}")
     public ResponseEntity<Message> deleteSchoolAdminAccount(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
-        Message response = new Message();
         try {
+            Message response = new Message();
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
             if(schoolAdmin == null){
                 response.setMessage("删除失败，未找到学校管理员");
@@ -155,14 +155,14 @@ public class SystemAdminBusinessController {
             }
         } catch (Exception e) {
             logger.error("删除学校管理员账号失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping("/create")
     public ResponseEntity<Message> register(@AuthenticationPrincipal BaseUser user, @RequestBody CreateSystemAdminRequest request) {
-        Message response = new Message();
         try {
+            Message response = new Message();
             if (systemAdminService.emailExist(request.getEmail())) {
                 response.setMessage("邮箱已存在");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -191,14 +191,14 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("创建系统管理员失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping("/{id}/update-username")
     public ResponseEntity<Message> updateUsername(@AuthenticationPrincipal BaseUser user, @PathVariable Long id, @RequestBody UpdateUsernameRequest request){
-        Message response = new Message();
         try {
+            Message response = new Message();
             String username = request.getUsername();
             SystemAdmin systemAdmin = systemAdminService.getSystemAdminById(id);
             if (systemAdmin == null) {
@@ -220,7 +220,7 @@ public class SystemAdminBusinessController {
             return ResponseEntity.ok(response);
         }catch (Exception e){
             logger.error("修改系统管理员用户名失败，错误信息: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
