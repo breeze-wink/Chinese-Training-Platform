@@ -136,16 +136,17 @@ public class SchoolAdminBusinessController {
         try {
             Message response = new Message();
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
+            List<Clazz> classes = classService.getClassesByTeacherId(teacherId);
+            if(classes != null && !classes.isEmpty()){
+                response.setMessage("该教师有班级，无法删除");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             Teacher teacher = teacherService.getTeacherById(teacherId);
             if(!Objects.equals(schoolAdmin.getSchoolId(), teacher.getSchoolId())){
                 response.setMessage("该教师不是该学校教师");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             String schoolName = schoolService.getSchoolById(schoolAdmin.getSchoolId()).getName();
-            List<Clazz> classes = classService.getClassesByTeacherId(teacherId);
-            for (Clazz clazz : classes) {
-                classService.removeClass(clazz.getId());
-            }
             int result = teacherService.removeTeacher(teacherId);
 
             if(result != 0){
