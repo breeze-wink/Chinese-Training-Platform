@@ -1120,6 +1120,7 @@ public class StudentBusinessController {
             AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, id);
             if(assignmentSubmission != null){
                 response.setTotalScore(assignmentSubmission.getTotalScore());
+                response.setFeedback(assignmentSubmission.getFeedback());
                 List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
                 for(SubmissionAnswer submissionAnswer : submissionAnswers){
                     HomeworkAnswerResponse.infoData infoData = new HomeworkAnswerResponse.infoData();
