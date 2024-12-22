@@ -19,6 +19,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 @RestController
 @RequestMapping("/api/uploads")

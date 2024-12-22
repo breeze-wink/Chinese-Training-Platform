@@ -29,6 +29,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -287,7 +289,7 @@ public class TeacherManagementController {
     }
 
     @GetMapping("/change-email")
-    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {
             String verificationCode = emailCodeService.getCode("teacher", newEmail);
@@ -308,7 +310,7 @@ public class TeacherManagementController {
     }
 
     @DeleteMapping("/delete-account")
-    public ResponseEntity<Message> deleteAccount(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<Message> deleteAccount(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         Message response = new Message();
         try {
             Teacher teacher = teacherService.getTeacherById(user.getId());

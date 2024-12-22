@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 @RestController
 @RequestMapping("/api/system-admin")
@@ -68,7 +70,7 @@ public class SystemAdminBusinessController {
     }
 
     @GetMapping("/get-school-admin-accounts")
-    public ResponseEntity<GetSchoolAdminAccountsResponse> getSchoolAdminAccounts(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetSchoolAdminAccountsResponse> getSchoolAdminAccounts(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         try {
             GetSchoolAdminAccountsResponse response = new GetSchoolAdminAccountsResponse();
             List<SchoolAdmin> schoolAdmins = schoolAdminService.getAllSchoolAdmins();
@@ -94,11 +96,11 @@ public class SystemAdminBusinessController {
     }
 
 //    @PostMapping("create-system-admin")
-//    public ResponseEntity<Message> createSystemAdmin(@AuthenticationPrincipal BaseUser user, @RequestBody CreateSystemAdminRequest request) {
+//    public ResponseEntity<Message> createSystemAdmin(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody CreateSystemAdminRequest request) {
 //
 //    }
     @PostMapping("/create-school-admin")
-    public ResponseEntity<Message> createSchoolAdmin(@AuthenticationPrincipal BaseUser user, @RequestBody CreateSchoolAdminRequest request) {
+    public ResponseEntity<Message> createSchoolAdmin(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody CreateSchoolAdminRequest request) {
         String name = request.getName();
         String password = request.getPassword();
         String schoolName = request.getSchoolName();
@@ -136,7 +138,7 @@ public class SystemAdminBusinessController {
 
 
     @DeleteMapping("/delete-school-admin-account/{id}")
-    public ResponseEntity<Message> deleteSchoolAdminAccount(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
+    public ResponseEntity<Message> deleteSchoolAdminAccount(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id) {
         try {
             Message response = new Message();
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
@@ -160,7 +162,7 @@ public class SystemAdminBusinessController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Message> register(@AuthenticationPrincipal BaseUser user, @RequestBody CreateSystemAdminRequest request) {
+    public ResponseEntity<Message> register(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody CreateSystemAdminRequest request) {
         try {
             Message response = new Message();
             if (systemAdminService.emailExist(request.getEmail())) {
@@ -196,7 +198,7 @@ public class SystemAdminBusinessController {
     }
 
     @PostMapping("/{id}/update-username")
-    public ResponseEntity<Message> updateUsername(@AuthenticationPrincipal BaseUser user, @PathVariable Long id, @RequestBody UpdateUsernameRequest request){
+    public ResponseEntity<Message> updateUsername(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id, @RequestBody UpdateUsernameRequest request){
         try {
             Message response = new Message();
             String username = request.getUsername();

@@ -34,6 +34,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 @RestController
 @RequestMapping("/api/school-admin")
@@ -418,7 +420,7 @@ public class SchoolAdminBusinessController {
     }
 
     @GetMapping("/get-teachers-to-change")
-    public ResponseEntity<GetTeachersToChangeResponse> getTeachersToChange(@AuthenticationPrincipal BaseUser user){
+    public ResponseEntity<GetTeachersToChangeResponse> getTeachersToChange(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user){
         try {
             GetTeachersToChangeResponse response = new GetTeachersToChangeResponse();
             List<GetTeachersToChangeResponse.infoData> data = new ArrayList<>();
@@ -443,7 +445,7 @@ public class SchoolAdminBusinessController {
     }
 
     @GetMapping("/change-teacher-of-class")
-    public ResponseEntity<Message> changeTeacherOfClass(@AuthenticationPrincipal BaseUser user,@RequestParam Long classId, @RequestParam Long teacherId){
+    public ResponseEntity<Message> changeTeacherOfClass(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,@RequestParam Long classId, @RequestParam Long teacherId){
         try {
             Message response = new Message();
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(user.getId());
@@ -467,7 +469,7 @@ public class SchoolAdminBusinessController {
         }
     }
     @PutMapping("/level-up")
-    public ResponseEntity<Message> levelUpTeacher(@AuthenticationPrincipal BaseUser user, @RequestParam Long id){
+    public ResponseEntity<Message> levelUpTeacher(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam Long id){
         Message response = new Message();
 
         try {
@@ -487,7 +489,7 @@ public class SchoolAdminBusinessController {
     }
 
     @PutMapping("/level-down")
-    public ResponseEntity<Message> levelDownTeacher(@AuthenticationPrincipal BaseUser user, @RequestParam Long id){
+    public ResponseEntity<Message> levelDownTeacher(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam Long id){
         Message response = new Message();
 
         try {

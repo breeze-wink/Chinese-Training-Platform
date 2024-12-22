@@ -47,6 +47,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Parameter;
+
+
 @RestController
 @RequestMapping("/api/system-admin")
 public class SystemAdminController {
@@ -132,7 +135,7 @@ public class SystemAdminController {
     }
 
     @PostMapping("/create-course-standard")
-    public ResponseEntity<CreateStandardResponse> createStandard(@AuthenticationPrincipal BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
+    public ResponseEntity<CreateStandardResponse> createStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
         CreateStandardResponse response = new CreateStandardResponse();
         if (file.isEmpty()) {
             response.setMessage("课标创建失败, 文件为空");
@@ -161,7 +164,7 @@ public class SystemAdminController {
     }
 
     @PutMapping("/update-course-standard/{id}")
-    public ResponseEntity<Message> updateCourseStandard(@AuthenticationPrincipal BaseUser user,
+    public ResponseEntity<Message> updateCourseStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,
                                                         @PathVariable Long id,
                                                         @RequestParam("file") MultipartFile file,
                                                         @RequestParam("executedDate") LocalDate executedDate) {
@@ -191,7 +194,7 @@ public class SystemAdminController {
     }
 
     @GetMapping("query-course-standard/{id}")
-    public ResponseEntity<InputStreamResource> getCourseStandard(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> getCourseStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id) {
         try {
             CourseStandard courseStandard = courseStandardService.getCourseStandardById(id);
             if (courseStandard == null) {
@@ -220,7 +223,7 @@ public class SystemAdminController {
     }
 
     @DeleteMapping("/delete-course-standard/{id}")
-    public ResponseEntity<Message> deleteCourseStandard(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
+    public ResponseEntity<Message> deleteCourseStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id) {
         try {
             Message response = new Message();
             CourseStandard courseStandard = courseStandardService.getCourseStandardById(id);
@@ -240,7 +243,7 @@ public class SystemAdminController {
     }
 
     @GetMapping("/get-all-course-standards")
-    public ResponseEntity<GetAllCourseStandardResponse> getAllCourseStandard(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetAllCourseStandardResponse> getAllCourseStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         List<CourseStandard> courseStandards = courseStandardService.getAllCourseStandards();
         GetAllCourseStandardResponse response = new GetAllCourseStandardResponse();
         response.setCourseStandardInfos(new ArrayList<>());
@@ -266,7 +269,7 @@ public class SystemAdminController {
     }
 
     @PostMapping("/create-knowledge-point")
-    public ResponseEntity<CreateKnowledgePointResponse> createKnowledgePoint(@AuthenticationPrincipal BaseUser user, @RequestBody CreateKnowledgePointRequest request) {
+    public ResponseEntity<CreateKnowledgePointResponse> createKnowledgePoint(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody CreateKnowledgePointRequest request) {
         CreateKnowledgePointResponse response = new CreateKnowledgePointResponse();
         KnowledgePoint knowledgePoint = new KnowledgePoint();
         knowledgePoint.setName(request.getName());
@@ -287,7 +290,7 @@ public class SystemAdminController {
     }
 
     @DeleteMapping("/delete-knowledge-point/{id}")
-    public ResponseEntity<Message> deleteKnowledgePoint(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
+    public ResponseEntity<Message> deleteKnowledgePoint(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id) {
         Message response = new Message();
         KnowledgePoint knowledgePoint = knowledgePointService.getKnowledgePointById(id);
         if (knowledgePoint == null) {
@@ -309,7 +312,7 @@ public class SystemAdminController {
     }
 
     @PutMapping("/update-knowledge-point/{id}")
-    public ResponseEntity<Message> updateKnowledgePoint(@AuthenticationPrincipal BaseUser user,
+    public ResponseEntity<Message> updateKnowledgePoint(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,
                                                         @PathVariable Long id,
                                                         @RequestBody CreateKnowledgePointRequest request) {
         Message response = new Message();
@@ -337,7 +340,7 @@ public class SystemAdminController {
     }
 
     @GetMapping("/query-knowledge-point/{id}")
-    public ResponseEntity<QueryKnowledgePointResponse> queryKnowledgePoint(@AuthenticationPrincipal BaseUser user,
+    public ResponseEntity<QueryKnowledgePointResponse> queryKnowledgePoint(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,
                                                                            @PathVariable Long id) {
         try {
             QueryKnowledgePointResponse response = new QueryKnowledgePointResponse();
@@ -364,7 +367,7 @@ public class SystemAdminController {
     }
 
     @GetMapping("/get-all-knowledge-points")
-    public ResponseEntity<GetAllKnowledgePointsResponse> getAllKnowledgePoints(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetAllKnowledgePointsResponse> getAllKnowledgePoints(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         List<KnowledgePoint> knowledgePoints = knowledgePointService.getAllKnowledgePoints();
         GetAllKnowledgePointsResponse response = new GetAllKnowledgePointsResponse();
         response.setKnowledgePointInfos(new ArrayList<>());
@@ -428,7 +431,7 @@ public class SystemAdminController {
     }
 
     @GetMapping("/change-email")
-    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
+    public ResponseEntity<ChangeEmailResponse> changeEmail(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam String newEmail, @RequestParam String code) {
         ChangeEmailResponse response = new ChangeEmailResponse();
         try {
             String verifyCode = emailCodeService.getCode("systemAdmin", newEmail);

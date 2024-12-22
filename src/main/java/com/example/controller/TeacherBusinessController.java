@@ -70,6 +70,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -175,7 +176,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/query-course-standard/{id}")
-    public ResponseEntity<InputStreamResource> getCourseStandard(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> getCourseStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id) {
         try {
             CourseStandard courseStandard = courseStandardService.getCourseStandardById(id);
             if (courseStandard == null) {
@@ -204,7 +205,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/get-all-course-standards")
-    public ResponseEntity<GetAllCourseStandardResponse> getAllCourseStandard(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetAllCourseStandardResponse> getAllCourseStandard(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         List<CourseStandard> courseStandards = courseStandardService.getAllCourseStandards();
         GetAllCourseStandardResponse response = new GetAllCourseStandardResponse();
         response.setCourseStandardInfos(new ArrayList<>());
@@ -299,7 +300,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/{id}/create-group")
-    public ResponseEntity<CreateGroupResponse> createGroup(@AuthenticationPrincipal BaseUser user, @RequestBody CreateGroupRequest request ) {
+    public ResponseEntity<CreateGroupResponse> createGroup(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody CreateGroupRequest request ) {
         CreateGroupResponse response = new CreateGroupResponse();
 
         try {
@@ -691,7 +692,7 @@ public class TeacherBusinessController {
 
 
     @GetMapping("/get-all-waiting-questions")
-    public ResponseEntity<GetAllQuestionsResponse> getAllWaitingQuestions(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetAllQuestionsResponse> getAllWaitingQuestions(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         GetAllQuestionsResponse response = new GetAllQuestionsResponse();
         List<GetAllQuestionsResponse.infoData> questions = new ArrayList<>();
 
@@ -730,7 +731,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/get-all-access-questions")
-    public ResponseEntity<GetAllQuestionsResponse> getALLAccessQuestions(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetAllQuestionsResponse> getALLAccessQuestions(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         GetAllQuestionsResponse response = new GetAllQuestionsResponse();
         List<GetAllQuestionsResponse.infoData> questions = new ArrayList<>();
 
@@ -771,7 +772,7 @@ public class TeacherBusinessController {
 
 
     @GetMapping("/get-question")
-    public ResponseEntity<GetQuestionResponse> getQuestion(@AuthenticationPrincipal BaseUser user,
+    public ResponseEntity<GetQuestionResponse> getQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,
                                                            @RequestParam Long questionId,
                                                            @RequestParam String type) {
         GetQuestionResponse response = new GetQuestionResponse();
@@ -864,7 +865,7 @@ public class TeacherBusinessController {
 
 
     @DeleteMapping("/delete-question")
-    public ResponseEntity<Message> deleteQuestion(@AuthenticationPrincipal BaseUser user,@RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
+    public ResponseEntity<Message> deleteQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,@RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
         Message response = new Message();
         try {
             if(Objects.equals(type, "small")){
@@ -898,7 +899,7 @@ public class TeacherBusinessController {
 
 
     @GetMapping("{id}/get-student-situation")
-    public ResponseEntity<AvgScoreResponse> getAvgScore(@AuthenticationPrincipal BaseUser user, @PathVariable Long id, @RequestParam Long studentId) {
+    public ResponseEntity<AvgScoreResponse> getAvgScore(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id, @RequestParam Long studentId) {
         AvgScoreResponse response = new AvgScoreResponse();
         try {
             AvgScoreResponse.infoData data = new AvgScoreResponse.infoData();
@@ -1088,7 +1089,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/search-questions")
-    public ResponseEntity<SearchQuestionsResponse> searchQuestions(@AuthenticationPrincipal BaseUser user, @RequestBody SearchQuestionsRequest request) {
+    public ResponseEntity<SearchQuestionsResponse> searchQuestions(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody SearchQuestionsRequest request) {
         SearchQuestionsResponse response = searchQuestionService.searchQuestions(request);
         try {
             return ResponseEntity.ok(response);
@@ -1323,7 +1324,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/uploaded-questions")
-    public ResponseEntity<GetUploadedQuestionResponse> getUploadedQuestions(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetUploadedQuestionResponse> getUploadedQuestions(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         GetUploadedQuestionResponse response = new GetUploadedQuestionResponse();
         try{
             List<TeacherQuestionStatistic> teacherQuestionStatistics = teacherQuestionStatisticService.getStatisticsByTeacherId(user.getId());
@@ -1355,7 +1356,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/homework/publish")
-    public ResponseEntity<Message> publishHomework(@RequestBody PublishHomeworkRequest request, @AuthenticationPrincipal BaseUser user) throws JsonProcessingException {
+    public ResponseEntity<Message> publishHomework(@RequestBody PublishHomeworkRequest request, @AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) throws JsonProcessingException {
         try {
             Teacher teacher = teacherService.getTeacherById(user.getId());
             Assignment assignment = new Assignment();
@@ -1394,7 +1395,7 @@ public class TeacherBusinessController {
     }
 
     @DeleteMapping("/delete-paper/{id}")
-    public ResponseEntity<Message> deletePaper(@AuthenticationPrincipal BaseUser user, @PathVariable Long id) throws JsonProcessingException {
+    public ResponseEntity<Message> deletePaper(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @PathVariable Long id) throws JsonProcessingException {
         try {
             TestPaper testPaper = testPaperService.selectById(id);
             if (testPaper == null) {
@@ -1414,7 +1415,7 @@ public class TeacherBusinessController {
     }
 
     @PutMapping("/deny-upload-question")
-    public ResponseEntity<Message> denyUploadQuestion(@AuthenticationPrincipal BaseUser user,
+    public ResponseEntity<Message> denyUploadQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,
                                                       @RequestBody DenyUploadQuestionRequest request) throws JsonProcessingException {
 
         try {
@@ -1527,13 +1528,10 @@ public class TeacherBusinessController {
 
 
     /**
-     * 批准题目
-     * 考虑题目内容更新
-     * 添加approve_question表
+     * 批准题目申请
      */
-
     @PutMapping("/approve-question")
-    public ResponseEntity<Message> approveQuestion(@AuthenticationPrincipal BaseUser user, @RequestBody ApproveQuestionRequest request) throws JsonProcessingException {
+    public ResponseEntity<Message> approveQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody ApproveQuestionRequest request) throws JsonProcessingException {
         try {
             Long executeTeacherId = user.getId();
             Long id = request.getId();
@@ -1619,7 +1617,7 @@ public class TeacherBusinessController {
     }
 
     @PutMapping("/modify-question")
-    public ResponseEntity<Message> modifyQuestion(@AuthenticationPrincipal BaseUser user, @RequestBody ModifyQuestionRequest request) throws JsonProcessingException {
+    public ResponseEntity<Message> modifyQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody ModifyQuestionRequest request) throws JsonProcessingException {
         try {
             Long executeTeacherId = user.getId();
             Long id = request.getId();
@@ -1821,7 +1819,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/generate-paper-with-types")
-    public ResponseEntity<GeneratePaperWithTypesResponse> generatePaperWithTypes(@AuthenticationPrincipal BaseUser user,
+    public ResponseEntity<GeneratePaperWithTypesResponse> generatePaperWithTypes(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,
                                                                                @RequestBody GeneratePaperWithTypeRequest request) {
         GeneratePaperWithTypesResponse response = new GeneratePaperWithTypesResponse();
         try {
@@ -1915,7 +1913,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/paper/auto")
-    public ResponseEntity<AutoPaperResponse> autoPaper(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<AutoPaperResponse> autoPaper(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         //此处硬编码考虑优化
 
         /*
@@ -2037,7 +2035,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/mark-submission")
-    public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal BaseUser user, @RequestBody MarkSubmissionRequest request) {
+    public ResponseEntity<Message> markSubmission(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody MarkSubmissionRequest request) {
         Message response = new Message();
         try {
             if(request.getData() != null && !request.getData().isEmpty()){
@@ -2287,7 +2285,7 @@ public class TeacherBusinessController {
     }
 
     @PostMapping("/upload-essay")
-    public ResponseEntity<UploadEssayResponse> uploadEssay(@AuthenticationPrincipal BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
+    public ResponseEntity<UploadEssayResponse> uploadEssay(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
         UploadEssayResponse response = new UploadEssayResponse();
         if (file.isEmpty()) {
             response.setMessage("作文上传失败, 文件为空");
@@ -2316,7 +2314,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/view-essays")
-    public ResponseEntity<GetEssaysResponse> getEssays(@AuthenticationPrincipal BaseUser user) {
+    public ResponseEntity<GetEssaysResponse> getEssays(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         try {
             GetEssaysResponse response = new GetEssaysResponse();
             List<GetEssaysResponse.InfoData> data = new ArrayList<>();
@@ -2340,7 +2338,7 @@ public class TeacherBusinessController {
     }
 
     @GetMapping("/get-essay")
-    public ResponseEntity<InputStreamResource> getEssayInfo(@AuthenticationPrincipal BaseUser user, @RequestParam Long essayId) {
+    public ResponseEntity<InputStreamResource> getEssayInfo(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam Long essayId) {
         try {
             Essay essay = essayService.getEssayById(essayId);
             if (essay == null) {
