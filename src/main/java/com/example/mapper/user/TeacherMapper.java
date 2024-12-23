@@ -43,6 +43,6 @@ public interface TeacherMapper {
 
     @Select("SELECT * FROM teacher where email = #{email} and status = 1")
     Teacher selectByEmail(String email);
-
-
+    @Select("SELECT permission FROM teacher where id = #{id}")
+    Integer selectPermissionById(Long id);
 }

@@ -15,7 +15,6 @@ public abstract class BaseUser implements UserDetails {
     protected String username;
     protected String email;
     protected String password;
-
     // 返回一个空的权限集合，因为系统目前不涉及权限
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList(); // 返回空集合

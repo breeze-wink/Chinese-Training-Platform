@@ -699,6 +699,10 @@ public class TeacherBusinessController {
         Teacher teacher = teacherService.getTeacherById(user.getId());
 
         try {
+            if (!teacherService.checkPermissionCorrect(teacher.getId(), Teacher.Leader)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
             List<UploadQuestion> uploadQuestions = uploadQuestionService.getInSchoolQuestions(teacher.getSchoolId());
             for (UploadQuestion uploadQuestion : uploadQuestions) {
                 if (!questionStatisticService.checkQuestionWaiting(uploadQuestion.getQuestionId(), uploadQuestion.getType())) {
@@ -738,6 +742,10 @@ public class TeacherBusinessController {
         Teacher teacher = teacherService.getTeacherById(user.getId());
 
         try {
+            if (!teacherService.checkPermissionCorrect(teacher.getId(), Teacher.Leader)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
             List<UploadQuestion> uploadQuestions = uploadQuestionService.getInSchoolQuestions(teacher.getSchoolId());
             for (UploadQuestion uploadQuestion : uploadQuestions) {
                 if (!questionStatisticService.checkQuestionPassed(uploadQuestion.getQuestionId(), uploadQuestion.getType())) {
@@ -868,6 +876,12 @@ public class TeacherBusinessController {
     public ResponseEntity<Message> deleteQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user,@RequestParam Long questionId, @RequestParam String type) throws JsonProcessingException {
         Message response = new Message();
         try {
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            if (!teacherService.checkPermissionCorrect(teacher.getId(), Teacher.Leader)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+
             if(Objects.equals(type, "small")){
                 Question question = questionService.getQuestionById(questionId);
                 if(question == null){
@@ -886,7 +900,7 @@ public class TeacherBusinessController {
                 cacheRefreshService.markTypeCacheOutOfDate(questionBody.getType());
             }
             response.setMessage("删除成功");
-            Teacher teacher = teacherService.getTeacherById(user.getId());
+
             operationLogger.info("教师 {} 删除了题目, id = {}", teacher.info(), questionId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -1421,6 +1435,12 @@ public class TeacherBusinessController {
         try {
             Long executeTeacherId = user.getId();
             Long id = request.getId();
+
+            if (!teacherService.checkPermissionCorrect(executeTeacherId, Teacher.Leader)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+
             String comment = request.getComment();
 
             UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
@@ -1534,6 +1554,11 @@ public class TeacherBusinessController {
     public ResponseEntity<Message> approveQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody ApproveQuestionRequest request) throws JsonProcessingException {
         try {
             Long executeTeacherId = user.getId();
+
+            if (!teacherService.checkPermissionCorrect(executeTeacherId, Teacher.Leader)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
             Long id = request.getId();
             UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
 
@@ -1620,6 +1645,10 @@ public class TeacherBusinessController {
     public ResponseEntity<Message> modifyQuestion(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestBody ModifyQuestionRequest request) throws JsonProcessingException {
         try {
             Long executeTeacherId = user.getId();
+
+            if (!teacherService.checkPermissionCorrect(executeTeacherId, Teacher.Leader)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
             Long id = request.getId();
             UploadQuestion uploadQuestion = uploadQuestionService.findById(id);
 

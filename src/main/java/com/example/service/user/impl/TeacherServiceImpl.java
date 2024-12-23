@@ -126,4 +126,9 @@ public class TeacherServiceImpl implements TeacherService {
         return teacherMapper.selectByEmail(email);
     }
 
+    @Override
+    public boolean checkPermissionCorrect(Long id, Integer permission) {
+        return Objects.equals(teacherMapper.selectPermissionById(id), permission);
+    }
+
 }

@@ -26,4 +26,6 @@ public interface TeacherService {
     void updatePassword(Teacher teacher);
 
     Teacher selectByEmail(String email);
+
+    boolean checkPermissionCorrect(Long id, Integer permission);
 }
