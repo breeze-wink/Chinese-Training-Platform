@@ -205,6 +205,9 @@ public class StudentInfoController {
             LocalDateTime now = LocalDateTime.now();
             newClassStudent.setJoinDate(now);
             classStudentService.addClassStudent(newClassStudent);
+            Student student = studentService.getStudentById(id);
+            student.setSchoolId(clazz.getSchoolId());
+            studentService.updateStudent(student);
             response.setMessage("加入成功");
             response.setClassName(clazz.getName());
             response.setSchoolName(schoolService.getSchoolById(clazz.getSchoolId()).getName());
