@@ -186,51 +186,47 @@ public class SchoolAdminManagementController {
         }
     }
 
-    @PostMapping("/{id}/send-verification-code")
-    public ResponseEntity<SchoolEmailVerifyResponse> sendVerificationCode(@PathVariable Long id, @RequestBody SchoolAdminBindEmailRequest request) throws MessagingException {
-        try {
-            String email = request.getEmail();
-
-            SchoolEmailVerifyResponse response = new SchoolEmailVerifyResponse();
-
-            String verificationCode = emailService.sendEmail(email);
-            response.setVerificationCode(verificationCode);
-            response.setMessage("验证码已发送");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("学校管理员发送验证码出现问题 {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
 
     @PostMapping("/{id}/bind-email")
-    public ResponseEntity<Message> bindEmail(@PathVariable Long id, @RequestBody SchoolAdminBindEmailRequest request) {
-        String email = request.getEmail();
+    public ResponseEntity<Message> bindEmail(@PathVariable Long id, @RequestParam String newEmail, @RequestParam String code) {
 
+        Message response = new Message();
         try {
+            String verificationCode = emailCodeService.getCode("schoolAdmin", newEmail);
+            if(!verificationCode.equals(code)){
+                response.setMessage("验证码错误或已失效");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             SchoolAdmin schoolAdmin = schoolAdminService.getSchoolAdminById(id);
-            schoolAdmin.setEmail(email);
+            schoolAdmin.setEmail(newEmail);
             schoolAdminService.updateSchoolAdmin(schoolAdmin);
-            operationLogger.info("学校管理员 {} 绑定邮箱: {}", schoolAdmin.info(), email);
-            return ResponseEntity.ok(new Message("成功"));
-        } catch (Exception e) {
-            logger.error("学校管理员绑定邮箱出现问题 {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
+            response.setMessage("邮箱设置成功");
+            operationLogger.info("学校管理员 {} 设置邮箱为: {}", schoolAdmin.info(), newEmail);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            response.setMessage("邮箱更换失败");
+            logger.error("邮箱更换失败 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
     }
 
     @GetMapping("/send-email-code")
     public ResponseEntity<SendEmailCodeResponse> sendEmailCode(@RequestParam String email) throws MessagingException {
-        SendEmailCodeResponse response = new SendEmailCodeResponse();
-        if (schoolAdminService.emailExist(email)) {
-            response.setMessage("邮箱已注册");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        try {
+            SendEmailCodeResponse response = new SendEmailCodeResponse();
+            if (schoolAdminService.emailExist(email)) {
+                response.setMessage("邮箱已注册");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            String code = emailService.sendEmail(email);
+            emailCodeService.setCode("schoolAdmin", email, code);
+            response.setMessage("验证码已发送");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("学校管理员发送验证码出现问题 {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        String code = emailService.sendEmail(email);
-        emailCodeService.setCode("schoolAdmin", email, code);
-        response.setMessage("验证码已发送");
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/change-email")
@@ -247,9 +243,11 @@ public class SchoolAdminManagementController {
             schoolAdminService.updateSchoolAdmin(schoolAdmin);
             response.setMessage("邮箱更换成功");
             response.setNewEmail(newEmail);
+            operationLogger.info("学校管理员 {} 更改邮箱为: {}", schoolAdmin.info(), newEmail);
             return ResponseEntity.ok(response);
         }catch (Exception e){
             response.setMessage("邮箱更换失败");
+            logger.error("邮箱更换失败 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
