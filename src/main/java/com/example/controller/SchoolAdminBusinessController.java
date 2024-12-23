@@ -176,11 +176,8 @@ public class SchoolAdminBusinessController {
                 response.setMessage("该学生不是该学校学生");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
-            List<ClassStudent> classStudents = classStudentService.getClassStudentsByStudentId(studentId);
-            if(!classStudents.isEmpty()){
-                ClassStudent classStudent = classStudents.get(0);
-                classService.removeStudentFromClass(classStudent.getClassId(), studentId);
-            }
+            ClassStudent classStudent = classStudentService.getClassStudentByStudentId(studentId);
+            classService.removeStudentFromClass(classStudent.getClassId(), studentId);
             student.setSchoolId(null);
             studentService.updateStudent(student);
             if (student.getName() != null && schoolAdmin.getName() != null) {
