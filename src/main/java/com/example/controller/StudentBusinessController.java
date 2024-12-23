@@ -343,8 +343,13 @@ public class StudentBusinessController {
                         }
                         pq.setPracticeId(practice.getId());
                         pq.setQuestionId(subQ.getQuestionId());
-                        pq.setSequence(sequence + "." + index);
-                        infoData.setSequence(sequence + "." + index++);
+                        if (!subQ.getType().equals("ESSAY")) {
+                            pq.setSequence(sequence + "." + index);
+                            infoData.setSequence(sequence + "." + index++);
+                        } else {
+                            pq.setSequence(sequence);
+                            infoData.setSequence(sequence);
+                        }
 
                         practiceQuestionService.addPracticeQuestion(pq);
 

@@ -108,6 +108,7 @@ public class PreAssembledQuestionServiceImpl implements PreAssembledQuestionServ
             for (Question question : questions) {
                 PreAssembledQuestion preassembledQuestion = new PreAssembledQuestion();
                 preassembledQuestion.setId(question.getId());
+                preassembledQuestion.setType("作文");
                 SubQuestion subQ = new SubQuestion();
                 subQ.setQuestionId(question.getId());
                 subQ.setType(question.getType());
