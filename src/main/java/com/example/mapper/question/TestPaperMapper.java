@@ -30,7 +30,7 @@ public interface TestPaperMapper {
     @Select("SELECT * FROM test_paper where isHidden=false")
     List<TestPaper> selectAll();
 
-    @Select("SELECT * FROM test_paper WHERE creatorId = #{creatorId}")
+    @Select("SELECT * FROM test_paper WHERE creatorId = #{creatorId} and isHidden=false")
     List<TestPaper> selectByCreatorId(Long creatorId);
 
     @Delete("DELETE FROM test_paper WHERE creatorId = #{id}")
