@@ -1,11 +1,9 @@
 package com.example.service.user.impl;
 
 import com.example.mapper.classes.ClassMapper;
-import com.example.mapper.question.AssignmentMapper;
 import com.example.mapper.question.TestPaperMapper;
 import com.example.mapper.user.TeacherMapper;
 import com.example.model.user.Teacher;
-import com.example.service.question.AssignmentService;
 import com.example.service.user.TeacherService;
 import com.example.service.utils.PasswordEncodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +79,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public boolean existTeacher(Teacher teacher) {
         Teacher checkTeacher = teacherMapper.findByEmail(teacher.getEmail());
-        return checkTeacher != null && Objects.equals(checkTeacher.getPermission(), teacher.getPermission());
+        return checkTeacher != null;
     }
 
     @Override
@@ -111,12 +109,9 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public int emailExist(String email) {
-        Teacher teacher = teacherMapper.emailExist(email);
-        if(teacher != null){
-            return 1;
-        }
-        return 0;
+    public boolean ManagerEmailExist(String email) {
+        Teacher teacher = teacherMapper.selectByEmail(email);
+        return teacher != null && Objects.equals(teacher.getPermission(), Teacher.Leader);
     }
 
     @Override

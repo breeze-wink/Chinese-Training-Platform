@@ -30,3 +30,4 @@
 2024-12-22 00:49:32 [http-nio-8081-exec-6] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
 2024-12-22 00:50:25 [http-nio-8081-exec-5] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 查询全校教师信息
 2024-12-22 00:54:13 [http-nio-8081-exec-3] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:68, 姓名:陈恩展, 昵称:Aozora) 获取班级列表
+2024-12-22 04:18:27 [http-nio-8081-exec-10] INFO  operations.schoolAdministrator - 湖南师大附中 的管理员(id:69, 姓名:肖健, 昵称:Sherman) 查询全校教师信息

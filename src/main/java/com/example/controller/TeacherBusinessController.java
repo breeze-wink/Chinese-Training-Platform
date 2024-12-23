@@ -1218,7 +1218,9 @@ public class TeacherBusinessController {
                 accumulateScore += questionDifficulty * score;
             }
         }
-        return accumulateScore / totalScore;
+        //保留小数点后两位
+        return new BigDecimal(accumulateScore).divide(new BigDecimal(totalScore), 2, RoundingMode.HALF_UP).doubleValue();
+
     }
 
     @GetMapping("/paper")
