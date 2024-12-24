@@ -899,7 +899,7 @@ public class StudentBusinessController {
                     }
                 }
             }
-            data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
+            data = data.stream().sorted(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed()).limit(10).toList();
             response.setData(data);
             response.setMessage("历史成绩获取成功");
             operationLogger.info("学生{}获取历史成绩", studentService.getStudentById(id).info());

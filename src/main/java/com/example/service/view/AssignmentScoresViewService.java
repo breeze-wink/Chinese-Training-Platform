@@ -8,4 +8,5 @@ import java.util.List;
 public interface AssignmentScoresViewService {
     List<AssignmentScoresView> selectAvgScoresByClassId(Long classId);
     List<AssignmentIdStudentIdScore> selectScoresByStudentId(Long studentId);
+    List<AssignmentScoresView> selectByGroupId(Long groupId);
 }

@@ -2147,25 +2147,18 @@ public class TeacherBusinessController {
             if(assignmentScoresViews.get(0).getScore() != null){
                 subScore += assignmentScoresViews.get(0).getScore();
                 subCount += 1;
-                totalScore += assignmentScoresViews.get(0).getScore();
-                count += 1;
             }
             for(int i = 1; i < assignmentScoresViews.size(); i++){
                 if(!Objects.equals(assignmentId, assignmentScoresViews.get(i).getAssignmentId())){
                     Assignment assignmentTemp = assignmentService.selectById(assignmentId);
-                    if(assignmentTemp.getEndTime() != null){
-                        infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                    }
-                    else{
-                        infoData.setEndTime(null);
-                    }
+                    TestPaper testPaper = testPaperService.selectById(assignmentTemp.getPaperId());
+                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
                     if(subCount > 0){
-                        infoData.setScore(new BigDecimal(subScore).divide(new BigDecimal(subCount), 2, RoundingMode.HALF_UP));
+                        infoData.setScore(new BigDecimal(subScore * 100).divide(new BigDecimal(subCount * testPaper.getTotalScore()), 2, RoundingMode.HALF_UP));
+                        totalScore +=infoData.getScore().doubleValue();
+                        count ++;
+                        data.add(infoData);
                     }
-                    else{
-                        infoData.setScore(null);
-                    }
-                    data.add(infoData);
                     assignmentId = assignmentScoresViews.get(i).getAssignmentId();
                     infoData = new HistoricalScoresResponse.infoData();
                     subScore = 0.0;
@@ -2174,31 +2167,24 @@ public class TeacherBusinessController {
                 if(assignmentScoresViews.get(i).getScore() != null){
                     subScore += assignmentScoresViews.get(i).getScore();
                     subCount += 1;
-                    totalScore += assignmentScoresViews.get(i).getScore();
-                    count += 1;
                 }
             }
             Assignment assignmentTemp = assignmentService.selectById(assignmentId);
-            if(assignmentTemp.getEndTime() != null){
-                infoData.setEndTime(assignmentTemp.getEndTime().toString());
-            }
-            else{
-                infoData.setEndTime(null);
-            }
+            TestPaper testPaper = testPaperService.selectById(assignmentTemp.getPaperId());
+            infoData.setEndTime(assignmentTemp.getEndTime().toString());
             if(subCount > 0){
-                infoData.setScore(new BigDecimal(subScore).divide(new BigDecimal(subCount), 2, RoundingMode.HALF_UP));
+                infoData.setScore(new BigDecimal(subScore * 100).divide(new BigDecimal(subCount * testPaper.getTotalScore()), 2, RoundingMode.HALF_UP));
+                totalScore +=infoData.getScore().doubleValue();
+                count ++;
+                data.add(infoData);
             }
-            else{
-                infoData.setScore(null);
-            }
-            data.add(infoData);
             if(count > 0){
                 response.setAvgScore(new BigDecimal(totalScore).divide(new BigDecimal(count), 2, RoundingMode.HALF_UP));
             }
             else{
                 response.setAvgScore(null);
             }
-            data.sort(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed());
+            data = data.stream().sorted(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed()).limit(10).toList();
             response.setData(data);
         }
         response.setMessage("success");
@@ -2209,7 +2195,7 @@ public class TeacherBusinessController {
     public ResponseEntity<HistoricalScoresResponse> getGroupHistoricalScores(@RequestParam Long groupId){
         HistoricalScoresResponse response = new HistoricalScoresResponse();
         List<HistoricalScoresResponse.infoData> data = new ArrayList<>();
-        List<AssignmentScoresView> assignmentScoresViews = assignmentScoresViewService.selectAvgScoresByClassId(groupId);
+        List<AssignmentScoresView> assignmentScoresViews = assignmentScoresViewService.selectByGroupId(groupId);
         if(assignmentScoresViews != null && !assignmentScoresViews.isEmpty()){
             assignmentScoresViews.sort(Comparator.comparing(AssignmentScoresView::getAssignmentId));
             Double totalScore = 0.0;
@@ -2221,25 +2207,18 @@ public class TeacherBusinessController {
             if(assignmentScoresViews.get(0).getScore() != null){
                 subScore += assignmentScoresViews.get(0).getScore();
                 subCount += 1;
-                totalScore += assignmentScoresViews.get(0).getScore();
-                count += 1;
             }
             for(int i = 1; i < assignmentScoresViews.size(); i++){
                 if(!Objects.equals(assignmentId, assignmentScoresViews.get(i).getAssignmentId())){
                     Assignment assignmentTemp = assignmentService.selectById(assignmentId);
-                    if(assignmentTemp.getEndTime() != null){
-                        infoData.setEndTime(assignmentTemp.getEndTime().toString());
-                    }
-                    else{
-                        infoData.setEndTime(null);
-                    }
+                    TestPaper testPaper = testPaperService.selectById(assignmentTemp.getPaperId());
+                    infoData.setEndTime(assignmentTemp.getEndTime().toString());
                     if(subCount > 0){
-                        infoData.setScore(new BigDecimal(subScore).divide(new BigDecimal(subCount), 2, RoundingMode.HALF_UP));
+                        infoData.setScore(new BigDecimal(subScore * 100).divide(new BigDecimal(subCount * testPaper.getTotalScore()), 2, RoundingMode.HALF_UP));
+                        totalScore +=infoData.getScore().doubleValue();
+                        count ++;
+                        data.add(infoData);
                     }
-                    else{
-                        infoData.setScore(null);
-                    }
-                    data.add(infoData);
                     assignmentId = assignmentScoresViews.get(i).getAssignmentId();
                     infoData = new HistoricalScoresResponse.infoData();
                     subScore = 0.0;
@@ -2248,31 +2227,24 @@ public class TeacherBusinessController {
                 if(assignmentScoresViews.get(i).getScore() != null){
                     subScore += assignmentScoresViews.get(i).getScore();
                     subCount += 1;
-                    totalScore += assignmentScoresViews.get(i).getScore();
-                    count += 1;
                 }
             }
             Assignment assignmentTemp = assignmentService.selectById(assignmentId);
-            if(assignmentTemp.getEndTime() != null){
-                infoData.setEndTime(assignmentTemp.getEndTime().toString());
-            }
-            else{
-                infoData.setEndTime(null);
-            }
+            TestPaper testPaper = testPaperService.selectById(assignmentTemp.getPaperId());
+            infoData.setEndTime(assignmentTemp.getEndTime().toString());
             if(subCount > 0){
-                infoData.setScore(new BigDecimal(subScore).divide(new BigDecimal(subCount), 2, RoundingMode.HALF_UP));
+                infoData.setScore(new BigDecimal(subScore * 100).divide(new BigDecimal(subCount * testPaper.getTotalScore()), 2, RoundingMode.HALF_UP));
+                totalScore +=infoData.getScore().doubleValue();
+                count ++;
+                data.add(infoData);
             }
-            else{
-                infoData.setScore(null);
-            }
-            data.add(infoData);
             if(count > 0){
                 response.setAvgScore(new BigDecimal(totalScore).divide(new BigDecimal(count), 2, RoundingMode.HALF_UP));
             }
             else{
                 response.setAvgScore(null);
             }
-            data.sort(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed());
+            data = data.stream().sorted(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed()).limit(10).toList();
             response.setData(data);
         }
         response.setMessage("success");
