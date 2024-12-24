@@ -15,4 +15,7 @@ public interface AssignmentScoresViewMapper {
 
     @Select("SELECT DISTINCT assignmentId,studentId,score FROM assignment_scores_view WHERE studentId = #{studentId}")
     List<AssignmentIdStudentIdScore> selectScoresByStudentId(Long studentId);
+
+    @Select("SELECT * FROM assignment_scores_view WHERE groupId = #{groupId}")
+    List<AssignmentScoresView> selectByGroupId(Long groupId);
 }

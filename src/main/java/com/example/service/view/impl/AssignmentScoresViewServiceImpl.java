@@ -29,4 +29,10 @@ public class AssignmentScoresViewServiceImpl implements AssignmentScoresViewServ
     public List<AssignmentIdStudentIdScore> selectScoresByStudentId(Long studentId) {
         return assignmentScoresViewMapper.selectScoresByStudentId(studentId);
     }
+
+    @Override
+    @Transactional
+    public List<AssignmentScoresView> selectByGroupId(Long groupId) {
+        return assignmentScoresViewMapper.selectByGroupId(groupId);
+    }
 }
