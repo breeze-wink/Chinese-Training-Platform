@@ -2415,4 +2415,128 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("{id}/watch-submission")
+    public ResponseEntity<WatchSubmissionResponse> watchSubmission(@PathVariable Long id, @RequestParam Long assignmentId, @RequestParam Long studentId) {
+        WatchSubmissionResponse response = new WatchSubmissionResponse();
+        List<WatchSubmissionResponse.QuestionInfo> data = new ArrayList<>();
+        AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, studentId);
+        int totalScore = 0;
+        if(assignmentSubmission != null){
+            response.setTotalScore(assignmentSubmission.getTotalScore());
+            List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
+            for(int i = 0; i < submissionAnswers.size(); i++){
+                SubmissionAnswer submissionAnswer = submissionAnswers.get(i);
+                WatchSubmissionResponse.QuestionInfo questionInfo = new WatchSubmissionResponse.QuestionInfo();
+                String [] sequenceTemp = submissionAnswer.getSequence().split("\\.");
+                questionInfo.setSequence(Integer.parseInt(sequenceTemp[0]));
+                if(sequenceTemp.length > 1){
+                    int scoreTemp = 0;
+                    List<WatchSubmissionResponse.SubQuestionInfo> subQuestions = new ArrayList<>();
+                    WatchSubmissionResponse.SubQuestionInfo subQuestionInfo = new WatchSubmissionResponse.SubQuestionInfo();
+                    Question question;
+                    try {
+                        question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    QuestionBody questionBody = questionBodyService.getQuestionBodyById(question.getBodyId());
+                    questionInfo.setBody(questionBody.getBody());
+                    subQuestionInfo.setQuestion(question.getContent());
+                    String [] answerAndExplanation = question.getAnswer().split("\\$\\$");
+                    subQuestionInfo.setAnswer(answerAndExplanation[0].replace("##", ";"));
+                    if(answerAndExplanation.length > 1){
+                        subQuestionInfo.setExplanation(answerAndExplanation[1]);
+                    }
+                    subQuestionInfo.setType(question.getType());
+                    if(question.getType().equals("CHOICE")){
+                        subQuestionInfo.setOptions(drawOptionsNew(question.getOptions()));
+                    }
+                    subQuestionInfo.setSubScore(submissionAnswer.getQuestionScore());
+                    subQuestionInfo.setStudentScore(submissionAnswer.getScore());
+                    scoreTemp += submissionAnswer.getQuestionScore();
+                    totalScore += submissionAnswer.getQuestionScore();
+                    subQuestionInfo.setStudentAnswer(submissionAnswer.getAnswerContent());
+                    subQuestionInfo.setSubmissionAnswerId(submissionAnswer.getId());
+                    subQuestions.add(subQuestionInfo);
+                    while(true){
+                        i ++;
+                        if(i >= submissionAnswers.size()){
+                            questionInfo.setScore(scoreTemp);
+                            questionInfo.setSubQuestions(subQuestions);
+                            data.add(questionInfo);
+                            break;
+                        }
+                        submissionAnswer = submissionAnswers.get(i);
+                        String [] temp = submissionAnswer.getSequence().split("\\.");
+                        if(Objects.equals(temp[0], sequenceTemp[0])){
+                            Question questionTemp;
+                            try {
+                                questionTemp = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                            WatchSubmissionResponse.SubQuestionInfo subQuestionInfoTemp = new WatchSubmissionResponse.SubQuestionInfo();
+                            subQuestionInfoTemp.setQuestion(questionTemp.getContent());
+                            String [] answerAndExplanationTemp = questionTemp.getAnswer().split("\\$\\$");
+                            subQuestionInfoTemp.setAnswer(answerAndExplanationTemp[0].replace("##", ";"));
+                            if(answerAndExplanationTemp.length > 1){
+                                subQuestionInfoTemp.setExplanation(answerAndExplanationTemp[1]);
+                            }
+                            subQuestionInfoTemp.setType(questionTemp.getType());
+                            if(questionTemp.getType().equals("CHOICE")){
+                                subQuestionInfoTemp.setOptions(drawOptionsNew(questionTemp.getOptions()));
+                            }
+                            subQuestionInfoTemp.setSubScore(submissionAnswer.getQuestionScore());
+                            subQuestionInfoTemp.setStudentScore(submissionAnswer.getScore());
+                            scoreTemp += submissionAnswer.getQuestionScore();
+                            totalScore += submissionAnswer.getQuestionScore();
+                            subQuestionInfoTemp.setStudentAnswer(submissionAnswer.getAnswerContent());
+                            subQuestionInfoTemp.setSubmissionAnswerId(submissionAnswer.getId());
+                            subQuestions.add(subQuestionInfoTemp);
+                        }
+                        else {
+                            i --;
+                            questionInfo.setScore(scoreTemp);
+                            questionInfo.setSubQuestions(subQuestions);
+                            data.add(questionInfo);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    Question question;
+                    try {
+                        question = questionService.getQuestionById(submissionAnswer.getQuestionId());
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if(question.getBodyId() != null){
+                        questionInfo.setBody(questionBodyService.getQuestionBodyById(question.getBodyId()).getBody());
+                    }
+                    questionInfo.setSubmissionAnswerId(submissionAnswer.getId());
+                    questionInfo.setQuestion(question.getContent());
+                    String [] answerAndExplanation = question.getAnswer().split("\\$\\$");
+                    questionInfo.setAnswer(answerAndExplanation[0].replace("##", ";"));
+                    if(answerAndExplanation.length > 1){
+                        questionInfo.setExplanation(answerAndExplanation[1]);
+                    }
+                    questionInfo.setType(question.getType());
+                    if(question.getType().equals("CHOICE")){
+                        questionInfo.setOptions(drawOptionsNew(question.getOptions()));
+                    }
+                    questionInfo.setStudentAnswer(submissionAnswer.getAnswerContent());
+                    questionInfo.setScore(submissionAnswer.getQuestionScore());
+                    questionInfo.setStudentScore(submissionAnswer.getScore());
+                    totalScore += submissionAnswer.getQuestionScore();
+                    data.add(questionInfo);
+                }
+            }
+        }
+        response.setTotalScore(totalScore);
+        response.setQuestions(data);
+        response.setMessage("success");
+        return ResponseEntity.ok(response);
+
+    }
 }

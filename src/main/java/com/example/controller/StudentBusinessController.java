@@ -995,7 +995,7 @@ public class StudentBusinessController {
                 Assignment assignment = assignmentService.selectById(assignmentId);
                 if(assignment != null){
                     List<PaperQuestion> paperQuestions = paperQuestionService.selectByPaperId(assignment.getPaperId());
-                    if(paperQuestions != null){
+                    if(paperQuestions != null && !paperQuestions.isEmpty()){
                         AssignmentSubmission submission = new AssignmentSubmission();
                         submission.setAssignmentId(assignmentId);
                         submission.setStudentId(id);
