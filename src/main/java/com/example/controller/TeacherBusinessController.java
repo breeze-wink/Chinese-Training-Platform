@@ -2423,7 +2423,7 @@ public class TeacherBusinessController {
         AssignmentSubmission assignmentSubmission = assignmentSubmissionService.selectByAssignmentIdAndStudentId(assignmentId, studentId);
         int totalScore = 0;
         if(assignmentSubmission != null){
-            response.setTotalScore(assignmentSubmission.getTotalScore());
+            response.setStudentTotalScore(assignmentSubmission.getTotalScore());
             List<SubmissionAnswer> submissionAnswers = submissionAnswerService.selectBySubmissionId(assignmentSubmission.getId());
             for(int i = 0; i < submissionAnswers.size(); i++){
                 SubmissionAnswer submissionAnswer = submissionAnswers.get(i);
