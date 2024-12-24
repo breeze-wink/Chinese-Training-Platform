@@ -1875,7 +1875,7 @@ public class TeacherBusinessController {
                         SubQuestion essayInfo = question.getSubQuestions().get(0);
                         essay.setContent(essayInfo.getQuestionContent());
                         essay.setType(essayInfo.getType());
-                        essay.setExplanation(essay.getExplanation());
+                        essay.setExplanation(essayInfo.getQuestionExplanation());
                         essay.setKnowledgePoint(essayInfo.getKnowledgePoint());
 
                         QuestionStatistic questionStatistic = questionStatisticService.findByIdAndType(question.getId(), "small");
