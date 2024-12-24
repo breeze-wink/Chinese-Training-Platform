@@ -2391,4 +2391,28 @@ public class TeacherBusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @DeleteMapping("/delete-assignment")
+    public ResponseEntity<Message> deleteAssignment(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam Long assignmentId) {
+        try {
+            Message response = new Message();
+            Assignment assignment = assignmentService.selectById(assignmentId);
+            if(assignment == null){
+                response.setMessage("作业不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            if(!Objects.equals(assignment.getCreatorId(), user.getId())){
+                response.setMessage("无权限");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            }
+            assignmentService.deleteAssignment(assignmentId);
+            response.setMessage("作业删除成功");
+            Teacher teacher = teacherService.getTeacherById(user.getId());
+            operationLogger.info("教师{}删除了作业{}", teacher.info(), assignment.info());
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            logger.error("删除作业失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }
