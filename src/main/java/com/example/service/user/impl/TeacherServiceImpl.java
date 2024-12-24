@@ -111,7 +111,7 @@ public class TeacherServiceImpl implements TeacherService {
     @Transactional
     public boolean ManagerEmailExist(String email) {
         Teacher teacher = teacherMapper.selectByEmail(email);
-        return teacher != null && Objects.equals(teacher.getPermission(), Teacher.Leader);
+        return teacher != null;
     }
 
     @Override

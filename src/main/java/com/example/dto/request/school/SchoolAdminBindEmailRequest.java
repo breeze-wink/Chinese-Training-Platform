@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class SchoolAdminBindEmailRequest {
     private String email;
+    private String code;
 }

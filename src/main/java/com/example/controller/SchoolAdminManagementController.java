@@ -33,10 +33,12 @@ import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import java.util.Objects;
+
 
 @RestController
 @RequestMapping("/api/school-admin")
-public class SchoolAdminManagementController {
+public class    SchoolAdminManagementController {
     private static final Logger logger = LoggerFactory.getLogger(SchoolAdminManagementController.class);
     private static final Logger operationLogger = LoggerFactory.getLogger("operations.schoolAdministrator");
     private final SchoolAdminService schoolAdminService;
@@ -187,13 +189,13 @@ public class SchoolAdminManagementController {
     }
 
 
-    @PostMapping("/{id}/bind-email")
+    @GetMapping("/{id}/bind-email")
     public ResponseEntity<Message> bindEmail(@PathVariable Long id, @RequestParam String newEmail, @RequestParam String code) {
-
         Message response = new Message();
         try {
             String verificationCode = emailCodeService.getCode("schoolAdmin", newEmail);
-            if(!verificationCode.equals(code)){
+            System.out.println(newEmail + " " + verificationCode);
+            if(!Objects.equals(verificationCode, code)){
                 response.setMessage("验证码错误或已失效");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
@@ -204,8 +206,8 @@ public class SchoolAdminManagementController {
             operationLogger.info("学校管理员 {} 设置邮箱为: {}", schoolAdmin.info(), newEmail);
             return ResponseEntity.ok(response);
         }catch (Exception e){
-            response.setMessage("邮箱更换失败");
-            logger.error("邮箱更换失败 {}", e.getMessage(), e);
+            response.setMessage("邮箱设置失败");
+            logger.error("邮箱设置失败 {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
