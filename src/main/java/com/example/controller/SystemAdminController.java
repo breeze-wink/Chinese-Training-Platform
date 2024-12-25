@@ -276,6 +276,11 @@ public class SystemAdminController {
         knowledgePoint.setDescription(request.getDescription());
         knowledgePoint.setType(request.getType());
         try {
+            if (knowledgePointService.isExist(knowledgePoint)) {
+                response.setMessage("知识点已存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
             knowledgePointService.addKnowledgePoint(knowledgePoint);
             response.setKnowledgePointId(knowledgePoint.getId());
             response.setMessage("知识点创建成功");

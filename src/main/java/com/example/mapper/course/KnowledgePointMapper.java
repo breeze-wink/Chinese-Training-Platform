@@ -29,4 +29,7 @@ public interface KnowledgePointMapper {
 
     @Select("SELECT DISTINCT type FROM knowledge_point WHERE knowledge_point.isHidden = false")
     List<String> selectAllTypes();
+
+    @Select("SELECT * from knowledge_point where name = #{name} and type = #{type}")
+    KnowledgePoint searchKnowledgePoint(KnowledgePoint knowledgePoint);
 }

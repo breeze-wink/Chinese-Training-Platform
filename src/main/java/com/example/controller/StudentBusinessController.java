@@ -1042,7 +1042,7 @@ public class StudentBusinessController {
                                         submissionAnswer.setSubmissionId(submission.getId());
                                         submissionAnswer.setQuestionId(question.getId());
                                         submissionAnswer.setSequence(paperQuestion.getSequence() + "." + indexTemp);
-                                        submissionAnswer.setQuestionScore(Integer.parseInt(scores[indexTemp - 1]));
+                                        submissionAnswer.setQuestionScore(Integer.parseInt(scores[indexTemp]));
                                         submissionAnswerService.insert(submissionAnswer);
                                         HomeworkDetailResponse.infoData infoData = new HomeworkDetailResponse.infoData();
                                         infoData.setSubmissionAnswerId(submissionAnswer.getId());

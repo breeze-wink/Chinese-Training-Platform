@@ -108,6 +108,11 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
     }
 
     @Override
+    public boolean isExist(KnowledgePoint knowledgePoint) {
+        return knowledgePointMapper.searchKnowledgePoint(knowledgePoint) != null;
+    }
+
+    @Override
     public Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> getAllKnowledgePointsGroupByType() {
         String cacheKey = "knowledgePointsGroupByType";
         Object object = redisTemplate.opsForValue().get(cacheKey);

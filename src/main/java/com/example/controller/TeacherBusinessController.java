@@ -1076,19 +1076,24 @@ public class TeacherBusinessController {
         HistoryScoresResponse response = new HistoryScoresResponse();
         try {
             List<HistoryScoresResponse.infoData> data = new ArrayList<>();
-            List<AssignmentSubmission> submissions = assignmentSubmissionService.selectByStudentId(studentId);
             List<AssignmentIdStudentIdScore> assignmentIdStudentIdScores = assignmentScoresViewService.selectScoresByStudentId(studentId);
             if(assignmentIdStudentIdScores != null && !assignmentIdStudentIdScores.isEmpty()){
                 for(AssignmentIdStudentIdScore assignmentIdStudentIdScore : assignmentIdStudentIdScores){
                     if(assignmentIdStudentIdScore.getScore() != null){
                         HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
-                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().toString());
-                        infoData.setScore(assignmentIdStudentIdScore.getScore());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().format(formatter));
+                        int paperScore = testPaperService.selectById(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getPaperId()).getTotalScore();
+                        infoData.setScore(100 * assignmentIdStudentIdScore.getScore() / paperScore);
                         data.add(infoData);
                     }
                 }
             }
-            data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed());
+            data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate));
+            if(data.size() > 10){
+                int l = data.size() - 10;
+                data = data.subList(l, data.size());
+            }
             response.setData(data);
             response.setMessage("历史成绩获取成功");
             Teacher teacher = teacherService.getTeacherById(id);
