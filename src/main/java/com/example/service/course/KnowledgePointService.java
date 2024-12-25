@@ -18,6 +18,8 @@ public interface KnowledgePointService {
 
     List<String> getAllTypes();
 
+    boolean isExist(KnowledgePoint knowledgePoint);
+
     Map<String, List<ListKnowledgeResponse.KnowledgePointInfo>> getAllKnowledgePointsGroupByType();
 
     void flushKnowledgePointCache();

@@ -179,7 +179,9 @@ public class SchoolAdminBusinessController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
             ClassStudent classStudent = classStudentService.getClassStudentByStudentId(studentId);
-            classService.removeStudentFromClass(classStudent.getClassId(), studentId);
+            if (classStudent != null) {
+                classService.removeStudentFromClass(classStudent.getClassId(), studentId);
+            }
             student.setSchoolId(null);
             studentService.updateStudent(student);
             if (student.getName() != null && schoolAdmin.getName() != null) {
