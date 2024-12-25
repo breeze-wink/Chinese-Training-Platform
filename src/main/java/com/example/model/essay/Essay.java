@@ -13,6 +13,7 @@ public class Essay {
     private String title;
     private byte[] content;
     private LocalDate submitDate;
+    private Long teacherId;
 
     // Constructors
     public Essay() {}

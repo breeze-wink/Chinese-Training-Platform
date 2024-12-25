@@ -18,5 +18,6 @@ public class GetEssaysResponse {
         private Long id;
         private String title;
         private LocalDate date;
+        private boolean canDelete;
     }
 }

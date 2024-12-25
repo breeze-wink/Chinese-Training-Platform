@@ -2293,6 +2293,7 @@ public class TeacherBusinessController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO:
     @PostMapping("/upload-essay")
     public ResponseEntity<UploadEssayResponse> uploadEssay(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam("file") MultipartFile file, @RequestParam("executedDate") LocalDate executedDate) {
         UploadEssayResponse response = new UploadEssayResponse();
@@ -2307,6 +2308,7 @@ public class TeacherBusinessController {
             essay.setTitle(title);
             essay.setContent(file.getBytes());
             essay.setSubmitDate(executedDate);
+            essay.setTeacherId(user.getId());
             essayService.createEssay(essay);
 
             response.setMessage("作文上传成功");
@@ -2322,6 +2324,7 @@ public class TeacherBusinessController {
         }
     }
 
+    //TODO
     @GetMapping("/view-essays")
     public ResponseEntity<GetEssaysResponse> getEssays(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user) {
         try {
@@ -2329,11 +2332,13 @@ public class TeacherBusinessController {
             List<GetEssaysResponse.InfoData> data = new ArrayList<>();
             List<Essay> essays = essayService.getAllEssays();
             if(essays != null && !essays.isEmpty()){
+                Long teacherId = user.getId();
                 for(Essay essay : essays){
                     GetEssaysResponse.InfoData infoData = new GetEssaysResponse.InfoData();
                     infoData.setId(essay.getId());
                     infoData.setTitle(essay.getTitle());
                     infoData.setDate(essay.getSubmitDate());
+                    infoData.setCanDelete(essay.getTeacherId().equals(teacherId));
                     data.add(infoData);
                 }
             }
@@ -2342,6 +2347,25 @@ public class TeacherBusinessController {
             return ResponseEntity.ok(response);
         } catch (Exception e){
             logger.error("老师获取作文失败，错误信息: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping("/delete-essay")
+    public ResponseEntity<Message> deleteEssay(@AuthenticationPrincipal @Parameter(hidden = true) BaseUser user, @RequestParam Long essayId) {
+        try {
+            Message response = new Message();
+            Essay essay = essayService.getEssayById(essayId);
+            if(!Objects.equals(essay.getTeacherId(), user.getId())){
+                response.setMessage("无权限");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            essayService.deleteEssay(essayId);
+            response.setMessage("作文删除成功");
+            operationLogger.info("教师{}删除了作文{}", user.getUsername(), essay.getTitle());
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            logger.error("老师删除作文失败，错误信息: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
