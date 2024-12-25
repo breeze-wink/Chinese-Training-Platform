@@ -2184,7 +2184,11 @@ public class TeacherBusinessController {
             else{
                 response.setAvgScore(null);
             }
-            data = data.stream().sorted(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed()).limit(10).toList();
+            data.sort(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime));
+            if(data.size() > 10){
+                int l = data.size() - 10;
+                data = data.subList(l, data.size());
+            }
             response.setData(data);
         }
         response.setMessage("success");
@@ -2244,7 +2248,11 @@ public class TeacherBusinessController {
             else{
                 response.setAvgScore(null);
             }
-            data = data.stream().sorted(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime).reversed()).limit(10).toList();
+            data.sort(Comparator.comparing(HistoricalScoresResponse.infoData::getEndTime));
+            if(data.size() > 10){
+                int l = data.size() - 10;
+                data = data.subList(l, data.size());
+            }
             response.setData(data);
         }
         response.setMessage("success");

@@ -86,6 +86,7 @@ public class StudentBusinessController {
     private final SubmissionAnswerService submissionAnswerService;
     private final StudentStatsViewService studentStatsViewService;
     private final AssignmentScoresViewService assignmentScoresViewService;
+    private final TestPaperService testPaperService;
 
     @Autowired
     public StudentBusinessController (PracticeServiceImpl practiceService,
@@ -105,7 +106,8 @@ public class StudentBusinessController {
                                       SubmissionAnswerServiceImpl submissionAnswerService,
                                       StudentServiceImpl studentService,
                                       StudentStatsViewServiceImpl studentStatsViewService,
-                                      AssignmentScoresViewServiceImpl assignmentScoresViewService
+                                      AssignmentScoresViewServiceImpl assignmentScoresViewService,
+                                      TestPaperServiceImpl testPaperService
                                       ) {
         this.practiceService = practiceService;
         this.knowledgePointService = knowledgePointService;
@@ -125,6 +127,7 @@ public class StudentBusinessController {
         this.studentService = studentService;
         this.studentStatsViewService = studentStatsViewService;
         this.assignmentScoresViewService = assignmentScoresViewService;
+        this.testPaperService = testPaperService;
     }
 
     @GetMapping("/{id}/get-unfinished-practice-list")
@@ -894,12 +897,17 @@ public class StudentBusinessController {
                         HistoryScoresResponse.infoData infoData = new HistoryScoresResponse.infoData();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                         infoData.setDate(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getEndTime().format(formatter));
-                        infoData.setScore(assignmentIdStudentIdScore.getScore());
+                        int paperScore = testPaperService.selectById(assignmentService.selectById(assignmentIdStudentIdScore.getAssignmentId()).getPaperId()).getTotalScore();
+                        infoData.setScore(100 * assignmentIdStudentIdScore.getScore() / paperScore);
                         data.add(infoData);
                     }
                 }
             }
-            data = data.stream().sorted(Comparator.comparing(HistoryScoresResponse.infoData::getDate).reversed()).limit(10).toList();
+            data.sort(Comparator.comparing(HistoryScoresResponse.infoData::getDate));
+            if(data.size() > 10){
+                int l = data.size() - 10;
+                data = data.subList(l, data.size());
+            }
             response.setData(data);
             response.setMessage("历史成绩获取成功");
             operationLogger.info("学生{}获取历史成绩", studentService.getStudentById(id).info());
