@@ -207,4 +207,10 @@ public class KnowledgePointServiceImpl implements KnowledgePointService {
 
     }
 
+    @Override
+    @Transactional
+    public KnowledgePoint selectByNameAndType(String name, String type) {
+        return knowledgePointMapper.selectByNameAndType(name, type);
+    }
+
 }

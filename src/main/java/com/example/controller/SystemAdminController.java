@@ -321,12 +321,17 @@ public class SystemAdminController {
                                                         @PathVariable Long id,
                                                         @RequestBody CreateKnowledgePointRequest request) {
         Message response = new Message();
-        KnowledgePoint knowledgePoint = knowledgePointService.getKnowledgePointById(id);
-        if (knowledgePoint == null) {
-            response.setMessage("知识点更新失败，id不匹配");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
         try {
+            KnowledgePoint knowledgePoint = knowledgePointService.getKnowledgePointById(id);
+            if (knowledgePoint == null) {
+                response.setMessage("knowledgePointId不存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            KnowledgePoint knowledgePointTemp = knowledgePointService.selectByNameAndType(request.getName(), request.getType());
+            if(knowledgePointTemp != null && !knowledgePointTemp.getId().equals(id)){
+                response.setMessage("知识点已存在");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             knowledgePoint.setName(request.getName());
             knowledgePoint.setDescription(request.getDescription());
             knowledgePoint.setType(request.getType());

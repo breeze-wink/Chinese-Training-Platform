@@ -31,4 +31,6 @@ public interface KnowledgePointService {
 
     void syncToRedis(KnowledgePoint knowledgePoint);
 
+    KnowledgePoint selectByNameAndType(String name, String type);
+
 }

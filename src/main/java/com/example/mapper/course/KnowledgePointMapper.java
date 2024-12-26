@@ -32,4 +32,7 @@ public interface KnowledgePointMapper {
 
     @Select("SELECT * from knowledge_point where name = #{name} and type = #{type}")
     KnowledgePoint searchKnowledgePoint(KnowledgePoint knowledgePoint);
+
+    @Select("SELECT * from knowledge_point where name = #{name} and type = #{type}")
+    KnowledgePoint selectByNameAndType(String name, String type);
 }
